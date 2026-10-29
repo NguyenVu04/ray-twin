@@ -1,6 +1,8 @@
 # --- Coding agents ---
 .claude/
+CLAUDE.md
 CLAUDE.local.md
+AGENTS.md
 .codex/
 .cursor/
 .aider*

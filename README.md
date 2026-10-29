@@ -13,7 +13,9 @@ RayTwin is a Rust ray-tracing engine that calculates versioned 3D radio maps and
 | **Contact** | [GitHub Issues](https://github.com/NguyenVu04/ray-twin/issues) |
 | **Source of record** | <https://github.com/NguyenVu04/ray-twin> |
 | **Issue tracker** | <https://github.com/NguyenVu04/ray-twin/issues> |
-| **Design document** | [`technical-report.html`](technical-report.html) (Vietnamese, version 1.0, 29 October 2026) |
+| **Design document** | [`docs/technical-report.html`](docs/technical-report.html) (Vietnamese, version 1.1, 29 October 2026) |
+| **Architecture** | [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) |
+| **Decisions** | [`docs/adr/`](docs/adr/README.md) |
 
 ## Contents
 
@@ -108,7 +110,9 @@ One Rust core crate serves two execution modes. Library mode runs everything in 
 
 ```mermaid
 flowchart LR
-    CL["Client<br/>Python or gRPC"] -->|"job: manifest hash, seed"| CO["Coordinator"]:::hl
+    CL["Client<br/>Python or any NATS client"] -->|"submit, cancel: snapshot id"| CO["Coordinator"]:::hl
+    CO -->|"job state"| KV[("JetStream KV<br/>RAYTWIN_JOBS")]
+    KV -.->|"watch"| CL
     CO -->|"tasks: Tx × ray batch"| TQ[("JetStream<br/>RAYTWIN_TASKS")]
     TQ -->|"pull, batch = 1"| W1["Worker<br/>CPU"]
     TQ -->|"pull, batch = 1"| W2["Worker<br/>GPU"]
@@ -128,10 +132,10 @@ In library mode, the Python API calls `raytwin-core` in the same process. Librar
 ### Design principles
 
 1. **Separate the core from the runtime.** `raytwin-core` contains all the physics. The distributed layer and the Python layer are thin wrappers. Thus the two modes give the same results.
-2. **Immutable snapshots, identified by content hash.** The manifest contains the geometry, material field, antennas, bands, and solver parameters. Workers cache data by hash, so they do not need to synchronize state.
+2. **Immutable snapshots, identified by content hash.** The manifest contains the geometry, material field, antennas, bands, and solver parameters, including the seed. The snapshot id does not include URIs. RayTwin checks the hash of each input when it reads the input, and it never overwrites an object. Workers cache data by hash, so they do not need to synchronize state ([ADR 0002](docs/adr/0002-snapshot-identity-and-path-based-storage.md)).
 3. **Split work by transmitter × ray batch.** A radio map is an incoherent sum of power. Thus the sum of partial maps is equal to the full map. For a very large area, RayTwin also splits the area into tiles with a buffer zone.
-4. **Plugins through traits.** Each extension point is a Rust trait. The MVP registers plugins statically at compile time. Dynamic plugins (WASM or gRPC services) come after the MVP.
-5. **Determinism.** The seed comes from (job, Tx, ray batch). The result does not depend on the number of workers or on the processing order. This also makes it safe to run a task again after a worker failure.
+4. **Internal traits, no plugin API in release 0.1.** A trait exists only where two or more implementations exist. In the MVP that is only `Backend`. Materials, antennas, interactions, and map accumulation are concrete types ([ADR 0007](docs/adr/0007-no-public-plugin-api-in-release-0-1.md)).
+5. **Determinism.** The random-number key is (manifest seed, Tx), and the counter is (global ray index, bounce). The key contains no job id and no batch index. Every backend and every partial result accumulates with 64-bit fixed-point integers. Thus the result does not depend on thread count, worker count, batch size, or merge order. Two jobs that compare two tilt values use the same random numbers. This also makes it safe to run a task again after a worker failure ([ADR 0003](docs/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md)).
 6. **One trace, many bands.** All bands share the path geometry. Each worker calculates the field and the accumulation for all bands of its ray batch.
 
 ### Components
@@ -139,13 +143,13 @@ In library mode, the Python API calls `raytwin-core` in the same process. Librar
 | Component | Responsibility | Location |
 |---|---|---|
 | `raytwin-core` | Geometry, BVH, SBR, image method, materials, antennas, voxel radio map, CIR. No network or Python dependency. | `raytwin-core` crate (planned) |
-| `raytwin-store` | Read and write snapshots, manifests, Zarr, and Parquet through `object_store` (local, S3, MinIO). | `raytwin-store` crate (planned) |
-| `raytwin-dist` | Coordinator, worker, task queue on NATS JetStream, gRPC API. | `raytwin-dist` crate (planned) |
+| `raytwin-store` | Read and write snapshots, manifests, and Zarr arrays through `object_store` (local, S3, MinIO). Check input hashes. Parse Mitsuba XML and PLY. | `raytwin-store` crate (planned) |
+| `raytwin-dist` | Coordinator, worker, task queue on NATS JetStream, NATS job protocol (submit, cancel, job state). Binary `raytwin` with the subcommands `coordinator` and `worker`. | `raytwin-dist` crate (planned) |
 | `raytwin-py` (package `raytwin`) | PyO3 binding: native API, `raytwin.compat` (Sionna-compatible names), `raytwin.calib` (PyTorch calibration). | `raytwin-py` crate (planned) |
 
 ### Data model: snapshot and manifest
 
-A manifest describes all inputs of one simulation. The hash of the manifest identifies the snapshot. Two runs with the same hash give the same result. When calibration makes a new material field, only the field gets a new version. The geometry and the antennas keep their hashes.
+A manifest describes all inputs of one simulation. The hash of the manifest identifies the snapshot. Two runs with the same hash give the same result. The hash covers the canonical manifest (RFC 8785) without its URI fields. Thus the same scene on local disk, MinIO, or S3 gets the same snapshot id. Inputs stay at the paths that the user selects. RayTwin checks each hash when it reads the input, and it writes every object create-only. When calibration makes a new material field, only the field gets a new version. The geometry and the antennas keep their hashes.
 
 Example manifest (illustrative, not a fixed format):
 
@@ -153,7 +157,8 @@ Example manifest (illustrative, not a fixed format):
 {
   "schema": "raytwin.manifest/v1",
   "scene": { "uri": "s3://raytwin/scenes/munich/munich.xml", "hash": "blake3:9f2c…" },
-  "materials": { "prior": "itu-classes", "field": "s3://raytwin/fields/munich.zarr", "version": 3 },
+  "materials": { "prior": "itu-classes",
+                 "field": { "uri": "s3://raytwin/fields/munich/v3.zarr", "hash": "blake3:7a01…" } },
   "bands": [
     { "id": "b3",  "f_center": 1.8e9, "bandwidth": 2.0e7, "n_sub": 1 },
     { "id": "n78", "f_center": 3.5e9, "bandwidth": 1.0e8, "n_sub": 1 }
@@ -172,12 +177,12 @@ Example manifest (illustrative, not a fixed format):
 | | Library mode | Distributed mode |
 |---|---|---|
 | Processes | One process | Client, coordinator, N workers |
-| Task queue | `LocalQueue` in memory | `JetStreamQueue` on NATS JetStream |
+| Task dispatch | Parallel iteration over the tasks (`rayon`), no queue | NATS JetStream pull consumer |
 | Compute | CPU (rayon) or GPU (wgpu) | Each worker uses the CPU or GPU of its machine |
 | Storage | Local disk is sufficient | S3 or MinIO |
 | Use | Research, notebooks, CI | Large areas, many transmitters |
 
-The two modes use the same `Task` type and the same `TaskQueue` trait. The compute core does not know which mode it runs in.
+The two modes use the same `Task` type and the same two functions, `run_task` and `merge`. The compute core does not know which mode it runs in ([ADR 0001](docs/adr/0001-one-core-two-runtime-modes.md)).
 
 ### Work distribution with NATS JetStream
 
@@ -193,7 +198,7 @@ sequenceDiagram
     participant J as JetStream
     participant W as Worker
     participant S as Object store
-    C->>K: Submit job (manifest hash, seed)
+    C->>K: Submit job (NATS request, snapshot id)
     K->>S: Check snapshot
     K->>J: Publish N tasks (Tx × ray batch)
     loop Until no task remains
@@ -218,61 +223,42 @@ sequenceDiagram
 | The worker sends in-progress acks more frequently than `AckWait` (default 30 s). | A ray batch can run longer than 30 s. Without the ack, JetStream gives the same task to a second worker. |
 | `MaxDeliver` is finite (for example 5). The coordinator monitors the advisories. | The default value (−1) gives a permanently failing task again without limit. The coordinator must mark the job as failed. |
 | A message contains only references: manifest hash, Tx, ray range, result key. | Messages stay much smaller than the 1 MB `max_payload` default. Large data goes through S3 or MinIO. |
-| Worker order: write result, then publish the "done" event, then ack. | If a worker stops at any step, the task runs again with the same result. The overwrite is safe. The coordinator deduplicates events by task ID. |
-| Stream `RAYTWIN_EVENTS` for completion events. A KV bucket can hold job state. | The coordinator tracks progress without a listing of the object store. |
+| Worker order: write result, then publish the "done" event, then ack. | If a worker stops at any step, the task runs again with the same result. The second write is create-only, and it counts as success when the hash agrees. The coordinator deduplicates events by task ID. |
+| Stream `RAYTWIN_EVENTS` for completion and failure events. KV bucket `RAYTWIN_JOBS` for job state. | The coordinator tracks progress without a listing of the object store. |
+| Subjects per job: `raytwin.tasks.<job>.<task>`. | The coordinator can purge all queued tasks of one job when the job is cancelled or fails ([ADR 0004](docs/adr/0004-work-distribution-with-nats-jetstream.md)). |
+| Three task kinds: `radio_map` (Tx × ray batch, merged by integer addition), `paths` and `tape` (Tx × receiver group or MDT sample group, merged by concatenation in task order). | Calibration also runs in distributed mode. `paths` and `tape` need no global deduplication. |
+| Clients submit with a request on `raytwin.jobs.submit` and cancel with a request on `raytwin.jobs.cancel`. They watch the job state in the KV bucket. | One protocol serves clients and workers. The coordinator and the workers open no listening port ([ADR 0005](docs/adr/0005-nats-as-the-client-protocol.md)). |
+| The job id is the hash of the canonical job spec. | A second submission is safe. A running job returns its state, a finished job returns its result, and a failed or cancelled job runs again. |
+| To cancel, the coordinator sets the state to `cancelled` and purges the queued tasks. A worker reads the state at each in-progress tick and stops between two ray sub-batches. | No new task of the job starts after the reply. A running task stops within about one tick (10 s). |
 
 Example task message:
 
 ```json
-{ "job": "job-0192", "task": 37, "manifest": "blake3:4c1e…", "kind": "radio_map",
-  "tx": "cell-17", "rays": [37000000, 38000000], "seed_key": ["job-0192", "cell-17", 37],
-  "out": "s3://raytwin/jobs/job-0192/parts/37.zarr" }
+{ "job": "4c1e…", "task": 37, "kind": "radio_map",
+  "snapshot": "blake3:9a7d…", "manifest": "s3://raytwin/snapshots/9a7d….json",
+  "tx": "cell-17", "rays": [37000000, 38000000], "scale": 1.0e-12,
+  "out": "s3://raytwin/jobs/4c1e…/parts/37.zarr" }
 ```
 
 For CIR jobs, the coordinator splits tasks by (Tx, receiver group), not by ray batch. With a split by ray batch, two workers can find the same path, and a global deduplication becomes necessary.
 
-### Plugin extension points
+### Extension points
 
-Each extension point is a Rust trait. A new plugin, for example a UTD diffraction model, a vendor antenna pattern, or an MLP material field, implements the trait and registers itself. The signatures below are illustrative.
+**Decided.** Release 0.1 has no public plugin API ([ADR 0007](docs/adr/0007-no-public-plugin-api-in-release-0-1.md)). A WGSL shader cannot call a Rust trait object, so a plugin trait would not run on the GPU backends. The only trait is the internal seam `Backend`, which has three implementations. It is not part of the stable API. The signature below is illustrative.
 
 ```rust
-/// Runs the full pipeline: Cpu (rayon + obvhs), GpuCompute (WGSL, own BVH traversal),
-/// GpuRayQuery (Vulkan, RT cores). Same input and seed give the same result within 1e-4.
+/// Cpu (rayon + obvhs), GpuCompute (WGSL, own BVH traversal), GpuRayQuery (Vulkan, RT cores).
+/// Same input and seed: bit-identical between runs. GPU within 1e-4 of the CPU.
 pub trait Backend: Send + Sync {
     fn caps(&self) -> BackendCaps; // ray query, f64, 64-bit atomics, VRAM
     fn upload(&mut self, snapshot: &Snapshot) -> Result<()>;
-    fn trace_map(&self, task: &MapTask, sink: &mut dyn RadioMapSink) -> Result<()>;
-    fn trace_paths(&self, task: &PathTask) -> Result<Paths>; // SBR + per-element image method
-}
-
-/// Material parameters at position x, for semantic class class_id and frequency f.
-pub trait MaterialField: Send + Sync {
-    fn eval(&self, x: [f32; 3], class_id: u16, f_hz: f64) -> MaterialParams; // eps_r, sigma, thickness
-}
-
-/// Interaction model: Jones matrix and the probability to select each interaction.
-pub trait InteractionModel: Send + Sync {
-    fn sample(&self, hit: &Hit, m: &MaterialParams, f_ref: f64, u: f32) -> Interaction;
-    fn jones(&self, hit: &Hit, m: &MaterialParams, kind: InteractionKind, f_hz: f64) -> Jones2x2;
-}
-
-/// Antenna pattern per (cell, band): the two field components along theta and phi.
-pub trait AntennaPattern: Send + Sync {
-    fn field(&self, theta: f32, phi: f32, f_hz: f64) -> [Complex32; 2];
-}
-
-/// Radio-map sink: accumulate per (band, voxel), merge two partial maps.
-pub trait RadioMapSink: Send {
-    fn accumulate(&mut self, band: usize, voxel: u32, power_times_length: f32);
-    fn merge(&mut self, other: &Self);
-}
-
-/// Task queue: LocalQueue (rayon) or JetStreamQueue (async-nats).
-pub trait TaskQueue: Send + Sync {
-    fn submit(&self, tasks: Vec<Task>) -> Result<JobId>;
-    fn next(&self) -> Result<Option<Leased<Task>>>; // Leased: ack, nak, in_progress
+    fn trace_map(&self, task: &MapTask, cancel: &CancelFlag) -> Result<FixedPointMap>;
+    fn trace_paths(&self, task: &PathTask, cancel: &CancelFlag) -> Result<Paths>; // SBR + per-element image method
+    fn trace_tape(&self, task: &TapeTask, cancel: &CancelFlag) -> Result<Tape>; // frozen paths for calibration
 }
 ```
+
+The other points are concrete types. `MaterialField` is a struct (ITU class prior plus δ grid). `AntennaPattern` is an enum (isotropic, dipole, TR 38.901). Interactions are functions (specular reflection, thin-slab transmission). After the MVP, a plugin API can keep the same signatures. Plugin jobs then run on the CPU first. Later, the core samples a plugin into a grid or a table that the GPU can read.
 
 ### External dependencies
 
@@ -285,10 +271,9 @@ Criticality states the effect on RayTwin when the dependency is not available. *
 | `rayon` | Data-parallel loops on CPU threads | Critical | rayon maintainers |
 | `object_store` | Access to local disk, S3, and MinIO | Critical | Apache Arrow |
 | `zarrs` | Chunked N-dimensional arrays (radio maps, material field) | Critical | zarrs maintainers |
-| `async-nats` (JetStream) | Task queue in distributed mode | Degraded (library mode remains) | NATS (Synadia) |
+| `async-nats` (JetStream) | Task queue and client job protocol in distributed mode | Degraded (library mode remains) | NATS (Synadia) |
 | NATS server with JetStream | Message broker in distributed mode | Degraded (library mode remains) | NATS (Synadia) |
 | S3 or MinIO | Snapshot and result storage in distributed mode | Degraded (local disk remains) | Deployment operator |
-| `tonic` | gRPC client API | Degraded | tonic maintainers |
 | PyO3, maturin, `rust-numpy` | Python binding, wheels, zero-copy arrays | Degraded (Rust API remains) | PyO3 project |
 | PyTorch | Calibration loop | Degraded (no calibration) | PyTorch Foundation |
 | Sionna RT 2.2.0 (pinned) | Reference oracle in CI, generator of simulated MDT | Optional at runtime, critical for CI | NVIDIA |
@@ -498,7 +483,7 @@ flowchart TB
         S4["Image method<br/>+ blockage check"] --> S5["τ, angles, Jones matrices,<br/>element pattern, per band"]
     end
     S3 --> S4
-    S5 --> S6[("Paths: a[rx, rx_ant, tx, tx_ant, path, band]<br/>CIR/CFR, Parquet")]:::store
+    S5 --> S6[("Paths: a[rx, rx_ant, tx, tx_ant, path, band]<br/>CIR/CFR, Zarr")]:::store
     classDef hl fill:#DCE8FA,stroke:#2F5FB3,color:#13233F,stroke-width:2px
     classDef store fill:#EAF6EE,stroke:#4E9A6A,color:#16301F
 ```
@@ -585,7 +570,7 @@ flowchart TB
     RQ --> WAVE
     CS --> WAVE
     WAVE --> IM["Image method in f64<br/>per element pair<br/>+ blockage check"]
-    IM --> OUT[("Radio map: Zarr<br/>CIR: Parquet")]:::store
+    IM --> OUT[("Radio map: Zarr<br/>CIR: Zarr")]:::store
     classDef hl fill:#DCE8FA,stroke:#2F5FB3,color:#13233F,stroke-width:2px
     classDef ext fill:#F1F3F6,stroke:#8A96A8,color:#1D2433
     classDef store fill:#EAF6EE,stroke:#4E9A6A,color:#16301F
@@ -597,7 +582,7 @@ The two GPU paths differ only in the hit search. All other steps share the same 
 |---|---|---|---|
 | Hit search | obvhs, CWBVH with SIMD traversal | Flat BVH, stack traversal in WGSL | `rayQuery` on TLAS/BLAS with RT cores |
 | Material lookup | `MaterialField::eval` | Field chunks in a storage buffer, trilinear interpolation in the shader | Same as compute shader |
-| Voxel accumulation | Per-thread sums, merged in a fixed order | 64-bit integer atomics on fixed-point values | Same as compute shader |
+| Voxel accumulation | 64-bit fixed-point integers, per-thread sums | 64-bit integer atomics on fixed-point values | Same as compute shader |
 | CIR candidates, deduplication | Dynamic hash table | Append buffer + atomic hash table, sorted before output | Same as compute shader |
 | Image method, blockage | f64 | f64 in the shader (`SHADER_F64`), any-hit with the BVH | f64 in the shader, any-hit with ray query |
 
@@ -605,8 +590,8 @@ The two GPU paths differ only in the hit search. All other steps share the same 
 
 **Decided.** With the same seed, each GPU path gives a bit-identical result between runs. The difference from the CPU result is at most $10^{-4}$ relative. A GPU runs thousands of threads in no fixed order. The design thus removes every dependency on order:
 
-1. **Counter-based random numbers (Philox).** The random numbers of each ray come from the key (job, Tx, ray ID, bounce). They do not depend on which thread runs first.
-2. **Fixed-point accumulation.** Each contribution $P\cdot\ell$ becomes an integer. A 64-bit atomic add sums it. Integer addition is commutative and associative, so the sum does not depend on order. Atomic floating-point addition does depend on order.
+1. **Counter-based random numbers (Philox).** The random numbers of each ray come from the key (manifest seed, Tx) and the counter (global ray ID, bounce). They do not depend on which thread runs first. The key contains no job id, so two jobs that compare two configurations use the same random numbers.
+2. **Fixed-point accumulation in every backend.** The CPU backend and every partial result use the same representation as the GPU. Each contribution $P\cdot\ell$ becomes an integer. A 64-bit atomic add sums it. Integer addition is commutative and associative, so the sum does not depend on order. Atomic floating-point addition does depend on order.
 3. **Sorted path lists.** Paths go into an append buffer in any order. RayTwin sorts them by (Tx, Rx, primitive sequence) before output. For duplicates, it keeps the candidate with the smallest ray ID (atomic min).
 
 ```math
@@ -615,7 +600,7 @@ q_v = \sum_i \operatorname{round}\!\left(\frac{P_i\,\ell_{i,v}}{s}\right) \in \m
 10\log_{10}2^{63} \approx 190\ \mathrm{dB}
 ```
 
-RayTwin selects the scale $s$ per job from the transmit power, the ray count, and the voxel size. The largest sum must stay below $2^{63}$. The dynamic range of about 190 dB is sufficient for RSRP maps. A contribution smaller than $s$ rounds to 0. For example, a contribution of $3.7\cdot10^{-9}$ with $s = 10^{-12}$ is stored as 3700. If an adapter has no 64-bit atomics, two 32-bit atomics with carry emulate the 64-bit add. The result stays deterministic.
+RayTwin selects the scale $s$ per job from the transmit power, the ray count, and the voxel size. The largest sum must stay below $2^{63}$. The dynamic range of about 190 dB is sufficient for RSRP maps. A contribution smaller than $s$ rounds to 0. For example, a contribution of $3.7\cdot10^{-9}$ with $s = 10^{-12}$ is stored as 3700. The job plan fixes $s$ one time, and every task of the job carries the same $s$. An adapter without 64-bit atomics uses the CPU backend. RayTwin has no 32-bit emulation of 64-bit atomics ([ADR 0006](docs/adr/0006-gpu-backends-through-wgpu.md)).
 
 ### Numerical precision of the CIR
 
@@ -724,6 +709,8 @@ flowchart TD
 
 The tape ignores one effect: the set of paths changes with the materials. The reason is that the Fresnel coefficients set the probability to select reflection or transmission. For this reason, the loop traces rays again after every $K$ iterations. The optimization runs in PyTorch, so a researcher can test loss functions, optimizers, and regularization without a Rust rebuild.
 
+**Decided.** Tapes run in both modes ([ADR 0008](docs/adr/0008-calibration-on-frozen-paths-in-pytorch.md)). In library mode, the tape arrays are NumPy views on Rust memory, with no copy. In distributed mode, a job of kind `tape` writes the tapes in Zarr, and Python reads them into NumPy. The Fresnel and thin-slab formulas exist in Rust and in PyTorch. A CI test requires that both agree within $10^{-6}$ when $\delta = 0$.
+
 ### Twin experiment with simulated MDT
 
 **Decided.** The MVP has no real measurement data. The v0 calibration is thus tested with a twin experiment on example scenes:
@@ -777,7 +764,7 @@ Not available yet. The configuration settings are not defined. The [snapshot man
 
 ## Usage
 
-Not available yet. The Python API and the gRPC API are in design. [Execution modes](#execution-modes) describes the planned job flow.
+Not available yet. The Python API and the NATS job protocol are in design. [Execution modes](#execution-modes) describes the planned job flow.
 
 ## Development
 
@@ -785,7 +772,7 @@ Not available yet. [Components](#components) describes the planned crate layout.
 
 ## Testing
 
-Not available yet. The planned validation is the four gates in [Roadmap](#roadmap). CI will compare each physics change with Sionna RT 2.2.0 as a reference oracle.
+Not available yet. The planned validation is the four gates in [Roadmap](#roadmap). CI will compare each physics change with Sionna RT 2.2.0 as a reference oracle. GPU tests will run on a self-hosted runner only for trusted pull requests, or for a fork after the owner adds the `gpu-ok` label ([ADR 0010](docs/adr/0010-trusted-pull-requests-on-the-gpu-runner.md)).
 
 ## Build and deployment
 
@@ -821,7 +808,7 @@ flowchart TD
     G2{{"Gate 2<br/>distributed = single machine"}}:::gate
     C9["9. Simulated MDT<br/>calibration v0 with PyTorch"]
     G3{{"Calibration v0<br/>acceptance"}}:::gate
-    C10["10. Plugin API, docs,<br/>release 0.1"]:::hl
+    C10["10. Docs,<br/>release 0.1"]:::hl
     C1 --> C2
     C2 --> C3
     C2 --> C4
@@ -851,9 +838,9 @@ flowchart TD
 | 5 | Oracle comparison in CI | Regression test suite with Sionna RT as the oracle. | 3, 4 |
 | 6 | GPU backend | wgpu compute shader and ray query, selected at run time. Full pipeline on GPU. | Gate 1 |
 | 7 | Material field and Python | Versioned δ grid. `raytwin`, `raytwin.compat`, `raytwin.calib`. Wheels for 3 operating systems. | Gate 1 |
-| 8 | Distributed mode | Coordinator, worker, NATS JetStream, gRPC, Docker Compose + MinIO. | Gate 1 |
+| 8 | Distributed mode | Coordinator, worker, NATS JetStream (tasks, events, job state, cancellation), tape jobs, Docker Compose + MinIO. | Gate 1 |
 | 9 | Simulated MDT and calibration v0 | MDT generator, PyTorch optimization loop. | 7 |
-| 10 | Plugin API, docs, release | Stable traits, documentation, release 0.1 on crates.io and PyPI. | GPU acceptance, Gate 2, 9 |
+| 10 | Docs, release | Documentation, release 0.1 on crates.io and PyPI. | GPU acceptance, Gate 2, 9 |
 
 ### Gates
 
@@ -876,7 +863,7 @@ flowchart TD
 | Materials | Class prior + δ grid in Zarr | Hash encoding or MLP, priors from images |
 | Scene loading | Mitsuba XML + PLY from local disk, S3, MinIO | glTF, CityGML, automatic OSM, geometry updates from images |
 | Execution | CPU (rayon) and GPU (wgpu) on Linux and Windows. Coordinator and workers on NATS JetStream. Docker Compose + MinIO. | GPU on macOS (Metal) and DX12, GPU performance tuning, Kubernetes, autoscaling |
-| API and release | Rust crates. Python (PyO3) with native API and `raytwin.compat`. gRPC. Wheels for Linux, macOS, Windows. Public release 0.1. | REST, dynamic plugins |
+| API and release | Rust crates. Python (PyO3) with native API and `raytwin.compat`. NATS job protocol (submit, watch, cancel). Wheels for Linux, macOS, Windows. Public release 0.1. | gRPC or REST gateway, plugin API |
 | Calibration | Twin experiment with simulated MDT. Optimization with PyTorch. | Real MDT import (CSV/Parquet, position filter), continuous calibration, joint CM and material calibration |
 | Multi-band | Several FR1 bands in one trace. ITU materials with valid-range checks. Antennas per (cell, band). Band axis in maps. | FR2-1 and FR2-2, wideband split into sub-frequencies, calibrated materials below 1 GHz |
 
