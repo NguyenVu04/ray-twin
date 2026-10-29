@@ -1,1 +1,66 @@
-.claude
+# --- Coding agents ---
+.claude/
+CLAUDE.local.md
+.codex/
+.cursor/
+.aider*
+.continue/
+
+# --- IDEs / editors ---
+.vscode/
+.idea/
+*.iml
+.fleet/
+.zed/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# --- Rust ---
+target/
+**/*.rs.bk
+*.pdb
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+*.egg
+build/
+dist/
+wheels/
+.eggs/
+.venv/
+venv/
+env/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.ipynb_checkpoints/
+
+# --- Env / secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Logs / temp ---
+*.log
+logs/
+tmp/
+*.tmp
+*.bak
