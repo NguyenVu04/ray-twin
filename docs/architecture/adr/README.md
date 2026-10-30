@@ -10,7 +10,7 @@ RayTwin has no code yet. During this phase:
 
 1. When a decision changes, edit its ADR or its row in section 10 directly. Do not write a superseding record.
 2. Set the `Updated` line of the ADR to the date of the change.
-3. Update the links in the technical report, the README and the architecture document in the same change.
+3. Update the links in the README and the architecture document in the same change.
 4. Add a new ADR only for a decision as significant as the four below. Number it with the next number.
 
 ## Index

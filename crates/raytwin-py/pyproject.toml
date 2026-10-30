@@ -1,0 +1,30 @@
+[build-system]
+requires = ["maturin>=1.9.4,<2"]
+build-backend = "maturin"
+
+[project]
+name = "raytwin"
+requires-python = ">=3.13"
+license = "MIT OR Apache-2.0"
+dynamic = ["version"]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.maturin]
+python-source = "python"
+module-name = "raytwin._native"
+
+[tool.uv]
+# uv rebuilds the extension only when one of these files changes.
+# A glob cannot start with `../*/`, so each sibling crate is listed by name.
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "Cargo.toml" },
+    { file = "src/**/*.rs" },
+    { file = "../../Cargo.toml" },
+    { file = "../../Cargo.lock" },
+    { file = "../raytwin-core/src/**/*.rs" },
+    { file = "../raytwin-store/src/**/*.rs" },
+    { file = "../raytwin-dist/src/**/*.rs" },
+]

@@ -367,7 +367,7 @@
     <tr><th>Classification</th><td>Public</td></tr>
     <tr><th>Distribution</th><td>Anyone. The repository is public</td></tr>
     <tr><th>Source of record</th><td><a href="https://github.com/NguyenVu04/ray-twin">https://github.com/NguyenVu04/ray-twin</a>, file <code>docs/USECASE_SPECIFICATION.html</code></td></tr>
-    <tr><th>Source of requirements</th><td>RayTwin technical report version 1.2 (<a href="technical-report.html">technical-report.html</a>, in Vietnamese) and the <a href="architecture/ARCHITECTURE.md">software architecture</a> of 2026-10-30. This document calls the technical report &ldquo;TR&rdquo;</td></tr>
+    <tr><th>Source of requirements</th><td>The <a href="architecture/ARCHITECTURE.md">software architecture</a> of 2026-10-30</td></tr>
     <tr><th>Writing standard</th><td>ASD-STE100 rules for sentence structure. The structural rules apply in full. The word-list rules are advisory</td></tr>
     <tr><th>Display</th><td>The browser draws the diagrams (Mermaid 11.14.0) and the formulas (KaTeX 0.16.11) from the jsDelivr content delivery network. Without an internet connection, the page shows the diagram source and the formula source as text</td></tr>
   </tbody>
@@ -386,7 +386,7 @@
       <td>0.1</td>
       <td class="nw">2026-10-30</td>
       <td>Nguyễn Duy Vũ</td>
-      <td>First draft for review. It converts TR version 1.2 and the architecture of 2026-10-30 into user-facing use cases for releases 0.1, 0.2 and 0.3.</td>
+      <td>First draft for review. It converts the architecture of 2026-10-30 into user-facing use cases for releases 0.1, 0.2 and 0.3.</td>
       <td>&mdash;</td>
     </tr>
   </tbody>
@@ -1126,20 +1126,20 @@ flowchart TD
     <tr><th>ID</th><th>Constraint</th><th>Type</th><th>Where it comes from</th></tr>
   </thead>
   <tbody>
-    <tr><td>C-01</td><td>One person builds and maintains RayTwin. The target for release 0.1 is 1 to 2 months. This is a wish, not a commitment</td><td>Organizational</td><td>Project owner, TR Appendix A</td></tr>
+    <tr><td>C-01</td><td>One person builds and maintains RayTwin. The target for release 0.1 is 1 to 2 months. This is a wish, not a commitment</td><td>Organizational</td><td>Project owner</td></tr>
     <tr><td>C-02</td><td>The development machine is a laptop with an RTX 3050 Ti GPU with 4 GB of memory</td><td>Technical</td><td>Hardware of the owner</td></tr>
     <tr><td>C-03</td><td>The GPU library wgpu 30.0.1 supports ray query and 64-bit floating point in GPU programs only on Vulkan. Its ray query is experimental</td><td>Technical</td><td>wgpu project</td></tr>
-    <tr><td>C-04</td><td>The repository is public, under the licence MIT OR Apache-2.0</td><td>Legal</td><td>Project owner, TR Appendix A</td></tr>
-    <tr><td>C-05</td><td>No real MDT exists for release 0.1</td><td>Organizational</td><td>Project owner, TR Appendix A</td></tr>
+    <tr><td>C-04</td><td>The repository is public, under the licence MIT OR Apache-2.0</td><td>Legal</td><td>Project owner</td></tr>
+    <tr><td>C-05</td><td>No real MDT exists for release 0.1</td><td>Organizational</td><td>Project owner</td></tr>
     <tr><td>C-06</td><td>In release 0.1, scenes arrive as a subset of Mitsuba XML with PLY meshes</td><td>Technical</td><td>Sample scenes of the reference simulator</td></tr>
-    <tr><td>C-07</td><td>Release 0.1 validates FR1 only</td><td>Technical</td><td>Project owner, TR &sect;12.5</td></tr>
+    <tr><td>C-07</td><td>Release 0.1 validates FR1 only</td><td>Technical</td><td>Project owner</td></tr>
     <tr><td>C-08</td><td>NATS JetStream limits: 1 MB for each message, a confirmation timeout of 30 s by default, no limit of redeliveries by default</td><td>Technical</td><td>NATS JetStream</td></tr>
-    <tr><td>C-09</td><td>The reference simulator is pinned to Sionna RT 2.2.0</td><td>Technical</td><td>Project owner, TR &sect;14.3</td></tr>
+    <tr><td>C-09</td><td>The reference simulator is pinned to Sionna RT 2.2.0</td><td>Technical</td><td>Project owner</td></tr>
     <tr><td>C-10</td><td>The test of distributed mode (Gate 2) runs 4 workers on one machine</td><td>Technical</td><td>C-02</td></tr>
     <tr><td>C-11</td><td>MDT throughput, delay and loss (M4 to M7) exist only when the operator configures immediate MDT. Few samples have a GNSS position</td><td>Technical</td><td>3GPP TS 37.320, operator practice</td></tr>
     <tr><td>C-12</td><td>MDT needs the consent of the phone user and contains personal data</td><td>Legal</td><td>3GPP TS 32.422, data-protection law</td></tr>
-    <tr><td>C-13</td><td>Releases 0.1 to 0.3 model line of sight, specular reflection and transmission through thin walls only. They do not model diffraction or diffuse scattering</td><td>Technical</td><td>TR &sect;14.1</td></tr>
-    <tr><td>C-14</td><td>Each material of ITU-R P.2040-4 has a frequency range of validity. Most building materials start at 1 GHz. Brick, plywood and asphalt concrete stop at 40 GHz</td><td>Technical</td><td>ITU-R P.2040-4, TR &sect;12.5</td></tr>
+    <tr><td>C-13</td><td>Releases 0.1 to 0.3 model line of sight, specular reflection and transmission through thin walls only. They do not model diffraction or diffuse scattering</td><td>Technical</td><td>Project owner</td></tr>
+    <tr><td>C-14</td><td>Each material of ITU-R P.2040-4 has a frequency range of validity. Most building materials start at 1 GHz. Brick, plywood and asphalt concrete stop at 40 GHz</td><td>Technical</td><td>ITU-R P.2040-4</td></tr>
   </tbody>
 </table>
 </div>
@@ -1161,55 +1161,55 @@ flowchart TD
     <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Release</th><th>Raised by</th><th>Use case</th><th>Arch.</th></tr>
   </thead>
   <tbody>
-    <tr id="fr-01"><td>FR-01</td><td>The system must let a planning engineer load a scene from local disk, S3 or MinIO.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;14.3 item 1</td><td><a href="#uc-01">UC-01</a></td><td>F-01</td></tr>
-    <tr id="fr-02"><td>FR-02</td><td>The system must give the same content hash for the same scene at every storage location.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;10.2</td><td><a href="#uc-01">UC-01</a></td><td>F-01</td></tr>
-    <tr id="fr-03"><td>FR-03</td><td>The system must report each scene element that it does not support.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;14.3 item 1</td><td><a href="#uc-01">UC-01</a></td><td>F-01</td></tr>
-    <tr id="fr-04"><td>FR-04</td><td>The system must let a planning engineer create a snapshot from a scene, a material field, bands, transmitters and solver settings.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;10.2</td><td><a href="#uc-01">UC-01</a></td><td>F-02</td></tr>
-    <tr id="fr-05"><td>FR-05</td><td>The system must let a planning engineer create a RAN config that has its own hash.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;10.2</td><td><a href="#uc-03">UC-03</a></td><td>F-02</td></tr>
-    <tr id="fr-06"><td>FR-06</td><td>The system must let a planning engineer calculate a 3D radio map for several FR1 bands from one ray trace.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;12</td><td><a href="#uc-02">UC-02</a></td><td>F-03</td></tr>
-    <tr id="fr-07"><td>FR-07</td><td>The system must give RSRP, SINR and the best server from a radio map and a RAN config, with no new trace.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;11.7</td><td><a href="#uc-03">UC-03</a></td><td>F-03</td></tr>
-    <tr id="fr-08"><td>FR-08</td><td>The system must let a SON researcher calculate the CIR and the CFR for each pair of antenna elements at given receiver points.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;13</td><td><a href="#uc-04">UC-04</a></td><td>F-04</td></tr>
-    <tr id="fr-09"><td>FR-09</td><td>The system must select the compute backend automatically, unless the actor forces one backend.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;10.7</td><td><a href="#uc-02">UC-02</a></td><td>F-07</td></tr>
-    <tr id="fr-10"><td>FR-10</td><td>The system must record the reason for each backend that it skips.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;14.3 item 6</td><td><a href="#uc-02">UC-02</a></td><td>F-07</td></tr>
-    <tr id="fr-11"><td>FR-11</td><td>The system must give a warning when it uses a material outside its ITU validity range.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;12.2</td><td><a href="#uc-02">UC-02</a></td><td>F-05</td></tr>
-    <tr id="fr-12"><td>FR-12</td><td>The system must let a SON researcher run a job on many workers.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;10.4</td><td><a href="#uc-07">UC-07</a></td><td>F-08</td></tr>
-    <tr id="fr-13"><td>FR-13</td><td>The system must let a SON researcher see the state of a job in distributed mode.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;10.4</td><td><a href="#uc-07">UC-07</a></td><td>F-08</td></tr>
-    <tr id="fr-14"><td>FR-14</td><td>The system must let a SON researcher cancel a job in distributed mode.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;10.4</td><td><a href="#uc-07">UC-07</a></td><td>F-08</td></tr>
-    <tr id="fr-15"><td>FR-15</td><td>The system must return the job state or the stored result when the same job arrives again.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;10.4</td><td><a href="#uc-07">UC-07</a></td><td>F-08</td></tr>
-    <tr id="fr-16"><td>FR-16</td><td>The system must let a service operator start the distributed service with one command.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;14.3 item 8</td><td><a href="#uc-06">UC-06</a></td><td>F-12</td></tr>
-    <tr id="fr-17"><td>FR-17</td><td>The system must let a planning engineer show the scene and a result in 3D in a Jupyter notebook.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;10.5</td><td><a href="#uc-05">UC-05</a></td><td>F-13</td></tr>
-    <tr id="fr-18"><td>FR-18</td><td>The system must let a planning engineer export the scene, a radio-map slice and the paths to a glTF file.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;10.5</td><td><a href="#uc-05">UC-05</a></td><td>F-13</td></tr>
-    <tr id="fr-19"><td>FR-19</td><td>The system must read MDT samples in the canonical MDT schema.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;11.4</td><td><a href="#uc-08">UC-08</a></td><td>F-06</td></tr>
-    <tr id="fr-20"><td>FR-20</td><td>The system must let a calibration researcher calibrate the material field from MDT samples.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;11.3</td><td><a href="#uc-08">UC-08</a></td><td>F-06</td></tr>
-    <tr id="fr-21"><td>FR-21</td><td>The system must store each calibrated field as a new version, and keep the old versions readable.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;14.3 item 7</td><td><a href="#uc-08">UC-08</a></td><td>F-02</td></tr>
-    <tr id="fr-22"><td>FR-22</td><td>The system must let a calibration researcher create tapes in distributed mode.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;11.3</td><td><a href="#uc-08">UC-08</a></td><td>F-06</td></tr>
-    <tr id="fr-23"><td>FR-23</td><td>The system must let a calibration researcher generate simulated MDT with the reference simulator, from a configuration and a seed.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;11.5</td><td><a href="#uc-09">UC-09</a></td><td>F-11</td></tr>
-    <tr id="fr-24"><td>FR-24</td><td>The system must run a reference-simulator script through the compatibility layer, with a change only to the import line.</td><td>Must</td><td>0.1</td><td>Project owner, TR &sect;10.5</td><td><a href="#uc-10">UC-10</a></td><td>F-09</td></tr>
-    <tr id="fr-25"><td>FR-25</td><td>The system must read vendor formats of MDT, PM and CM into the canonical schema through reader plugins.</td><td>Must</td><td>0.2</td><td>Project owner, TR &sect;17.7 Q1</td><td><a href="#uc-11">UC-11</a></td><td>F-15</td></tr>
-    <tr id="fr-26"><td>FR-26</td><td>The system must let a SON researcher create a UE scenario with a seed from MDT.</td><td>Must</td><td>0.2</td><td>Project owner, TR &sect;17.4</td><td><a href="#uc-11">UC-11</a></td><td>F-15</td></tr>
-    <tr id="fr-27"><td>FR-27</td><td>The system must let a SON researcher evaluate the service quality of a configuration for a scenario.</td><td>Must</td><td>0.2</td><td>Project owner, TR &sect;17.3</td><td><a href="#uc-12">UC-12</a></td><td>F-14</td></tr>
-    <tr id="fr-28"><td>FR-28</td><td>The system must store each service-quality run as a time series that a viewer can replay.</td><td>Must</td><td>0.2</td><td>Project owner, TR &sect;17.5</td><td><a href="#uc-12">UC-12</a>, <a href="#uc-05">UC-05</a></td><td>F-14</td></tr>
-    <tr id="fr-29"><td>FR-29</td><td>The system must let a planning engineer derive a new snapshot or RAN config from a configuration delta.</td><td>Must</td><td>0.2</td><td>Project owner, TR &sect;19.3</td><td><a href="#uc-13">UC-13</a></td><td>F-17</td></tr>
-    <tr id="fr-30"><td>FR-30</td><td>The system must keep the history of a plan in a named reference that only grows.</td><td>Must</td><td>0.2</td><td>Project owner, TR &sect;19.3</td><td><a href="#uc-13">UC-13</a></td><td>F-17</td></tr>
-    <tr id="fr-31"><td>FR-31</td><td>The system must let a planning engineer roll back a plan without the deletion of any data.</td><td>Must</td><td>0.2</td><td>Project owner, TR &sect;19.3</td><td><a href="#uc-13">UC-13</a></td><td>F-17</td></tr>
-    <tr id="fr-32"><td>FR-32</td><td>The system must load plugins through Python entry points.</td><td>Must</td><td>0.2</td><td>Project owner, TR &sect;18.3</td><td><a href="#uc-14">UC-14</a></td><td>F-16</td></tr>
-    <tr id="fr-33"><td>FR-33</td><td>The system must refuse a plugin with an API version that it does not support, and give the reason.</td><td>Must</td><td>0.2</td><td>Project owner, TR &sect;18.1</td><td><a href="#uc-14">UC-14</a></td><td>F-16</td></tr>
-    <tr id="fr-34"><td>FR-34</td><td>The system must let a plugin author check that a plugin gives bit-identical output.</td><td>Must</td><td>0.2</td><td>Project owner, TR &sect;18.1</td><td><a href="#uc-14">UC-14</a></td><td>F-16</td></tr>
-    <tr id="fr-35"><td>FR-35</td><td>The system must let a planning engineer use a vendor antenna pattern as a table.</td><td>Must</td><td>0.3</td><td>Project owner, TR &sect;18.2 PL-08</td><td><a href="#uc-15">UC-15</a></td><td>F-16</td></tr>
-    <tr id="fr-36"><td>FR-36</td><td>The system must let a planning engineer use a material table for a material class.</td><td>Must</td><td>0.3</td><td>Project owner, TR &sect;18.2 PL-09</td><td><a href="#uc-15">UC-15</a></td><td>F-16</td></tr>
-    <tr id="fr-37"><td>FR-37</td><td>The system must let a planning engineer import a scene from CityGML, OSM or glTF.</td><td>Must</td><td>0.3</td><td>Project owner, TR &sect;18.2 PL-10</td><td><a href="#uc-16">UC-16</a></td><td>F-16</td></tr>
-    <tr id="fr-38"><td>FR-38</td><td>The system must let a SON researcher run a SON policy in a closed loop with an evaluation budget.</td><td>Must</td><td>0.3</td><td>Project owner, TR &sect;18.4</td><td><a href="#uc-17">UC-17</a></td><td>F-18</td></tr>
-    <tr id="fr-39"><td>FR-39</td><td>The system must trace again only the transmitters whose trace inputs changed.</td><td>Must</td><td>0.3</td><td>Project owner, TR &sect;18.4</td><td><a href="#uc-17">UC-17</a></td><td>F-18</td></tr>
-    <tr id="fr-40"><td>FR-40</td><td>The system must evaluate the best candidates of a SON loop again with another seed.</td><td>Must</td><td>0.3</td><td>Project owner, TR &sect;18.4</td><td><a href="#uc-17">UC-17</a></td><td>F-18</td></tr>
-    <tr id="fr-41"><td>FR-41</td><td>A web user interface for planning engineers.</td><td>Won't</td><td>After 0.3</td><td>Project owner, TR &sect;19.4</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr id="fr-42"><td>FR-42</td><td>Continuous monitoring of measurements against predictions over time.</td><td>Won't</td><td>After 0.3</td><td>Project owner, TR &sect;19.4</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr id="fr-43"><td>FR-43</td><td>Diffraction and diffuse scattering.</td><td>Won't</td><td>After the MVP, no release number yet</td><td>Project owner, TR &sect;14.1, &sect;16</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr id="fr-44"><td>FR-44</td><td>FR2 bands (FR2-1 and FR2-2).</td><td>Won't</td><td>After the MVP, no release number yet</td><td>Project owner, TR &sect;12.5</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr id="fr-45"><td>FR-45</td><td>GPU backends on macOS (Metal) and DirectX 12.</td><td>Won't</td><td>After the MVP, no release number yet</td><td>Project owner, TR &sect;14.1</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr id="fr-46"><td>FR-46</td><td>A gRPC or REST gateway for clients.</td><td>Won't</td><td>After the MVP, no release number yet</td><td>Project owner, TR &sect;14.1</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr id="fr-47"><td>FR-47</td><td>Deployment on Kubernetes with automatic scaling.</td><td>Won't</td><td>After the MVP, no release number yet</td><td>Project owner, TR &sect;14.1</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr id="fr-01"><td>FR-01</td><td>The system must let a planning engineer load a scene from local disk, S3 or MinIO.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-01">UC-01</a></td><td>F-01</td></tr>
+    <tr id="fr-02"><td>FR-02</td><td>The system must give the same content hash for the same scene at every storage location.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-01">UC-01</a></td><td>F-01</td></tr>
+    <tr id="fr-03"><td>FR-03</td><td>The system must report each scene element that it does not support.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-01">UC-01</a></td><td>F-01</td></tr>
+    <tr id="fr-04"><td>FR-04</td><td>The system must let a planning engineer create a snapshot from a scene, a material field, bands, transmitters and solver settings.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-01">UC-01</a></td><td>F-02</td></tr>
+    <tr id="fr-05"><td>FR-05</td><td>The system must let a planning engineer create a RAN config that has its own hash.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-03">UC-03</a></td><td>F-02</td></tr>
+    <tr id="fr-06"><td>FR-06</td><td>The system must let a planning engineer calculate a 3D radio map for several FR1 bands from one ray trace.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-02">UC-02</a></td><td>F-03</td></tr>
+    <tr id="fr-07"><td>FR-07</td><td>The system must give RSRP, SINR and the best server from a radio map and a RAN config, with no new trace.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-03">UC-03</a></td><td>F-03</td></tr>
+    <tr id="fr-08"><td>FR-08</td><td>The system must let a SON researcher calculate the CIR and the CFR for each pair of antenna elements at given receiver points.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-04">UC-04</a></td><td>F-04</td></tr>
+    <tr id="fr-09"><td>FR-09</td><td>The system must select the compute backend automatically, unless the actor forces one backend.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-02">UC-02</a></td><td>F-07</td></tr>
+    <tr id="fr-10"><td>FR-10</td><td>The system must record the reason for each backend that it skips.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-02">UC-02</a></td><td>F-07</td></tr>
+    <tr id="fr-11"><td>FR-11</td><td>The system must give a warning when it uses a material outside its ITU validity range.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-02">UC-02</a></td><td>F-05</td></tr>
+    <tr id="fr-12"><td>FR-12</td><td>The system must let a SON researcher run a job on many workers.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-07">UC-07</a></td><td>F-08</td></tr>
+    <tr id="fr-13"><td>FR-13</td><td>The system must let a SON researcher see the state of a job in distributed mode.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-07">UC-07</a></td><td>F-08</td></tr>
+    <tr id="fr-14"><td>FR-14</td><td>The system must let a SON researcher cancel a job in distributed mode.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-07">UC-07</a></td><td>F-08</td></tr>
+    <tr id="fr-15"><td>FR-15</td><td>The system must return the job state or the stored result when the same job arrives again.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-07">UC-07</a></td><td>F-08</td></tr>
+    <tr id="fr-16"><td>FR-16</td><td>The system must let a service operator start the distributed service with one command.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-06">UC-06</a></td><td>F-12</td></tr>
+    <tr id="fr-17"><td>FR-17</td><td>The system must let a planning engineer show the scene and a result in 3D in a Jupyter notebook.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-05">UC-05</a></td><td>F-13</td></tr>
+    <tr id="fr-18"><td>FR-18</td><td>The system must let a planning engineer export the scene, a radio-map slice and the paths to a glTF file.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-05">UC-05</a></td><td>F-13</td></tr>
+    <tr id="fr-19"><td>FR-19</td><td>The system must read MDT samples in the canonical MDT schema.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-08">UC-08</a></td><td>F-06</td></tr>
+    <tr id="fr-20"><td>FR-20</td><td>The system must let a calibration researcher calibrate the material field from MDT samples.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-08">UC-08</a></td><td>F-06</td></tr>
+    <tr id="fr-21"><td>FR-21</td><td>The system must store each calibrated field as a new version, and keep the old versions readable.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-08">UC-08</a></td><td>F-02</td></tr>
+    <tr id="fr-22"><td>FR-22</td><td>The system must let a calibration researcher create tapes in distributed mode.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-08">UC-08</a></td><td>F-06</td></tr>
+    <tr id="fr-23"><td>FR-23</td><td>The system must let a calibration researcher generate simulated MDT with the reference simulator, from a configuration and a seed.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-09">UC-09</a></td><td>F-11</td></tr>
+    <tr id="fr-24"><td>FR-24</td><td>The system must run a reference-simulator script through the compatibility layer, with a change only to the import line.</td><td>Must</td><td>0.1</td><td>Project owner</td><td><a href="#uc-10">UC-10</a></td><td>F-09</td></tr>
+    <tr id="fr-25"><td>FR-25</td><td>The system must read vendor formats of MDT, PM and CM into the canonical schema through reader plugins.</td><td>Must</td><td>0.2</td><td>Project owner</td><td><a href="#uc-11">UC-11</a></td><td>F-15</td></tr>
+    <tr id="fr-26"><td>FR-26</td><td>The system must let a SON researcher create a UE scenario with a seed from MDT.</td><td>Must</td><td>0.2</td><td>Project owner</td><td><a href="#uc-11">UC-11</a></td><td>F-15</td></tr>
+    <tr id="fr-27"><td>FR-27</td><td>The system must let a SON researcher evaluate the service quality of a configuration for a scenario.</td><td>Must</td><td>0.2</td><td>Project owner</td><td><a href="#uc-12">UC-12</a></td><td>F-14</td></tr>
+    <tr id="fr-28"><td>FR-28</td><td>The system must store each service-quality run as a time series that a viewer can replay.</td><td>Must</td><td>0.2</td><td>Project owner</td><td><a href="#uc-12">UC-12</a>, <a href="#uc-05">UC-05</a></td><td>F-14</td></tr>
+    <tr id="fr-29"><td>FR-29</td><td>The system must let a planning engineer derive a new snapshot or RAN config from a configuration delta.</td><td>Must</td><td>0.2</td><td>Project owner</td><td><a href="#uc-13">UC-13</a></td><td>F-17</td></tr>
+    <tr id="fr-30"><td>FR-30</td><td>The system must keep the history of a plan in a named reference that only grows.</td><td>Must</td><td>0.2</td><td>Project owner</td><td><a href="#uc-13">UC-13</a></td><td>F-17</td></tr>
+    <tr id="fr-31"><td>FR-31</td><td>The system must let a planning engineer roll back a plan without the deletion of any data.</td><td>Must</td><td>0.2</td><td>Project owner</td><td><a href="#uc-13">UC-13</a></td><td>F-17</td></tr>
+    <tr id="fr-32"><td>FR-32</td><td>The system must load plugins through Python entry points.</td><td>Must</td><td>0.2</td><td>Project owner</td><td><a href="#uc-14">UC-14</a></td><td>F-16</td></tr>
+    <tr id="fr-33"><td>FR-33</td><td>The system must refuse a plugin with an API version that it does not support, and give the reason.</td><td>Must</td><td>0.2</td><td>Project owner</td><td><a href="#uc-14">UC-14</a></td><td>F-16</td></tr>
+    <tr id="fr-34"><td>FR-34</td><td>The system must let a plugin author check that a plugin gives bit-identical output.</td><td>Must</td><td>0.2</td><td>Project owner</td><td><a href="#uc-14">UC-14</a></td><td>F-16</td></tr>
+    <tr id="fr-35"><td>FR-35</td><td>The system must let a planning engineer use a vendor antenna pattern as a table.</td><td>Must</td><td>0.3</td><td>Project owner</td><td><a href="#uc-15">UC-15</a></td><td>F-16</td></tr>
+    <tr id="fr-36"><td>FR-36</td><td>The system must let a planning engineer use a material table for a material class.</td><td>Must</td><td>0.3</td><td>Project owner</td><td><a href="#uc-15">UC-15</a></td><td>F-16</td></tr>
+    <tr id="fr-37"><td>FR-37</td><td>The system must let a planning engineer import a scene from CityGML, OSM or glTF.</td><td>Must</td><td>0.3</td><td>Project owner</td><td><a href="#uc-16">UC-16</a></td><td>F-16</td></tr>
+    <tr id="fr-38"><td>FR-38</td><td>The system must let a SON researcher run a SON policy in a closed loop with an evaluation budget.</td><td>Must</td><td>0.3</td><td>Project owner</td><td><a href="#uc-17">UC-17</a></td><td>F-18</td></tr>
+    <tr id="fr-39"><td>FR-39</td><td>The system must trace again only the transmitters whose trace inputs changed.</td><td>Must</td><td>0.3</td><td>Project owner</td><td><a href="#uc-17">UC-17</a></td><td>F-18</td></tr>
+    <tr id="fr-40"><td>FR-40</td><td>The system must evaluate the best candidates of a SON loop again with another seed.</td><td>Must</td><td>0.3</td><td>Project owner</td><td><a href="#uc-17">UC-17</a></td><td>F-18</td></tr>
+    <tr id="fr-41"><td>FR-41</td><td>A web user interface for planning engineers.</td><td>Won't</td><td>After 0.3</td><td>Project owner</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr id="fr-42"><td>FR-42</td><td>Continuous monitoring of measurements against predictions over time.</td><td>Won't</td><td>After 0.3</td><td>Project owner</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr id="fr-43"><td>FR-43</td><td>Diffraction and diffuse scattering.</td><td>Won't</td><td>After the MVP, no release number yet</td><td>Project owner</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr id="fr-44"><td>FR-44</td><td>FR2 bands (FR2-1 and FR2-2).</td><td>Won't</td><td>After the MVP, no release number yet</td><td>Project owner</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr id="fr-45"><td>FR-45</td><td>GPU backends on macOS (Metal) and DirectX 12.</td><td>Won't</td><td>After the MVP, no release number yet</td><td>Project owner</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr id="fr-46"><td>FR-46</td><td>A gRPC or REST gateway for clients.</td><td>Won't</td><td>After the MVP, no release number yet</td><td>Project owner</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr id="fr-47"><td>FR-47</td><td>Deployment on Kubernetes with automatic scaling.</td><td>Won't</td><td>After the MVP, no release number yet</td><td>Project owner</td><td>&mdash;</td><td>&mdash;</td></tr>
     <tr id="fr-48"><td>FR-48</td><td>Physics models (diffraction, scattering) as plugin crates.</td><td>Won't</td><td>Dropped</td><td>Project owner, ADR 0004</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr id="fr-49"><td>FR-49</td><td>A prediction of the absolute throughput of one UE.</td><td>Won't</td><td>Not planned. The service-quality layer ranks scenarios</td><td>Project owner, TR &sect;17.6</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr id="fr-49"><td>FR-49</td><td>A prediction of the absolute throughput of one UE.</td><td>Won't</td><td>Not planned. The service-quality layer ranks scenarios</td><td>Project owner</td><td>&mdash;</td><td>&mdash;</td></tr>
   </tbody>
 </table>
 </div>
@@ -1224,17 +1224,17 @@ flowchart TD
     <tr><th>ID</th><th>Rule</th><th>Applies to</th><th>Source</th></tr>
   </thead>
   <tbody>
-    <tr id="br-01"><td>BR-01</td><td>A voxel is ray-sufficient when at least 100 ray segments cross it. Every quantitative comparison and every mobility KPI uses only ray-sufficient voxels. The viewer shows the other voxels as transparent. (The architecture document says &ldquo;ray-sufficient cell&rdquo;.)</td><td>UC-02, UC-03, UC-05, UC-09, UC-12</td><td>TR &sect;14.3 item 4, D-16</td></tr>
+    <tr id="br-01"><td>BR-01</td><td>A voxel is ray-sufficient when at least 100 ray segments cross it. Every quantitative comparison and every mobility KPI uses only ray-sufficient voxels. The viewer shows the other voxels as transparent. (The architecture document says &ldquo;ray-sufficient cell&rdquo;.)</td><td>UC-02, UC-03, UC-05, UC-09, UC-12</td><td>Component 4, D-16</td></tr>
     <tr id="br-02"><td>BR-02</td><td>The snapshot id is the hash of the canonical manifest without its storage locations. The same inputs give the same id at every location.</td><td>UC-01, UC-02, UC-07, UC-08</td><td>ADR 0002</td></tr>
     <tr id="br-03"><td>BR-03</td><td>Every write of RayTwin creates a new object. RayTwin never overwrites or deletes stored data. When it reads an input, it checks the hash and stops if the hash does not agree.</td><td>UC-01, UC-07, UC-08, UC-13</td><td>ADR 0002</td></tr>
-    <tr id="br-04"><td>BR-04</td><td>A change of transmit power, EPRE, CIO, handover parameters or cell on/off state changes only the RAN config. It needs no new ray trace.</td><td>UC-03, UC-12, UC-13, UC-17</td><td>ADR 0002, TR &sect;17.5</td></tr>
-    <tr id="br-05"><td>BR-05</td><td>RayTwin compares simulation with MDT through the reported RSRP of the measurement operator (<a href="#eq-14">EQ-14</a>). It never uses the total received power (RSS) for this. RSS is only for display and for the compatibility layer.</td><td>UC-03, UC-08, UC-09</td><td>TR &sect;11.7, D-14</td></tr>
+    <tr id="br-04"><td>BR-04</td><td>A change of transmit power, EPRE, CIO, handover parameters or cell on/off state changes only the RAN config. It needs no new ray trace.</td><td>UC-03, UC-12, UC-13, UC-17</td><td>ADR 0002</td></tr>
+    <tr id="br-05"><td>BR-05</td><td>RayTwin compares simulation with MDT through the reported RSRP of the measurement operator (<a href="#eq-14">EQ-14</a>). It never uses the total received power (RSS) for this. RSS is only for display and for the compatibility layer.</td><td>UC-03, UC-08, UC-09</td><td>D-14</td></tr>
     <tr id="br-06"><td>BR-06</td><td>The key of each random number contains the manifest seed and the transmitter, but not the job. Two jobs with the same seed use the same random numbers.</td><td>UC-02, UC-12, UC-13, UC-17</td><td>ADR 0003</td></tr>
-    <tr id="br-07"><td>BR-07</td><td>The job id is the hash of the canonical job spec. When the same job arrives again: a running job returns its state, a finished job returns its result, a failed or cancelled job runs again.</td><td>UC-07</td><td>TR &sect;10.4, D-06</td></tr>
-    <tr id="br-08"><td>BR-08</td><td>A validation of calibration or of service quality splits the data by cell and by configuration (leave one cell out, leave one tilt out). It never splits at random by point.</td><td>UC-09, UC-12</td><td>TR &sect;11.6</td></tr>
+    <tr id="br-07"><td>BR-07</td><td>The job id is the hash of the canonical job spec. When the same job arrives again: a running job returns its state, a finished job returns its result, a failed or cancelled job runs again.</td><td>UC-07</td><td>D-06</td></tr>
+    <tr id="br-08"><td>BR-08</td><td>A validation of calibration or of service quality splits the data by cell and by configuration (leave one cell out, leave one tilt out). It never splits at random by point.</td><td>UC-09, UC-12</td><td>Project owner</td></tr>
     <tr id="br-09"><td>BR-09</td><td>Plugin code runs only in the Python client. Workers never run plugin code. The GPU sees only data tables with a hash.</td><td>UC-14, UC-15</td><td>ADR 0004</td></tr>
-    <tr id="br-10"><td>BR-10</td><td>From release 0.3, a change of tilt, azimuth or antenna of some cells, or a new site, traces only those transmitters again. A change of geometry, material field or ray count traces all transmitters again.</td><td>UC-13, UC-17</td><td>ADR 0003, TR &sect;17.5</td></tr>
-    <tr id="br-11"><td>BR-11</td><td>Each MDT sample has a weight from the confidence of its position: a GNSS position counts more than an estimated position or a cell-only position. Samples without GNSS are used only for coarse densities.</td><td>UC-08, UC-11</td><td>TR &sect;11.2, &sect;17.6</td></tr>
+    <tr id="br-10"><td>BR-10</td><td>From release 0.3, a change of tilt, azimuth or antenna of some cells, or a new site, traces only those transmitters again. A change of geometry, material field or ray count traces all transmitters again.</td><td>UC-13, UC-17</td><td>ADR 0003</td></tr>
+    <tr id="br-11"><td>BR-11</td><td>Each MDT sample has a weight from the confidence of its position: a GNSS position counts more than an estimated position or a cell-only position. Samples without GNSS are used only for coarse densities.</td><td>UC-08, UC-11</td><td>Project owner</td></tr>
   </tbody>
 </table>
 </div>
@@ -1260,18 +1260,18 @@ flowchart TD
     <tr id="nfr-09"><td>NFR-09</td><td>Resource use</td><td>RayTwin runs on a 4 GB GPU</td><td>munich, 1 km&sup2; &times; 60 m radio map, 4 bands, 64T64R CIR: peak GPU memory below 4 GB</td><td>GPU CI runner</td><td>QA-07</td></tr>
     <tr id="nfr-10"><td>NFR-10</td><td>Installability</td><td>RayTwin installs with pip on three operating systems</td><td>Wheels for Linux x86_64, macOS arm64 and Windows x86_64. Smoke test passes on 3 of 3. GPU through Vulkan on Linux and Windows</td><td>CI build matrix</td><td>QA-08</td></tr>
     <tr id="nfr-11"><td>NFR-11</td><td>Calibration quality</td><td>The calibrated field predicts held-out configurations better than the prior</td><td>RSRP RMSE at least 30 % lower. Spearman &rho;<sub>s</sub> &ge; 0.8 for the tilt ranking</td><td>Twin experiment (<a href="#uc-09">UC-09</a>)</td><td>QA-09</td></tr>
-    <tr id="nfr-12"><td>NFR-12</td><td>Performance</td><td>The speed of the ray trace is known for each backend</td><td>Measured and reported, with no threshold (decision of the owner). Benchmark: munich, 1 transmitter, 10<sup>6</sup> rays, depth 3. Report the time, the rays per second and the peak memory</td><td>Benchmark report for each release</td><td>TR &sect;14.3 items 2 and 6</td></tr>
+    <tr id="nfr-12"><td>NFR-12</td><td>Performance</td><td>The speed of the ray trace is known for each backend</td><td>Measured and reported, with no threshold (decision of the owner). Benchmark: munich, 1 transmitter, 10<sup>6</sup> rays, depth 3. Report the time, the rays per second and the peak memory</td><td>Benchmark report for each release</td><td>Components 2 and 6</td></tr>
     <tr id="nfr-13"><td>NFR-13</td><td>Repeatability <span class="rel r02">0.2</span></td><td>Two service-quality runs that SON compares use the same UEs</td><td>Same scenario and seed under two configurations: 100 % identical UE positions and traffic. A second run, and a run with the UEs in another order, are bit-identical</td><td>Test</td><td>QA-12</td></tr>
     <tr id="nfr-14"><td>NFR-14</td><td>Performance <span class="rel r02">0.2</span></td><td>The time of a static service-quality evaluation is known</td><td>10<sup>5</sup> UEs and 50 cells on the development laptop: measured and reported, with no threshold</td><td>Benchmark report</td><td>QA-13</td></tr>
     <tr id="nfr-15"><td>NFR-15</td><td>Modifiability <span class="rel r02">0.2</span></td><td>A plugin adds a model without a change to RayTwin</td><td>Bit-identical output in two runs and in one run with the input rows in another order. A plugin that fails the check does not load by default</td><td>Conformance check <code>raytwin.plugins.check</code></td><td>QA-14</td></tr>
     <tr id="nfr-16"><td>NFR-16</td><td>Performance <span class="rel r03">0.3</span></td><td>A local change re-traces only the changed transmitters</td><td>A change of k transmitters traces k transmitters. The results of the other transmitters stay bit-identical</td><td>Test</td><td>QA-15</td></tr>
-    <tr id="nfr-17"><td>NFR-17</td><td>Security</td><td>Distributed mode runs only on a trusted network</td><td>The coordinator and the workers open no network port. NATS has no accounts and no TLS before the web user interface. Every deployment is on a network that only trusted machines can reach</td><td>Deployment review</td><td>D-06, TR &sect;19.4</td></tr>
+    <tr id="nfr-17"><td>NFR-17</td><td>Security</td><td>Distributed mode runs only on a trusted network</td><td>The coordinator and the workers open no network port. NATS has no accounts and no TLS before the web user interface. Every deployment is on a network that only trusted machines can reach</td><td>Deployment review</td><td>D-06</td></tr>
     <tr id="nfr-18"><td>NFR-18</td><td>Security</td><td>Unknown code does not run on the GPU test machine</td><td>The GPU CI runner runs pull requests of the owner and of collaborators. A pull request from a fork runs only after the owner reads the diff and adds the label <code>gpu-ok</code>, again for each new commit. The runner has no secrets</td><td>Review of the repository settings</td><td>D-10</td></tr>
     <tr id="nfr-19"><td>NFR-19</td><td>Data integrity</td><td>Stored data never changes</td><td>100 % of the writes are create-only. Every read checks the hash. A hash that does not agree stops the job with an error</td><td>Test</td><td>ADR 0002</td></tr>
-    <tr id="nfr-20"><td>NFR-20</td><td>Data handling</td><td>MDT data protects the phone user</td><td>RayTwin stores a pseudonymous trace id, the time, the position with its confidence, the cell, RSRP, RSRQ and optional service-quality columns. It never stores an IMSI, a SUPI or an IMEI. A scenario for sharing contains densities, not raw tracks. The data stays at the storage location that the data owner selects. RayTwin deletes nothing, so the retention period is the policy of the data owner. Access control is the access control of that storage</td><td>Schema check, review of the scenario output</td><td>C-12, TR &sect;17.6</td></tr>
+    <tr id="nfr-20"><td>NFR-20</td><td>Data handling</td><td>MDT data protects the phone user</td><td>RayTwin stores a pseudonymous trace id, the time, the position with its confidence, the cell, RSRP, RSRQ and optional service-quality columns. It never stores an IMSI, a SUPI or an IMEI. A scenario for sharing contains densities, not raw tracks. The data stays at the storage location that the data owner selects. RayTwin deletes nothing, so the retention period is the policy of the data owner. Access control is the access control of that storage</td><td>Schema check, review of the scenario output</td><td>C-12</td></tr>
     <tr id="nfr-21"><td>NFR-21</td><td>Compliance</td><td>The licence is clear</td><td>MIT OR Apache-2.0, with both licence files in the repository and in each package</td><td>Release check</td><td>C-04</td></tr>
-    <tr id="nfr-22"><td>NFR-22</td><td>Usability</td><td>A new actor can start without help</td><td>Guides for 4 cases: library mode, distributed mode, compatibility layer, calibration. The examples of the native API (radio map and CIR) run in CI</td><td>Documentation review, CI smoke test</td><td>TR &sect;14.3 item 10</td></tr>
-    <tr id="nfr-23"><td>NFR-23</td><td>Supportability</td><td>Each result explains itself</td><td>Every result array carries its grid, band ids, transmitter ids, CRS, snapshot id and job id. Each radio map carries the segment count of each voxel. Each skipped backend and each unsupported scene element has a logged reason</td><td>Test</td><td>D-16, TR &sect;14.3</td></tr>
+    <tr id="nfr-22"><td>NFR-22</td><td>Usability</td><td>A new actor can start without help</td><td>Guides for 4 cases: library mode, distributed mode, compatibility layer, calibration. The examples of the native API (radio map and CIR) run in CI</td><td>Documentation review, CI smoke test</td><td>Component 10</td></tr>
+    <tr id="nfr-23"><td>NFR-23</td><td>Supportability</td><td>Each result explains itself</td><td>Every result array carries its grid, band ids, transmitter ids, CRS, snapshot id and job id. Each radio map carries the segment count of each voxel. Each skipped backend and each unsupported scene element has a logged reason</td><td>Test</td><td>D-16</td></tr>
   </tbody>
 </table>
 </div>
@@ -3294,7 +3294,7 @@ flowchart TD
 
   <h4>Notes</h4>
   <ul>
-    <li><b>Open question.</b> The TR gives no acceptance criterion for the importers yet. Owner: Nguyễn Duy Vũ. Needed by: the start of the work on release 0.3 (no date set).</li>
+    <li><b>Open question.</b> No acceptance criterion for the importers exists yet. Owner: Nguyễn Duy Vũ. Needed by: the start of the work on release 0.3 (no date set).</li>
     <li><b>Deliberately excluded.</b> Geometry from photographs comes after the MVP, with no release number.</li>
   </ul>
 </section>
@@ -3427,7 +3427,7 @@ flowchart TD
 
 <h2 id="traceability">11. Traceability matrix</h2>
 
-<p>This table answers two questions. Does a use case deliver each requirement? Does each use case exist for a reason? &ldquo;TR &sect;14.3 item n&rdquo; is the list of completion criteria of component n in the TR. All rows have the status <b>Not started</b>, because RayTwin is in the design phase.</p>
+<p>This table answers two questions. Does a use case deliver each requirement? Does each use case exist for a reason? &ldquo;Component n&rdquo; is component n of the <a href="../README.md#component-order">roadmap in the README</a>. All rows have the status <b>Not started</b>, because RayTwin is in the design phase.</p>
 
 <div class="table-wrap">
 <table>
@@ -3435,46 +3435,46 @@ flowchart TD
     <tr><th>Requirement</th><th>Use case</th><th>Test or acceptance reference</th><th>Status</th></tr>
   </thead>
   <tbody>
-    <tr><td>FR-01</td><td>UC-01</td><td>TR &sect;14.3 item 1: all 15 sample scenes of the reference simulator load. Shape count, triangle count and materials agree</td><td>Not started</td></tr>
-    <tr><td>FR-02</td><td>UC-01</td><td>TR &sect;14.3 item 1: the same scene from local disk, MinIO and S3 gives the same hash</td><td>Not started</td></tr>
-    <tr><td>FR-03</td><td>UC-01</td><td>TR &sect;14.3 item 1: an unsupported element gives a clear error and is never ignored</td><td>Not started</td></tr>
-    <tr><td>FR-04</td><td>UC-01</td><td>TR &sect;14.3 item 1: the manifest hash does not change with another run, another machine or another key order</td><td>Not started</td></tr>
-    <tr><td>FR-05</td><td>UC-03</td><td>TR &sect;14.3 item 7: the RAN config has its own hash. A change of it does not change the snapshot id</td><td>Not started</td></tr>
-    <tr><td>FR-06</td><td>UC-02</td><td>TR &sect;14.3 item 4: one trace for K bands agrees with K single-band traces within the Monte Carlo noise. QA-02</td><td>Not started</td></tr>
-    <tr><td>FR-07</td><td>UC-03</td><td>TR &sect;14.3 item 7: RSRP follows the measurement operator (<a href="#eq-14">EQ-14</a>)</td><td>Not started</td></tr>
-    <tr><td>FR-08</td><td>UC-04</td><td>TR &sect;14.3 item 3, QA-01</td><td>Not started</td></tr>
-    <tr><td>FR-09</td><td>UC-02</td><td>TR &sect;14.3 item 6: automatic order ray query, compute shader, CPU. A forced backend is used</td><td>Not started</td></tr>
-    <tr><td>FR-10</td><td>UC-02</td><td>TR &sect;14.3 item 6: a missing GPU feature gives a logged reason and the next backend. QA-08</td><td>Not started</td></tr>
-    <tr><td>FR-11</td><td>UC-02</td><td>TR &sect;12.2: a warning for each material outside its validity range</td><td>Not started</td></tr>
-    <tr><td>FR-12</td><td>UC-07</td><td>TR &sect;14.3 item 8, QA-05</td><td>Not started</td></tr>
-    <tr><td>FR-13</td><td>UC-07</td><td>TR &sect;10.4: job state in the job-state store</td><td>Not started</td></tr>
-    <tr><td>FR-14</td><td>UC-07</td><td>TR &sect;14.3 item 8, QA-11</td><td>Not started</td></tr>
-    <tr><td>FR-15</td><td>UC-07</td><td>TR &sect;14.3 item 8: a second submission returns the state, the result, or runs again</td><td>Not started</td></tr>
-    <tr><td>FR-16</td><td>UC-06</td><td>TR &sect;14.3 item 8: one <code>docker compose up</code> starts NATS, MinIO, the coordinator and N workers. One command runs the example job</td><td>Not started</td></tr>
-    <tr><td>FR-17</td><td>UC-05</td><td>TR &sect;14.3 item 7: the preview of munich with a radio-map slice runs in the smoke test with the viewer extra</td><td>Not started</td></tr>
-    <tr><td>FR-18</td><td>UC-05</td><td>TR &sect;14.3 item 7: the glTF export runs in the same smoke test</td><td>Not started</td></tr>
-    <tr><td>FR-19</td><td>UC-08</td><td>TR &sect;14.3 item 7: the MDT module holds the canonical schema and its reader</td><td>Not started</td></tr>
-    <tr><td>FR-20</td><td>UC-08</td><td>TR &sect;14.3 item 9, QA-09</td><td>Not started</td></tr>
-    <tr><td>FR-21</td><td>UC-08</td><td>TR &sect;14.3 item 7: a new field version gives a new manifest hash and keeps the geometry hash. Old versions stay readable</td><td>Not started</td></tr>
-    <tr><td>FR-22</td><td>UC-08</td><td>TR &sect;14.3 item 8: a tape job in distributed mode gives tapes that are bit-identical to library mode</td><td>Not started</td></tr>
-    <tr><td>FR-23</td><td>UC-09</td><td>TR &sect;14.3 item 9: the generator gives the same data for the same configuration and seed</td><td>Not started</td></tr>
-    <tr><td>FR-24</td><td>UC-10</td><td>TR &sect;14.3 item 7: a script in the style of the reference simulator runs with a change only to the import line. It gives arrays of the same shape</td><td>Not started</td></tr>
-    <tr><td>FR-25</td><td>UC-11</td><td>TR &sect;17.7 Q1: the default reader refuses samples without required columns, with a reason. A known check point converts within 0.1 m</td><td>Not started</td></tr>
-    <tr><td>FR-26</td><td>UC-11</td><td>TR &sect;17.7 Q4, QA-12</td><td>Not started</td></tr>
-    <tr><td>FR-27</td><td>UC-12</td><td>TR &sect;17.7 Q2 and Q3: the two-cell example of <a href="#eq-21">EQ-21</a> agrees within 0.1 Mbit/s. A UE between two symmetric cells has exactly one handover when Hys &gt; 0</td><td>Not started</td></tr>
-    <tr><td>FR-28</td><td>UC-12, UC-05</td><td>TR &sect;17.7 Q3: the run is stored as a time series. The viewer draws one frame</td><td>Not started</td></tr>
-    <tr><td>FR-29</td><td>UC-13</td><td>TR &sect;17.7 Q5: derive and diff run in both modes</td><td>Not started</td></tr>
-    <tr><td>FR-30</td><td>UC-13</td><td>TR &sect;17.7 Q5: commit appends to the reference log in both modes</td><td>Not started</td></tr>
-    <tr><td>FR-31</td><td>UC-13</td><td>TR &sect;17.7 Q5: rollback deletes no object and uses the stored results again</td><td>Not started</td></tr>
-    <tr><td>FR-32</td><td>UC-14</td><td>TR &sect;18.5: plugins load through entry points. A plugin package outside the repository installs with pip and runs in the service-quality example</td><td>Not started</td></tr>
-    <tr><td>FR-33</td><td>UC-14</td><td>TR &sect;18.5: a plugin with a wrong API version is refused with a reason</td><td>Not started</td></tr>
-    <tr><td>FR-34</td><td>UC-14</td><td>TR &sect;18.5, QA-14</td><td>Not started</td></tr>
-    <tr><td>FR-35</td><td>UC-15</td><td>TR &sect;18.5: a table that samples the TR 38.901 pattern agrees with the formula within the interpolation error. CPU and GPU agree within 10<sup>&minus;4</sup></td><td>Not started</td></tr>
-    <tr><td>FR-36</td><td>UC-15</td><td>TR &sect;18.5: a material table with ITU parameters is bit-identical to the built-in ITU material</td><td>Not started</td></tr>
-    <tr><td>FR-37</td><td>UC-16</td><td>No criterion in the TR yet. See the open question of UC-16</td><td>Not started</td></tr>
-    <tr><td>FR-38</td><td>UC-17</td><td>TR &sect;18.5: a grid search over 3 cells &times; 5 tilts evaluates 125 candidates with 15 traces of one transmitter</td><td>Not started</td></tr>
-    <tr><td>FR-39</td><td>UC-17</td><td>TR &sect;18.5, QA-15</td><td>Not started</td></tr>
-    <tr><td>FR-40</td><td>UC-17</td><td>TR &sect;18.5: the report of the seed check is given</td><td>Not started</td></tr>
+    <tr><td>FR-01</td><td>UC-01</td><td>Component 1: all 15 sample scenes of the reference simulator load. Shape count, triangle count and materials agree</td><td>Not started</td></tr>
+    <tr><td>FR-02</td><td>UC-01</td><td>Component 1: the same scene from local disk, MinIO and S3 gives the same hash</td><td>Not started</td></tr>
+    <tr><td>FR-03</td><td>UC-01</td><td>Component 1: an unsupported element gives a clear error and is never ignored</td><td>Not started</td></tr>
+    <tr><td>FR-04</td><td>UC-01</td><td>Component 1: the manifest hash does not change with another run, another machine or another key order</td><td>Not started</td></tr>
+    <tr><td>FR-05</td><td>UC-03</td><td>Component 7: the RAN config has its own hash. A change of it does not change the snapshot id</td><td>Not started</td></tr>
+    <tr><td>FR-06</td><td>UC-02</td><td>Component 4: one trace for K bands agrees with K single-band traces within the Monte Carlo noise. QA-02</td><td>Not started</td></tr>
+    <tr><td>FR-07</td><td>UC-03</td><td>Component 7: RSRP follows the measurement operator (<a href="#eq-14">EQ-14</a>)</td><td>Not started</td></tr>
+    <tr><td>FR-08</td><td>UC-04</td><td>Component 3, QA-01</td><td>Not started</td></tr>
+    <tr><td>FR-09</td><td>UC-02</td><td>Component 6: automatic order ray query, compute shader, CPU. A forced backend is used</td><td>Not started</td></tr>
+    <tr><td>FR-10</td><td>UC-02</td><td>Component 6: a missing GPU feature gives a logged reason and the next backend. QA-08</td><td>Not started</td></tr>
+    <tr><td>FR-11</td><td>UC-02</td><td>A warning for each material outside its validity range</td><td>Not started</td></tr>
+    <tr><td>FR-12</td><td>UC-07</td><td>Component 8, QA-05</td><td>Not started</td></tr>
+    <tr><td>FR-13</td><td>UC-07</td><td>Job state in the job-state store</td><td>Not started</td></tr>
+    <tr><td>FR-14</td><td>UC-07</td><td>Component 8, QA-11</td><td>Not started</td></tr>
+    <tr><td>FR-15</td><td>UC-07</td><td>Component 8: a second submission returns the state, the result, or runs again</td><td>Not started</td></tr>
+    <tr><td>FR-16</td><td>UC-06</td><td>Component 8: one <code>docker compose up</code> starts NATS, MinIO, the coordinator and N workers. One command runs the example job</td><td>Not started</td></tr>
+    <tr><td>FR-17</td><td>UC-05</td><td>Component 7: the preview of munich with a radio-map slice runs in the smoke test with the viewer extra</td><td>Not started</td></tr>
+    <tr><td>FR-18</td><td>UC-05</td><td>Component 7: the glTF export runs in the same smoke test</td><td>Not started</td></tr>
+    <tr><td>FR-19</td><td>UC-08</td><td>Component 7: the MDT module holds the canonical schema and its reader</td><td>Not started</td></tr>
+    <tr><td>FR-20</td><td>UC-08</td><td>Component 9, QA-09</td><td>Not started</td></tr>
+    <tr><td>FR-21</td><td>UC-08</td><td>Component 7: a new field version gives a new manifest hash and keeps the geometry hash. Old versions stay readable</td><td>Not started</td></tr>
+    <tr><td>FR-22</td><td>UC-08</td><td>Component 8: a tape job in distributed mode gives tapes that are bit-identical to library mode</td><td>Not started</td></tr>
+    <tr><td>FR-23</td><td>UC-09</td><td>Component 9: the generator gives the same data for the same configuration and seed</td><td>Not started</td></tr>
+    <tr><td>FR-24</td><td>UC-10</td><td>Component 7: a script in the style of the reference simulator runs with a change only to the import line. It gives arrays of the same shape</td><td>Not started</td></tr>
+    <tr><td>FR-25</td><td>UC-11</td><td>The default reader refuses samples without required columns, with a reason. A known check point converts within 0.1 m</td><td>Not started</td></tr>
+    <tr><td>FR-26</td><td>UC-11</td><td>QA-12</td><td>Not started</td></tr>
+    <tr><td>FR-27</td><td>UC-12</td><td>The two-cell example of <a href="#eq-21">EQ-21</a> agrees within 0.1 Mbit/s. A UE between two symmetric cells has exactly one handover when Hys &gt; 0</td><td>Not started</td></tr>
+    <tr><td>FR-28</td><td>UC-12, UC-05</td><td>The run is stored as a time series. The viewer draws one frame</td><td>Not started</td></tr>
+    <tr><td>FR-29</td><td>UC-13</td><td>Derive and diff run in both modes</td><td>Not started</td></tr>
+    <tr><td>FR-30</td><td>UC-13</td><td>Commit appends to the reference log in both modes</td><td>Not started</td></tr>
+    <tr><td>FR-31</td><td>UC-13</td><td>Rollback deletes no object and uses the stored results again</td><td>Not started</td></tr>
+    <tr><td>FR-32</td><td>UC-14</td><td>Plugins load through entry points. A plugin package outside the repository installs with pip and runs in the service-quality example</td><td>Not started</td></tr>
+    <tr><td>FR-33</td><td>UC-14</td><td>A plugin with a wrong API version is refused with a reason</td><td>Not started</td></tr>
+    <tr><td>FR-34</td><td>UC-14</td><td>QA-14</td><td>Not started</td></tr>
+    <tr><td>FR-35</td><td>UC-15</td><td>A table that samples the TR 38.901 pattern agrees with the formula within the interpolation error. CPU and GPU agree within 10<sup>&minus;4</sup></td><td>Not started</td></tr>
+    <tr><td>FR-36</td><td>UC-15</td><td>A material table with ITU parameters is bit-identical to the built-in ITU material</td><td>Not started</td></tr>
+    <tr><td>FR-37</td><td>UC-16</td><td>No criterion yet. See the open question of UC-16</td><td>Not started</td></tr>
+    <tr><td>FR-38</td><td>UC-17</td><td>A grid search over 3 cells &times; 5 tilts evaluates 125 candidates with 15 traces of one transmitter</td><td>Not started</td></tr>
+    <tr><td>FR-39</td><td>UC-17</td><td>QA-15</td><td>Not started</td></tr>
+    <tr><td>FR-40</td><td>UC-17</td><td>The report of the seed check is given</td><td>Not started</td></tr>
     <tr><td>FR-41 to FR-49</td><td>&mdash;</td><td>Won't in releases 0.1 to 0.3. No test</td><td>Won't</td></tr>
     <tr><td>NFR-01</td><td>UC-02</td><td>QA-02, QA-10, Gate 1</td><td>Not started</td></tr>
     <tr><td>NFR-02</td><td>UC-04</td><td>QA-01, Gate 1</td><td>Not started</td></tr>
@@ -3487,18 +3487,18 @@ flowchart TD
     <tr><td>NFR-09</td><td>UC-02, UC-04</td><td>QA-07</td><td>Not started</td></tr>
     <tr><td>NFR-10</td><td>All</td><td>QA-08</td><td>Not started</td></tr>
     <tr><td>NFR-11</td><td>UC-09</td><td>QA-09, acceptance of calibration v0</td><td>Not started</td></tr>
-    <tr><td>NFR-12</td><td>UC-02</td><td>TR &sect;14.3 items 2 and 6: benchmark report</td><td>Not started</td></tr>
-    <tr><td>NFR-13</td><td>UC-11, UC-12</td><td>QA-12, TR &sect;17.7 Q2</td><td>Not started</td></tr>
+    <tr><td>NFR-12</td><td>UC-02</td><td>Components 2 and 6: benchmark report</td><td>Not started</td></tr>
+    <tr><td>NFR-13</td><td>UC-11, UC-12</td><td>QA-12</td><td>Not started</td></tr>
     <tr><td>NFR-14</td><td>UC-12</td><td>QA-13</td><td>Not started</td></tr>
     <tr><td>NFR-15</td><td>UC-14</td><td>QA-14</td><td>Not started</td></tr>
     <tr><td>NFR-16</td><td>UC-17</td><td>QA-15</td><td>Not started</td></tr>
     <tr><td>NFR-17</td><td>UC-06</td><td>Deployment review, D-06</td><td>Not started</td></tr>
     <tr><td>NFR-18</td><td>&mdash; (CI)</td><td>Review of the repository settings, D-10</td><td>Not started</td></tr>
     <tr><td>NFR-19</td><td>UC-01, UC-07, UC-08, UC-13</td><td>ADR 0002: write and read tests</td><td>Not started</td></tr>
-    <tr><td>NFR-20</td><td>UC-08, UC-11</td><td>TR &sect;17.7 Q4: no real subscriber id is stored. A density scenario contains no raw tracks</td><td>Not started</td></tr>
-    <tr><td>NFR-21</td><td>All</td><td>TR &sect;14.3 item 10: release check</td><td>Not started</td></tr>
-    <tr><td>NFR-22</td><td>UC-10</td><td>TR &sect;14.3 items 7 and 10</td><td>Not started</td></tr>
-    <tr><td>NFR-23</td><td>UC-03</td><td>TR &sect;14.3 item 4, D-16</td><td>Not started</td></tr>
+    <tr><td>NFR-20</td><td>UC-08, UC-11</td><td>No real subscriber id is stored. A density scenario contains no raw tracks</td><td>Not started</td></tr>
+    <tr><td>NFR-21</td><td>All</td><td>Component 10: release check</td><td>Not started</td></tr>
+    <tr><td>NFR-22</td><td>UC-10</td><td>Components 7 and 10</td><td>Not started</td></tr>
+    <tr><td>NFR-23</td><td>UC-03</td><td>Component 4, D-16</td><td>Not started</td></tr>
   </tbody>
 </table>
 </div>
@@ -3592,7 +3592,6 @@ flowchart TD
     <tr><th>Document</th><th>ID and version</th><th>Owner</th><th>Where to find it</th></tr>
   </thead>
   <tbody>
-    <tr><td>RayTwin technical report (TR), in Vietnamese</td><td>Version 1.2, 2026-10-30</td><td>Nguyễn Duy Vũ</td><td><a href="technical-report.html">docs/technical-report.html</a></td></tr>
     <tr><td>RayTwin software architecture</td><td>2026-10-30</td><td>Nguyễn Duy Vũ</td><td><a href="architecture/ARCHITECTURE.md">docs/architecture/ARCHITECTURE.md</a></td></tr>
     <tr><td>Architecture decision records</td><td>ADR 0001 to ADR 0004</td><td>Nguyễn Duy Vũ</td><td><a href="architecture/adr/README.md">docs/architecture/adr/</a></td></tr>
     <tr><td>RayTwin README</td><td>Repository head</td><td>Nguyễn Duy Vũ</td><td><a href="../README.md">README.md</a></td></tr>
@@ -3600,10 +3599,6 @@ flowchart TD
     <tr><td>3GPP TS 38.215 &mdash; NR physical layer measurements (RSRP, RSRQ)</td><td>Release 19</td><td>3GPP</td><td><a href="https://www.3gpp.org/dynareport/38215.htm">3gpp.org</a></td></tr>
     <tr><td>3GPP TS 38.331 &mdash; NR radio resource control (L3 filter, event A3)</td><td>Release 19</td><td>3GPP</td><td><a href="https://www.3gpp.org/dynareport/38331.htm">3gpp.org</a></td></tr>
     <tr><td>3GPP TS 38.101-2 &mdash; NR frequency ranges FR2</td><td>Release 19, &sect;5.1</td><td>3GPP</td><td><a href="https://www.3gpp.org/dynareport/38101-2.htm">3gpp.org</a></td></tr>
-    <tr><td>3GPP TS 28.313 &mdash; SON for 5G</td><td>As cited in TR &sect;17.1</td><td>3GPP</td><td><a href="https://www.3gpp.org/dynareport/28313.htm">3gpp.org</a></td></tr>
-    <tr><td>3GPP TS 32.422 &mdash; Trace and MDT activation, user consent</td><td>As cited in TR &sect;17.2</td><td>3GPP</td><td><a href="https://www.3gpp.org/dynareport/32422.htm">3gpp.org</a></td></tr>
-    <tr><td>3GPP TR 36.942 and TR 38.803 &mdash; attenuated Shannon bound</td><td>As cited in TR &sect;17.3</td><td>3GPP</td><td><a href="https://www.3gpp.org/dynareport/36942.htm">3gpp.org</a></td></tr>
-    <tr><td>3GPP TS 38.306 and TS 38.214 &mdash; overhead and CQI table</td><td>As cited in TR &sect;17.3</td><td>3GPP</td><td><a href="https://www.3gpp.org/dynareport/38214.htm">3gpp.org</a></td></tr>
     <tr><td>ITU-R P.2040 &mdash; Effects of building materials on radio propagation</td><td>P.2040-4</td><td>ITU-R</td><td><a href="https://www.itu.int/rec/R-REC-P.2040">itu.int</a></td></tr>
     <tr><td>Sionna RT (reference simulator)</td><td>2.2.0</td><td>Sionna project</td><td><a href="https://pypi.org/project/sionna-rt/2.2.0/">pypi.org</a></td></tr>
     <tr><td>Mermaid (diagram display)</td><td>11.14.0</td><td>Mermaid project</td><td><a href="https://mermaid.js.org/">mermaid.js.org</a></td></tr>
@@ -3622,7 +3617,7 @@ flowchart TD
   <li>an explanation in plain words,</li>
   <li>a numerical example.</li>
 </ol>
-<p>The examples come from the TR. Many examples use the same small scene, so you can follow the numbers from one formula to the next.</p>
+<p>Many examples use the same small scene, so you can follow the numbers from one formula to the next.</p>
 
 <div class="callout"><b>How to read decibels.</b> Radio engineers write power ratios in decibels (dB): <span>\( x_{\mathrm{dB}} = 10\log_{10} x \)</span>. +3 dB is approximately 2 times the power. +10 dB is 10 times. +20 dB is 100 times. A power in dBm is a power relative to 1 mW: 0 dBm = 1 mW, 30 dBm = 1 W. In decibels, a product becomes a sum. Thus a gain adds and a loss subtracts.</div>
 

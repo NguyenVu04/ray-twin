@@ -6,7 +6,6 @@
 | **Status** | Accepted. ADR 0001 to ADR 0004 and the decisions of section 10 are in force from 2026-10-30 |
 | **Date** | 2026-10-29. Updated 2026-10-30 |
 | **Author** | Nguyễn Duy Vũ |
-| **Source of requirements** | RayTwin technical report (TR) version 1.2 ([`../technical-report.html`](../technical-report.html)) |
 | **Related decisions** | [ADR 0001](adr/0001-one-core-two-runtime-modes.md) one physics core for both runtime modes<br>[ADR 0002](adr/0002-snapshot-identity-and-path-based-storage.md) snapshot identity, RAN config, edits and history<br>[ADR 0003](adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md) bit-identical results, common random numbers, independent transmitters<br>[ADR 0004](adr/0004-plugin-api.md) plugin API from release 0.2<br>Every other decision: [section 10](#10-decisions-and-rationale) |
 | **Related documents** | [`README.md`](../../README.md) for the overview and the physics summary. [`adr/`](adr/README.md) for the decision records |
 | **Writing standard** | ASD-STE100 rules for sentence structure. The structural rules apply in full. The word-list rules are advisory |
@@ -36,11 +35,11 @@ This document gives the architecture of RayTwin. It shows the system in three vi
 
 It also gives the reason for each significant decision.
 
-The design covers every function of the TR for the MVP (release 0.1). It covers library mode and distributed mode, in the development environment and in CI. The MVP has no production environment.
+The design covers every function of the MVP (release 0.1). It covers library mode and distributed mode, in the development environment and in CI. The MVP has no production environment.
 
-The design also covers the planned additions of release 0.2 (service-quality layer and plugin API, TR §17 and §18) and of release 0.3 (tables, scene importers, SON loop and transmitter cache). The text marks each of these elements with its release. It also lists the extension points for an interactive planning twin (TR §19), which has no release yet.
+The design also covers the planned additions of release 0.2 (service-quality layer and plugin API) and of release 0.3 (tables, scene importers, SON loop and transmitter cache). The text marks each of these elements with its release. It also lists the extension points for an interactive planning twin, which has no release yet.
 
-This document contains no code and no operational runbook. It does not give the physics formulas or the numerical examples. The TR and the README give them. It does not give a schedule. The TR gives the order of the components and the gates.
+This document contains no code and no operational runbook. It does not give the physics formulas or the numerical examples. The [README](../../README.md#how-it-works) gives them. It does not give a schedule. The [README roadmap](../../README.md#roadmap) gives the order of the components and the gates.
 
 | Reader | Comes here for | Starts at |
 |---|---|---|
@@ -81,7 +80,7 @@ This document contains no code and no operational runbook. It does not give the 
 | Seed key | The input of the random-number generator: manifest seed, transmitter, ray index, bounce and draw index |
 | Common random numbers (CRN) | The use of the same random numbers in two jobs that SON compares. The noise then cannot hide the difference between the two configurations |
 | Reference oracle | The pinned reference simulator (Sionna RT 2.2.0). CI uses it to check RayTwin results. It is not a runtime dependency |
-| Gate | A checkpoint in the TR plan. Work continues only when the gate criteria pass |
+| Gate | A checkpoint in the plan of the [README roadmap](../../README.md#gates). Work continues only when the gate criteria pass |
 | Ray-sufficient cell | A voxel or plane cell that at least 100 ray segments cross. Every quantitative comparison uses only these cells. The result array `segments` holds the count |
 
 The [README glossary](../../README.md#glossary) defines the radio terms, for example RSRP, SINR, MDT, CIR, SBR and BVH.
@@ -133,48 +132,48 @@ The Graphviz program `dot` must be on `PATH`. On Windows, the Graphviz installer
 
 ### 4.1 Functions
 
-The TR has no requirement ids. This table gives each MVP function an id. The other sections refer to these ids.
+This table gives each MVP function an id. The other sections refer to these ids.
 
-| # | Function | Input and output | Modes | TR |
-|---|---|---|---|---|
-| F-01 | Load a scene | Mitsuba XML and PLY from local disk, S3 or MinIO → triangle mesh with material classes and a content hash | Both | §14.3 item 1 |
-| F-02 | Make a snapshot and a RAN config | Scene with an optional CRS, material field, bands, transmitters and solver settings → manifest and snapshot id. Radio parameters → RAN config and its hash. A new field version keeps the scene hash | Both | §10.2 |
-| F-03 | Calculate a multi-band 3D radio map | Snapshot and voxel grid → path gain `[band, tx, z, y, x]` and `segments` `[tx, z, y, x]`, with the grid, band, transmitter and CRS attributes. RSRP and SINR at read time from a RAN config. Optional measurement plane | Both | §4.6, §12 |
-| F-04 | Calculate the CIR and the CFR per antenna element | Snapshot and receiver points → `a[rx, rx_ant, tx, tx_ant, path, band]`, `τ[rx, rx_ant, tx, tx_ant, path]` and a validity mask | Both | §13 |
-| F-05 | Evaluate the material field | Hit point, class and frequency → εr, σ and thickness from the ITU prior and the δ grid. A warning outside the ITU validity range | Both | §11.1, §12.5 |
-| F-06 | Calibrate the material field | Snapshot, RAN config and MDT samples in the canonical schema → tapes → PyTorch loop on reported RSRP → new field version | Both | §11.3, §11.5, §11.7 |
-| F-07 | Select a backend | Adapter capabilities and configuration → `GpuRayQuery`, `GpuCompute` or `Cpu`, with the reason for each skipped backend | Both | §10.7 |
-| F-08 | Run jobs on many workers | Job spec → tasks on JetStream → parts → merged result. Includes job state, a second submission and cancellation | Distributed | §10.4 |
-| F-09 | Give a Python API | Native API (Manifest → Job → Result) and `raytwin.compat` with Sionna-compatible names | Both | §10.5 |
-| F-10 | Compare with the reference oracle in CI | Pull request → comparison report and a Gate 1 result | CI only | §14.3 item 5 |
-| F-11 | Generate simulated MDT | Known field, seed and error parameters, including an EPRE error per cell → RSRP samples from the reference simulator in the canonical MDT schema, for the twin experiment | Tool only | §11.5 |
-| F-12 | Package and release | Source → wheels for Linux x86_64, macOS arm64 and Windows x86_64, crates and a container image | Release | §14.3 items 7 and 10 |
-| F-13 | Show the scene and the results in 3D | Scene, radio-map result, paths and points → interactive preview in Jupyter and a `.glb` file. Release 0.2 adds users, serving cells, cell load and handover events for one time step | Client | §10.5, §19 |
-| F-14 | Simulate service quality (release 0.2) | Radio-map result, RAN config and scenario → time series per user and per cell: serving cell, RSRP, SINR, throughput, cell load, handover events | Client | §17 |
-| F-15 | Make scenarios from MDT (release 0.2) | MDT, PM and the scenario plugin → user population, traffic and trajectories with a seed | Client | §17.4 |
-| F-16 | Load plugins (release 0.2) | Installed entry points and snapshot tables → plugin objects with a checked API version and an identity in the job id | Client | §18 |
-| F-17 | Edit a plan and go back (release 0.2) | Snapshot or RAN config and a config delta → new document. Reference log with history and rollback | Client | §19.3 |
-| F-18 | Run a SON loop (release 0.3) | SON policy, baseline and scenario → evaluated candidates with KPIs, with reuse of transmitter results | Client and distributed | §18.4 |
+| # | Function | Input and output | Modes |
+|---|---|---|---|
+| F-01 | Load a scene | Mitsuba XML and PLY from local disk, S3 or MinIO → triangle mesh with material classes and a content hash | Both |
+| F-02 | Make a snapshot and a RAN config | Scene with an optional CRS, material field, bands, transmitters and solver settings → manifest and snapshot id. Radio parameters → RAN config and its hash. A new field version keeps the scene hash | Both |
+| F-03 | Calculate a multi-band 3D radio map | Snapshot and voxel grid → path gain `[band, tx, z, y, x]` and `segments` `[tx, z, y, x]`, with the grid, band, transmitter and CRS attributes. RSRP and SINR at read time from a RAN config. Optional measurement plane | Both |
+| F-04 | Calculate the CIR and the CFR per antenna element | Snapshot and receiver points → `a[rx, rx_ant, tx, tx_ant, path, band]`, `τ[rx, rx_ant, tx, tx_ant, path]` and a validity mask | Both |
+| F-05 | Evaluate the material field | Hit point, class and frequency → εr, σ and thickness from the ITU prior and the δ grid. A warning outside the ITU validity range | Both |
+| F-06 | Calibrate the material field | Snapshot, RAN config and MDT samples in the canonical schema → tapes → PyTorch loop on reported RSRP → new field version | Both |
+| F-07 | Select a backend | Adapter capabilities and configuration → `GpuRayQuery`, `GpuCompute` or `Cpu`, with the reason for each skipped backend | Both |
+| F-08 | Run jobs on many workers | Job spec → tasks on JetStream → parts → merged result. Includes job state, a second submission and cancellation | Distributed |
+| F-09 | Give a Python API | Native API (Manifest → Job → Result) and `raytwin.compat` with Sionna-compatible names | Both |
+| F-10 | Compare with the reference oracle in CI | Pull request → comparison report and a Gate 1 result | CI only |
+| F-11 | Generate simulated MDT | Known field, seed and error parameters, including an EPRE error per cell → RSRP samples from the reference simulator in the canonical MDT schema, for the twin experiment | Tool only |
+| F-12 | Package and release | Source → wheels for Linux x86_64, macOS arm64 and Windows x86_64, crates and a container image | Release |
+| F-13 | Show the scene and the results in 3D | Scene, radio-map result, paths and points → interactive preview in Jupyter and a `.glb` file. Release 0.2 adds users, serving cells, cell load and handover events for one time step | Client |
+| F-14 | Simulate service quality (release 0.2) | Radio-map result, RAN config and scenario → time series per user and per cell: serving cell, RSRP, SINR, throughput, cell load, handover events | Client |
+| F-15 | Make scenarios from MDT (release 0.2) | MDT, PM and the scenario plugin → user population, traffic and trajectories with a seed | Client |
+| F-16 | Load plugins (release 0.2) | Installed entry points and snapshot tables → plugin objects with a checked API version and an identity in the job id | Client |
+| F-17 | Edit a plan and go back (release 0.2) | Snapshot or RAN config and a config delta → new document. Reference log with history and rollback | Client |
+| F-18 | Run a SON loop (release 0.3) | SON policy, baseline and scenario → evaluated candidates with KPIs, with reuse of transmitter results | Client and distributed |
 
 ### 4.2 Quality attribute scenarios
 
-The Attribute column uses only the characteristics and sub-characteristics of the product quality model in ISO/IEC 25010:2023, in the form "characteristic: sub-characteristic". The scenario gives the RayTwin meaning of each attribute.
+The Attribute column uses only the characteristics and sub-characteristics of the product quality model in ISO/IEC 25010:2023, in the form "characteristic: sub-characteristic". The scenario gives the RayTwin meaning of each attribute. In the Source column, "Component n" is component n of the [README roadmap](../../README.md#component-order).
 
 | # | Attribute | Stimulus | Response | Measure | Source |
 |---|---|---|---|---|---|
-| QA-01 | Functional suitability: functional correctness | CI compares a CIR with the oracle on the same scene, materials and depth (3 or less) | RayTwin finds every specular path of the oracle | 100 % of the oracle paths. \|Δτ\| ≤ 1 ps. \|a\| within 0.1 dB, also per element pair | TR §14.4, Gate 1 |
-| QA-02 | Functional suitability: functional correctness | CI compares path gain on a measurement plane with the oracle, at two bands | Path gain agrees on ray-sufficient cells | Median deviation ≤ 1 dB. P90 ≤ 3 dB | TR §14.4, Gate 1 |
-| QA-03 | Functional suitability: functional correctness | A job runs again with the same snapshot, but with another thread count, worker count or batch size | The result does not change | Bit-identical for the same backend. Each GPU path within 10⁻⁴ (relative) of the CPU on ray-sufficient cells | TR §14.3 items 2 and 6 |
-| QA-04 | Functional suitability: functional correctness | SON submits two jobs that differ only in tilt, azimuth or transmit power, with the same seed | Both jobs trace the same ray paths | 100 % identical paths. Only the ray weights differ | TR §3, ADR 0003 |
-| QA-05 | Flexibility: scalability | The worker count increases from 1 to 4, with the same thread count per worker | The wall time decreases and the result does not change | Speed-up ≥ 3. Result bit-identical to 1 worker | TR §14.4, Gate 2 |
-| QA-06 | Reliability: fault tolerance | A worker stops during a task | JetStream gives the task to another worker | The final result does not change. No part counts two times. A task that always fails stops after 5 deliveries, and the job becomes `failed` | TR §14.3 item 8 |
-| QA-07 | Performance efficiency: resource utilization | The munich scene, a 1 km² × 60 m map with 4 bands and a 64T64R CIR run on the development GPU | The job runs on the GPU | Peak VRAM below 4 GB. The backend selects the batch size from the free VRAM | TR §14.3 item 6 |
-| QA-08 | Flexibility: installability | A user installs the wheel on Linux x86_64, macOS arm64 or Windows x86_64 | The smoke test passes. Linux and Windows use the GPU through Vulkan | 3 of 3 operating systems pass in CI. A missing GPU feature gives a logged reason and the next backend | TR §14.3 items 6 and 7 |
-| QA-09 | Functional suitability: functional correctness | The twin experiment evaluates held-out cells and tilts | The calibrated field predicts better than the prior | RSRP RMSE at least 30 % lower. Spearman ρs ≥ 0.8 for the tilt ranking | TR §14.4 |
-| QA-10 | Maintainability: testability | A pull request changes physics code | CI compares the change with the oracle before the merge | Every pull request runs the full comparison, with munich at two bands. A Gate 1 failure blocks the merge | TR §14.3 item 5 |
+| QA-01 | Functional suitability: functional correctness | CI compares a CIR with the oracle on the same scene, materials and depth (3 or less) | RayTwin finds every specular path of the oracle | 100 % of the oracle paths. \|Δτ\| ≤ 1 ps. \|a\| within 0.1 dB, also per element pair | Gate 1 |
+| QA-02 | Functional suitability: functional correctness | CI compares path gain on a measurement plane with the oracle, at two bands | Path gain agrees on ray-sufficient cells | Median deviation ≤ 1 dB. P90 ≤ 3 dB | Gate 1 |
+| QA-03 | Functional suitability: functional correctness | A job runs again with the same snapshot, but with another thread count, worker count or batch size | The result does not change | Bit-identical for the same backend. Each GPU path within 10⁻⁴ (relative) of the CPU on ray-sufficient cells | Components 2 and 6 |
+| QA-04 | Functional suitability: functional correctness | SON submits two jobs that differ only in tilt, azimuth or transmit power, with the same seed | Both jobs trace the same ray paths | 100 % identical paths. Only the ray weights differ | ADR 0003 |
+| QA-05 | Flexibility: scalability | The worker count increases from 1 to 4, with the same thread count per worker | The wall time decreases and the result does not change | Speed-up ≥ 3. Result bit-identical to 1 worker | Gate 2 |
+| QA-06 | Reliability: fault tolerance | A worker stops during a task | JetStream gives the task to another worker | The final result does not change. No part counts two times. A task that always fails stops after 5 deliveries, and the job becomes `failed` | Component 8 |
+| QA-07 | Performance efficiency: resource utilization | The munich scene, a 1 km² × 60 m map with 4 bands and a 64T64R CIR run on the development GPU | The job runs on the GPU | Peak VRAM below 4 GB. The backend selects the batch size from the free VRAM | Component 6 |
+| QA-08 | Flexibility: installability | A user installs the wheel on Linux x86_64, macOS arm64 or Windows x86_64 | The smoke test passes. Linux and Windows use the GPU through Vulkan | 3 of 3 operating systems pass in CI. A missing GPU feature gives a logged reason and the next backend | Components 6 and 7 |
+| QA-09 | Functional suitability: functional correctness | The twin experiment evaluates held-out cells and tilts | The calibrated field predicts better than the prior | RSRP RMSE at least 30 % lower. Spearman ρs ≥ 0.8 for the tilt ranking | Calibration v0 acceptance |
+| QA-10 | Maintainability: testability | A pull request changes physics code | CI compares the change with the oracle before the merge | Every pull request runs the full comparison, with munich at two bands. A Gate 1 failure blocks the merge | Component 5 |
 | QA-11 | Performance efficiency: time behaviour | A client cancels a running job | No new task of the job starts, and running tasks stop | No task starts after the reply. Each running task stops within one in-progress interval (10 s) plus one sub-batch | D-06 |
 | QA-12 | Functional suitability: functional correctness (release 0.2) | Two service-quality runs use the same scenario and seed with two network configurations | Both runs use the same users and the same random draws | 100 % identical user positions and traffic. Only the network quantities differ | ADR 0003 |
-| QA-13 | Performance efficiency: time behaviour (release 0.2) | One static evaluation with 10⁵ users and 50 cells on the development laptop | The evaluation runs in the client process | Measured and reported, with no threshold. The TR estimate is below 1 s per fixed-point iteration | TR §17.6 |
+| QA-13 | Performance efficiency: time behaviour (release 0.2) | One static evaluation with 10⁵ users and 50 cells on the development laptop | The evaluation runs in the client process | Measured and reported, with no threshold. The design estimate is below 1 s per fixed-point iteration | D-11 |
 | QA-14 | Maintainability: modifiability (release 0.2) | A developer adds a new link model as a plugin package | RayTwin loads the plugin through its entry point. The conformance check runs it two times, and once with its input rows in another order | No change in the RayTwin code. Bit-identical outputs. A plugin that fails the check is not loaded by default | ADR 0004 |
 | QA-15 | Performance efficiency: time behaviour (release 0.3) | A user changes the tilt of k transmitters, or adds k sites | Only the changed transmitters are traced again | k transmitters traced. The other transmitter results are reused and stay bit-identical | ADR 0003 |
 
@@ -182,15 +181,15 @@ The Attribute column uses only the characteristics and sub-characteristics of th
 
 | # | Constraint | Imposed by | Effect on the design |
 |---|---|---|---|
-| C-01 | One person builds and maintains RayTwin. The MVP target is 1 to 2 months. This is a wish, not a commitment | Owner, TR Appendix A | One physics core (ADR 0001). No plugin API in 0.1 (ADR 0004). Few runtime components |
+| C-01 | One person builds and maintains RayTwin. The MVP target is 1 to 2 months. This is a wish, not a commitment | Owner | One physics core (ADR 0001). No plugin API in 0.1 (ADR 0004). Few runtime components |
 | C-02 | The development machine is a dual-boot laptop with an RTX 3050 Ti (4 GB VRAM) | Owner's hardware | Batch size comes from the free VRAM. The same laptop is the GPU CI runner (D-10). Gate 2 runs on one machine |
 | C-03 | In wgpu 30.0.1, ray query is experimental and Vulkan-only. f64 in shaders is Vulkan-only | wgpu project | The MVP runs the GPU only on Linux and Windows. A compute-shader path exists next to ray query (D-07) |
-| C-04 | The repository is public, under MIT OR Apache-2.0 | Owner, TR Appendix A | Untrusted pull requests do not run on the GPU runner (D-10). No secret appears in documents or CI logs |
-| C-05 | No real MDT exists for the MVP | Owner, TR Appendix A | Calibration v0 uses simulated MDT from the reference simulator, not from RayTwin, to prevent an inverse crime |
+| C-04 | The repository is public, under MIT OR Apache-2.0 | Owner | Untrusted pull requests do not run on the GPU runner (D-10). No secret appears in documents or CI logs |
+| C-05 | No real MDT exists for the MVP | Owner | Calibration v0 uses simulated MDT from the reference simulator, not from RayTwin, to prevent an inverse crime |
 | C-06 | Scenes arrive as a subset of Mitsuba XML with PLY meshes | Sample scenes of the reference oracle | The parser reads only that subset. It reports each element that it does not support |
-| C-07 | The MVP validates FR1 only | Owner, TR §12.5 | Band, material and antenna types have no band limit. FR2 needs no architecture change |
+| C-07 | The MVP validates FR1 only | Owner | Band, material and antenna types have no band limit. FR2 needs no architecture change |
 | C-08 | JetStream limits: 1 MB message payload, `AckWait` 30 s by default, no redelivery limit by default | NATS JetStream | Messages carry only references. In-progress acknowledgements every 10 s. `MaxDeliver` 5 (D-05) |
-| C-09 | The reference oracle is pinned to version 2.2.0 | Owner, TR §14.3 item 5 | CI caches oracle results by scene hash, oracle version and configuration |
+| C-09 | The reference oracle is pinned to version 2.2.0 | Owner | CI caches oracle results by scene hash, oracle version and configuration |
 | C-10 | Gate 2 runs 4 workers on one machine | C-02 | Each worker uses T threads, with 4T not more than the physical core count. The 1-worker baseline also uses T threads |
 | C-11 | MDT throughput, delay and loss (M4 to M7) exist only when the operator configures immediate MDT. Few samples have a GNSS position | 3GPP TS 37.320, operator practice | The service-quality layer ranks scenarios. It does not promise absolute throughput. Its validation uses PM counters when M5 is absent |
 | C-12 | MDT needs user consent and contains personal data | 3GPP TS 32.422, data-protection law | RayTwin accepts only pseudonymous trace ids. It never stores an IMSI, a SUPI or an IMEI. Scenarios for sharing use densities, not raw tracks |
@@ -463,7 +462,7 @@ classDiagram
 
 - a 32-bit emulation of 64-bit atomics ([D-07](#10-decisions-and-rationale))
 - plugin code of any kind. Plugins act only through tables in the snapshot ([ADR 0004](adr/0004-plugin-api.md))
-- diffraction and diffuse scattering, which come after the MVP (TR §14.1). They will be part of the core, not plugins
+- diffraction and diffuse scattering, which come after the MVP. They will be part of the core, not plugins
 - service-quality models. They are in the Python package ([ADR 0001](adr/0001-one-core-two-runtime-modes.md))
 
 ### 6.5 `raytwin-store`
@@ -848,7 +847,7 @@ classDiagram
 
 **Tapes without a copy.** In library mode, the tape arrays are NumPy views on Rust memory, and `torch.from_numpy` uses them directly. In distributed mode, `trace_frozen` reads the tape parts from Zarr into NumPy one time.
 
-**Scope of `compat`.** It covers `load_scene`, `PlanarArray`, `Transmitter`, `Receiver`, `PathSolver`, `RadioMapSolver` and `cir(out_type="numpy")`. A change of the reference API changes only this module (TR §10.5).
+**Scope of `compat`.** It covers `load_scene`, `PlanarArray`, `Transmitter`, `Receiver`, `PathSolver`, `RadioMapSolver` and `cir(out_type="numpy")`. A change of the reference API changes only this module.
 
 ### 6.8 `raytwin.qos`, `raytwin.plugins` and `raytwin.son` (releases 0.2 and 0.3)
 
@@ -1375,7 +1374,7 @@ The owner, Nguyễn Duy Vũ, made each decision below in the design reviews of 2
 
 - Rows D-01 to D-04 have an ADR in [`adr/`](adr/README.md).
 - Rows D-05 to D-16 have no ADR. The row is the record of the decision. During the design phase, a change edits the row directly.
-- Rows T-01 and T-02 come from the TR decision log.
+- Rows T-01 and T-02 come from the decision log of the first plan.
 - Rows P-01 to P-08 are preferences. They are cheap to change.
 
 | # | Decision | Answers | Alternative rejected | ADR |
@@ -1396,8 +1395,8 @@ The owner, Nguyễn Duy Vũ, made each decision below in the design reviews of 2
 | D-14 | MDT matching uses reported RSRP through a measurement operator: reference-signal EPRE, path gain, UE gain and body loss, beam consolidation, 1 dB quantization, reporting range. RSS is only a derived value | F-06, QA-09 | Total received power (RSS) as the observable, because MDT does not report it, and its conversion to RSRP adds an unknown offset per cell that calibration would put into the material field | — |
 | D-15 | Radio parameters in a RAN config with its own hash. RSRP, SINR and service quality are identified by (job id, RAN config hash) | F-02, F-03, QA-04 | Radio parameters in the manifest, because a change would start a new trace | — |
 | D-16 | 3D viewer `raytwin.viz` in release 0.1, through the optional extra `raytwin[viz]` (trimesh): inline preview in Jupyter and `.glb` export. No image renderer | F-13 | A viewer in a separate application, because the MVP has no UI. A path-traced image renderer, because a screenshot of the preview is sufficient | — |
-| T-01 | Native Python API (Manifest → Job → Result) plus `raytwin.compat` | F-09 | Only a Sionna-compatible API, because it does not fit versioned snapshots and distributed jobs | TR Appendix A |
-| T-02 | Pinned reference oracle in CI, with cached reference results | QA-01, QA-02, QA-10, C-09 | An oracle without a pinned version, because its results change between releases | TR Appendix A |
+| T-01 | Native Python API (Manifest → Job → Result) plus `raytwin.compat` | F-09 | Only a Sionna-compatible API, because it does not fit versioned snapshots and distributed jobs | — |
+| T-02 | Pinned reference oracle in CI, with cached reference results | QA-01, QA-02, QA-10, C-09 | An oracle without a pinned version, because its results change between releases | — |
 | P-01 | The GPU code is in `raytwin-core` behind the cargo feature `gpu` | F-07, F-12 | A separate GPU crate, because core internals would have to become public | — |
 | P-02 | One binary `raytwin` with the subcommands `coordinator` and `worker`. One CPU-only container image. The GPU worker runs on the host | F-08 | Vulkan inside containers, because it needs the NVIDIA Container Toolkit with graphics support | — |
 | P-03 | The coordinator merges parts from the object store after the last task. State only in KV and in the object store. One coordinator | QA-06 | A merge in memory, because a restart loses it. Reduce tasks on workers, because they add a task kind | — |
@@ -1443,13 +1442,13 @@ The owner, Nguyễn Duy Vũ, made each decision below in the design reviews of 2
 | QA-13 | Module | `qos.evaluate` |
 | QA-14 | Module | `plugins.check` |
 | QA-15 | Module, C&C | `Manifest.tx_key`, `task::plan`, transmitter cache in section 6.6 |
-| Plugin API (TR §18) | Module | Release 0.1: none. Release 0.2 and 0.3: section 6.8 ([ADR 0004](adr/0004-plugin-api.md)) |
+| Plugin API | Module | Release 0.1: none. Release 0.2 and 0.3: section 6.8 ([ADR 0004](adr/0004-plugin-api.md)) |
 
 ## 12. Open items
 
 These items are outside this design, or need a decision before implementation.
 
-1. **Second license file.** The TR names MIT OR Apache-2.0 with both license files. The repository has only the MIT file. The owner adds `LICENSE-APACHE` before release 0.1.
+1. **Second license file.** The planned license is MIT OR Apache-2.0, with both license files. The repository has only the MIT file. The owner adds `LICENSE-APACHE` before release 0.1.
 2. **Coordinator availability.** One coordinator runs. If it stops, jobs wait until it starts again. While it is down, it also misses max-deliveries advisories (C10). P-08 covers panics, but not a worker process that stops on its last delivery at that time. The next step is a periodic check for stuck jobs, or a second coordinator.
 3. **Authentication and TLS.** The Compose stack uses a NATS user and password and MinIO access keys from `.env`. It uses no TLS. Run distributed mode only on a trusted network until a later decision defines NATS accounts and TLS.
 4. **Layers inside `raytwin-core`.** Rules 2 and 6 of section 6.2 depend on review only. If review is not sufficient, split the core into more crates.
@@ -1459,13 +1458,13 @@ These items are outside this design, or need a decision before implementation.
 8. **Formula for the scale s.** Component 4 must show by test that no voxel sum can exceed 2⁶³ ([ADR 0003](adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md)).
 9. **Tape size.** Component 9 measures the tape size in distributed mode (samples × paths × hits). If it is too large, compress the tapes or split them by band.
 10. **GPU tests on Windows.** The laptop runs one operating system at a time. The owner runs the GPU test suite on Windows by hand before each release.
-11. **Trademark check.** Before release, check the name RayTwin in Nice classes 9 and 42. Also check that the crate and package names are free (TR §14.3 item 10).
-12. **Validation of service quality.** The twin experiment checks the radio part only. The service-quality layer needs real MDT with M5 or PM counters (PRB utilization, active users, handover counters) before a statement about its accuracy (TR §17.6, C-11).
+11. **Trademark check.** Before release, check the name RayTwin in Nice classes 9 and 42. Also check that the crate and package names are free (component 10).
+12. **Validation of service quality.** The twin experiment checks the radio part only. The service-quality layer needs real MDT with M5 or PM counters (PRB utilization, active users, handover counters) before a statement about its accuracy (C-11).
 13. **MDT privacy.** RayTwin stores only pseudonymous trace ids. The owner defines how long MDT samples and scenario tracks stay in the object store before real data arrives (C-12).
-14. **Mobility KPIs are proxies.** The radio map has no fast fading, so the radio link failure count is a proxy, and Monte Carlo noise of about 0.4 dB can cause false ping-pong. Report mobility KPIs as comparisons between scenarios, and mask cells with fewer than 100 segments (TR §17.6).
-15. **SSB beams of massive MIMO cells.** Release 0.3 uses the envelope of the SSB beams as one pattern table. The envelope is an upper bound of the best-beam RSRP. Maps per SSB beam, in one trace like the bands, are the next step if the bias matters (TR §11.7).
+14. **Mobility KPIs are proxies.** The radio map has no fast fading, so the radio link failure count is a proxy, and Monte Carlo noise of about 0.4 dB can cause false ping-pong. Report mobility KPIs as comparisons between scenarios, and mask cells with fewer than 100 segments.
+15. **SSB beams of massive MIMO cells.** Release 0.3 uses the envelope of the SSB beams as one pattern table. The envelope is an upper bound of the best-beam RSRP. Maps per SSB beam, in one trace like the bands, are the next step if the bias matters.
 16. **Transmitter cache size.** Objects under `tx/` grow with each new transmitter configuration. They fall under item 7.
-17. **Interactive planning twin.** No release has a UI yet. The design keeps these extension points open (TR §19):
+17. **Interactive planning twin.** No release has a UI yet. The design keeps these extension points open:
     - edits as config deltas, a reference log and rollback (ADR 0002);
     - independent transmitters and the transmitter cache (ADR 0003, D-13);
     - stable ids for cells, transmitters, users, scenarios and jobs;

@@ -7,17 +7,17 @@
 
 ## Context
 
-SBR is a Monte Carlo method. SON compares candidate configurations, for example two tilt values. The Monte Carlo noise can be larger than the difference that SON must measure ([TR §3](../../technical-report.html#boi-canh)).
+SBR is a Monte Carlo method. SON compares candidate configurations, for example two tilt values. The Monte Carlo noise can be larger than the difference that SON must measure.
 
-The accepted criteria ([TR §14.3](../../technical-report.html#mvp-tieu-chi)) are:
+The accepted criteria are:
 
 - The same seed gives a bit-identical result for any number of CPU threads.
 - Each GPU path is bit-identical between runs and within 10⁻⁴ (relative) of the CPU.
 - Four workers agree with one worker within 10⁻⁶ (relative).
 
-[TR §10.7](../../technical-report.html#kt-gpu) takes random numbers from the key (job, Tx, ray id, bounce). Two jobs that compare two configurations have different job ids, so they get different random numbers. TR §10.7 also uses fixed-point accumulation only on the GPU. A floating-point sum depends on the order of its terms. Thread count, worker count and merge order can then change the last bits of a CPU result.
+The first draft of the design takes random numbers from the key (job, Tx, ray id, bounce). Two jobs that compare two configurations have different job ids, so they get different random numbers. The draft also uses fixed-point accumulation only on the GPU. A floating-point sum depends on the order of its terms. Thread count, worker count and merge order can then change the last bits of a CPU result.
 
-The design review of 2026-10-30 added two needs. The service-quality layer compares scenarios, so its random user populations need the same protection as the rays ([TR §17.4](../../technical-report.html#qos-kich-ban)). Planning edits change one transmitter at a time, so the result of one transmitter must not depend on the others ([TR §19.3](../../technical-report.html#tt-moc)).
+The design review of 2026-10-30 added two needs. The service-quality layer compares scenarios, so its random user populations need the same protection as the rays. Planning edits change one transmitter at a time, so the result of one transmitter must not depend on the others.
 
 ## Decision
 
@@ -63,6 +63,6 @@ The design review of 2026-10-30 added two needs. The service-quality layer compa
 
 **Floating-point atomics on the GPU.** This is faster and simpler. Rejected because the sum depends on thread order, so two runs are not bit-identical.
 
-**A key that contains the job id ([TR §10.7](../../technical-report.html#kt-gpu)).** Different jobs get independent random numbers. Rejected because SON comparisons need common random numbers between jobs.
+**A key that contains the job id.** Different jobs get independent random numbers. Rejected because SON comparisons need common random numbers between jobs.
 
 **One scale s for the whole job.** It is one number to store. Rejected because the scale would depend on all transmitters. A new site would then change the integer values of the other transmitters, and their results could not be reused.

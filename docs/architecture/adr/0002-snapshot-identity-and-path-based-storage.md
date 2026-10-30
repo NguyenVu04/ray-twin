@@ -7,9 +7,9 @@
 
 ## Context
 
-A manifest describes every input of one simulation. The hash of the manifest identifies the snapshot, and workers cache inputs by content hash ([TR §10.2](../../technical-report.html#kt-du-lieu)).
+A manifest describes every input of one simulation. The hash of the manifest identifies the snapshot, and workers cache inputs by content hash.
 
-TR criterion 1 requires that the same scene gives the same hash from local disk, from MinIO and from S3 ([TR §14.3](../../technical-report.html#mvp-tieu-chi)). The example manifest in TR §10.2 contains URIs. A hash over that manifest changes when only the location changes. The example also identifies the material field by a version number. A number does not prove the content.
+The completion criteria of component 1 require that the same scene gives the same hash from local disk, from MinIO and from S3. The example manifest of the first draft contains URIs. A hash over that manifest changes when only the location changes. The example also identifies the material field by a version number. A number does not prove the content.
 
 Two storage layouts were possible:
 
@@ -18,8 +18,8 @@ Two storage layouts were possible:
 
 The design review of 2026-10-30 added three needs:
 
-- RSRP, SINR and service quality need radio parameters, for example the reference-signal power and the cell individual offset. These parameters do not change the ray paths. A change of them must not cause a new ray trace ([TR §17.5](../../technical-report.html#qos-tich-hop)).
-- A planning engineer edits a configuration in small steps and must be able to go back to an earlier step ([TR §19.3](../../technical-report.html#tt-moc)).
+- RSRP, SINR and service quality need radio parameters, for example the reference-signal power and the cell individual offset. These parameters do not change the ray paths. A change of them must not cause a new ray trace.
+- A planning engineer edits a configuration in small steps and must be able to go back to an earlier step.
 - Real measurement data has geographic coordinates. The scene needs a coordinate reference.
 
 ## Decision
@@ -79,7 +79,7 @@ The design review of 2026-10-30 added three needs:
 
 **Content-addressed blobs with named references.** The structure itself guarantees immutability and removes duplicates. Rejected by the owner because import must copy every input, the bucket is hard to read by eye, and unused blobs need garbage collection. Hash checks with create-only writes protect every object that RayTwin writes.
 
-**A manifest hash that includes the URIs.** This is the simplest rule. Rejected because one content at two locations gets two ids. That breaks TR criterion 1 and the worker cache by content.
+**A manifest hash that includes the URIs.** This is the simplest rule. Rejected because one content at two locations gets two ids. That breaks the criteria of component 1 and the worker cache by content.
 
 **Field versions identified only by number.** Numbers are easy to read. Rejected because a number does not prove which content a snapshot used.
 

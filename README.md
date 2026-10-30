@@ -13,7 +13,6 @@ RayTwin is a Rust ray-tracing engine that calculates versioned 3D radio maps and
 | **Contact** | [GitHub Issues](https://github.com/NguyenVu04/ray-twin/issues) |
 | **Source of record** | <https://github.com/NguyenVu04/ray-twin> |
 | **Issue tracker** | <https://github.com/NguyenVu04/ray-twin/issues> |
-| **Design document** | [`docs/technical-report.html`](docs/technical-report.html) (Vietnamese, version 1.2, 30 October 2026) |
 | **Architecture** | [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) |
 | **Decisions** | [`docs/architecture/adr/`](docs/architecture/adr/README.md) and [section 10 of the architecture](docs/architecture/ARCHITECTURE.md#10-decisions-and-rationale) |
 
@@ -805,7 +804,7 @@ For this reason, RayTwin splits the validation set by cell and by configuration 
 
 ## Service-quality simulation (release 0.2)
 
-A SON application must also know what the users get: throughput, cell load, and handovers. The service-quality layer `raytwin.qos` calculates these values from a radio map, a RAN config, and a scenario. It is a Python module in the client process. It reads results and traces no rays. The design is in [TR §17](docs/technical-report.html#qos).
+A SON application must also know what the users get: throughput, cell load, and handovers. The service-quality layer `raytwin.qos` calculates these values from a radio map, a RAN config, and a scenario. It is a Python module in the client process. It reads results and traces no rays.
 
 A scenario is a set of users with traffic and trajectories, and a seed. It comes from MDT: positions of samples, a user density per voxel scaled to PM counters, or the trajectories of logged MDT. The random generator of a scenario does not use the network configuration. Thus two configurations of one scenario see the same users ([ADR 0003](docs/architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md)).
 
@@ -965,7 +964,7 @@ flowchart TD
 
 ### Interactive planning
 
-A later phase adds a user interface for planning engineers. The design already keeps these extension points open ([TR §19](docs/technical-report.html#tuong-tac)):
+A later phase adds a user interface for planning engineers. The design already keeps these extension points open:
 
 - Edits are config deltas with a history and a rollback.
 - Each transmitter has an independent result, so an edit traces only the changed transmitters.

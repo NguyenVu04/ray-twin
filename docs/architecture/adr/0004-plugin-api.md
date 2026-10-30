@@ -7,14 +7,14 @@
 
 ## Context
 
-[TR §10.6](../../technical-report.html#kt-plugin) first listed six extension traits for the physics: `Backend`, `MaterialField`, `InteractionModel`, `AntennaPattern`, `RadioMapSink` and `TaskQueue`. The design review of 2026-10-29 found these problems:
+The first draft of the design listed six extension traits for the physics: `Backend`, `MaterialField`, `InteractionModel`, `AntennaPattern`, `RadioMapSink` and `TaskQueue`. The design review of 2026-10-29 found these problems:
 
 - WGSL shaders cannot call Rust trait objects. A plugin for `MaterialField`, `AntennaPattern` or `InteractionModel` cannot run on a GPU backend.
 - The GPU accumulates with atomics in VRAM. It cannot call back to a `RadioMapSink` on the CPU.
 - The correct shape of `InteractionModel` is not known before the design of diffuse scattering and diffraction. Diffraction acts on edges, not on hit points.
 - `TaskQueue` has only one implementation ([ADR 0001](0001-one-core-two-runtime-modes.md)).
 
-Release 0.2 adds a service-quality layer ([TR §17](../../technical-report.html#qos)). Its association, link, sharing, mobility and scenario models are policies that each operator and each researcher wants to replace. Measurement data, configuration data, antenna patterns and city models come in formats that change from vendor to vendor. On 2026-10-30 the owner accepted the plugin features PL-01 to PL-11 and rejected PL-12 ([TR §18.2](../../technical-report.html#pl-danh-sach)).
+Release 0.2 adds a service-quality layer. Its association, link, sharing, mobility and scenario models are policies that each operator and each researcher wants to replace. Measurement data, configuration data, antenna patterns and city models come in formats that change from vendor to vendor. On 2026-10-30 the owner accepted the plugin features PL-01 to PL-11 and rejected PL-12.
 
 ## Decision
 

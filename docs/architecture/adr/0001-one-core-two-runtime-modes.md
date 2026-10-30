@@ -7,15 +7,15 @@
 
 ## Context
 
-RayTwin must run in two ways. Library mode runs in one process for research, notebooks and CI. Distributed mode runs on many machines for large areas and many transmitters ([TR §10.3](../../technical-report.html#kt-che-do)).
+RayTwin must run in two ways. Library mode runs in one process for research, notebooks and CI. Distributed mode runs on many machines for large areas and many transmitters.
 
-Both modes must give the same result for the same snapshot and seed. Gate 2 measures this directly ([TR §14.4](../../technical-report.html#mvp-nghiem-thu)).
+Both modes must give the same result for the same snapshot and seed. Gate 2 measures this directly.
 
-One person builds and maintains the system ([TR Appendix A](../../technical-report.html#quyet-dinh)). Each physics implementation must pass the comparison with the reference oracle in CI. Two physics implementations would double that work.
+One person builds and maintains the system. Each physics implementation must pass the comparison with the reference oracle in CI. Two physics implementations would double that work.
 
-TR §10.3 also gives library mode an in-memory task queue (`LocalQueue`) behind a `TaskQueue` trait. Library mode needs no lease, no acknowledgement and no redelivery.
+The first draft of the design also gives library mode an in-memory task queue (`LocalQueue`) behind a `TaskQueue` trait. Library mode needs no lease, no acknowledgement and no redelivery.
 
-Release 0.2 adds a service-quality layer ([TR §17](../../technical-report.html#qos)), and release 0.3 adds a SON loop ([TR §18.4](../../technical-report.html#pl-son)). Both read radio-map results. They do not trace rays.
+Release 0.2 adds a service-quality layer, and release 0.3 adds a SON loop. Both read radio-map results. They do not trace rays.
 
 ## Decision
 
@@ -54,8 +54,8 @@ The service-quality layer (`raytwin.qos`), the SON loop (`raytwin.son`) and the 
 
 **Separate engines for each mode.** Each engine could fit its runtime better. Rejected because two physics codes double the oracle work for one person, and Gate 2 compares results that must agree.
 
-**A `TaskQueue` trait with an in-memory `LocalQueue` ([TR §10.3](../../technical-report.html#kt-che-do)).** The two modes would share one code path for task dispatch. Rejected because library mode uses no queue feature. A parallel iteration over the task list does the same work with no extra type.
+**A `TaskQueue` trait with an in-memory `LocalQueue`.** The two modes would share one code path for task dispatch. Rejected because library mode uses no queue feature. A parallel iteration over the task list does the same work with no extra type.
 
 **The core only as a service.** Library mode would call a local service, so only one runtime would exist. Rejected because notebooks and CI would then need a broker and an object store, and library mode must not need them.
 
-**A `qos` task kind in the core.** Workers would run service-quality jobs. Rejected for release 0.2, because one evaluation costs much less than one ray trace ([TR §17.6](../../technical-report.html#qos-danh-gia)). A measurement can change this decision.
+**A `qos` task kind in the core.** Workers would run service-quality jobs. Rejected for release 0.2, because one evaluation costs much less than one ray trace. A measurement can change this decision.
