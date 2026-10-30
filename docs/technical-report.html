@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RayTwin – Tài liệu kỹ thuật</title>
-<meta name="description" content="RayTwin: khảo sát Sionna RT và AODT, kiến trúc và đánh giá khả thi bộ mô phỏng lan truyền sóng bằng ray tracing viết bằng Rust, hướng tới digital twin cho SON.">
+<meta name="description" content="RayTwin: khảo sát Sionna RT và AODT, kiến trúc và đánh giá khả thi bộ mô phỏng lan truyền sóng bằng ray tracing viết bằng Rust, hướng tới digital twin cho SON; mô phỏng chất lượng dịch vụ từ MDT, API plugin và các móc cho digital twin tương tác.">
 <style>
 :root{
   --bg:#ffffff; --bg-soft:#f6f8fb; --bg-softer:#fbfcfe; --text:#1d2433; --muted:#5a6476; --faint:#8a94a6;
@@ -167,15 +167,15 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
 <div class="layout">
   <nav class="toc" id="toc" aria-label="Mục lục">
     <div class="toc-title">Mục lục</div>
-    <ol><li><a href="#tom-tat"><span class="num">1</span>Tóm tắt điều hành</a><ol><li><a href="#tom-tat-phat-hien"><span class="num">1.1</span>Các phát hiện chính</a></li><li><a href="#tom-tat-mvp"><span class="num">1.2</span>MVP gồm gì</a></li></ol></li><li><a href="#thuat-ngu"><span class="num">2</span>Thuật ngữ và khái niệm nền</a><ol><li><a href="#tn-mang"><span class="num">2.1</span>Mạng di động và đo đạc</a></li><li><a href="#tn-raytracing"><span class="num">2.2</span>Ray tracing và vật lý sóng</a></li><li><a href="#tn-he-thong"><span class="num">2.3</span>Dữ liệu, hệ thống và học máy</a></li><li><a href="#tn-gpu"><span class="num">2.4</span>GPU và tính toán song song</a></li></ol></li><li><a href="#boi-canh"><span class="num">3</span>Bối cảnh: SON và vai trò của bộ mô phỏng lan truyền</a></li><li><a href="#nen-tang"><span class="num">4</span>Nền tảng vật lý và thuật toán</a><ol><li><a href="#nt-friis"><span class="num">4.1</span>Quang hình học và suy hao không gian tự do</a></li><li><a href="#nt-vatlieu"><span class="num">4.2</span>Vật liệu và hệ số Fresnel</a></li><li><a href="#nt-sbr"><span class="num">4.3</span>Bắn và nảy tia (SBR)</a></li><li><a href="#nt-image"><span class="num">4.4</span>Image method: tìm đường phản xạ chính xác</a></li><li><a href="#nt-cir"><span class="num">4.5</span>CIR và CFR</a></li><li><a href="#nt-map"><span class="num">4.6</span>Bản đồ lan truyền 3D bằng track-length estimator</a></li><li><a href="#nt-mang-anten"><span class="num">4.7</span>Mảng anten: synthetic và theo từng phần tử</a></li></ol></li><li><a href="#khao-sat-sionna"><span class="num">5</span>Khảo sát Sionna RT</a></li><li><a href="#khao-sat-aodt"><span class="num">6</span>Khảo sát NVIDIA Aerial Omniverse Digital Twin (AODT)</a></li><li><a href="#kiem-chung"><span class="num">7</span>Kiểm chứng các nhược điểm đã nêu</a></li><li><a href="#han-che-son"><span class="num">8</span>Các hạn chế bổ sung khi dùng cho SON</a></li><li><a href="#rust"><span class="num">9</span>Đánh giá hệ sinh thái Rust</a></li><li><a href="#kien-truc"><span class="num">10</span>Kiến trúc RayTwin</a><ol><li><a href="#kt-tong-quan"><span class="num">10.1</span>Tổng quan và nguyên tắc thiết kế</a></li><li><a href="#kt-du-lieu"><span class="num">10.2</span>Mô hình dữ liệu: snapshot và manifest</a></li><li><a href="#kt-che-do"><span class="num">10.3</span>Chế độ thư viện và chế độ phân tán</a></li><li><a href="#kt-jetstream"><span class="num">10.4</span>Phân phối công việc bằng NATS JetStream Đã chốt</a></li><li><a href="#kt-api"><span class="num">10.5</span>API Python: API riêng và lớp tương thích Sionna Đã chốt</a></li><li><a href="#kt-plugin"><span class="num">10.6</span>Điểm mở rộng: không có API plugin trong 0.1 Đã chốt</a></li><li><a href="#kt-gpu"><span class="num">10.7</span>Backend CPU và GPU Đã chốt</a></li></ol></li><li><a href="#vat-lieu"><span class="num">11</span>Trường vật liệu theo vị trí và hiệu chỉnh</a><ol><li><a href="#vl-mo-hinh"><span class="num">11.1</span>Mô hình hóa</a></li><li><a href="#vl-bai-toan"><span class="num">11.2</span>Bài toán hiệu chỉnh</a></li><li><a href="#vl-pytorch"><span class="num">11.3</span>Đường đi cố định và vòng tối ưu bằng PyTorch Đã chốt</a></li><li><a href="#vl-du-lieu"><span class="num">11.4</span>Dữ liệu đầu vào</a></li><li><a href="#vl-twin"><span class="num">11.5</span>Twin experiment với MDT mô phỏng Đã chốt</a></li><li><a href="#vl-nhan-dang"><span class="num">11.6</span>Rủi ro nhận dạng và cách kiểm định</a></li></ol></li><li><a href="#da-bang"><span class="num">12</span>Hỗ trợ đa băng tần</a><ol><li><a href="#db-sionna"><span class="num">12.1</span>Hiện trạng ở Sionna RT</a></li><li><a href="#db-thiet-ke"><span class="num">12.2</span>Thiết kế đề xuất</a></li><li><a href="#db-loi-ich"><span class="num">12.3</span>Lợi ích cho hiệu chỉnh</a></li><li><a href="#db-gioi-han"><span class="num">12.4</span>Giới hạn</a></li><li><a href="#db-fr2"><span class="num">12.5</span>FR1 trong MVP, FR2 sau MVP Đã chốt</a></li></ol></li><li><a href="#cir"><span class="num">13</span>CIR theo từng phần tử anten</a><ol><li><a href="#cir-sionna"><span class="num">13.1</span>Sionna làm gì</a></li><li><a href="#cir-thiet-ke"><span class="num">13.2</span>Thiết kế đề xuất</a></li><li><a href="#cir-quy-trinh"><span class="num">13.3</span>Quy trình tính theo từng phần tử</a></li><li><a href="#cir-chi-phi"><span class="num">13.4</span>Chi phí tính toán</a></li><li><a href="#cir-kiem-dinh"><span class="num">13.5</span>Kiểm định và giới hạn</a></li></ol></li><li><a href="#mvp"><span class="num">14</span>Phạm vi MVP và tiêu chí hoàn thành</a><ol><li><a href="#mvp-pham-vi"><span class="num">14.1</span>Trong và ngoài MVP</a></li><li><a href="#mvp-thu-tu"><span class="num">14.2</span>Thứ tự hoàn thiện các thành phần</a></li><li><a href="#mvp-tieu-chi"><span class="num">14.3</span>Tiêu chí hoàn thành theo thành phần</a></li><li><a href="#mvp-nghiem-thu"><span class="num">14.4</span>Bốn điểm kiểm tra Đã chốt</a></li></ol></li><li><a href="#rui-ro"><span class="num">15</span>Rủi ro và biện pháp giảm thiểu</a></li><li><a href="#ket-luan"><span class="num">16</span>Kết luận và khuyến nghị</a></li><li><a href="#quyet-dinh">Phụ lục A. Nhật ký quyết định</a></li><li><a href="#tham-khao">Tài liệu tham khảo</a></li></ol>
+    <ol><li><a href="#tom-tat"><span class="num">1</span>Tóm tắt điều hành</a><ol><li><a href="#tom-tat-phat-hien"><span class="num">1.1</span>Các phát hiện chính</a></li><li><a href="#tom-tat-mvp"><span class="num">1.2</span>MVP gồm gì</a></li></ol></li><li><a href="#thuat-ngu"><span class="num">2</span>Thuật ngữ và khái niệm nền</a><ol><li><a href="#tn-mang"><span class="num">2.1</span>Mạng di động và đo đạc</a></li><li><a href="#tn-raytracing"><span class="num">2.2</span>Ray tracing và vật lý sóng</a></li><li><a href="#tn-he-thong"><span class="num">2.3</span>Dữ liệu, hệ thống và học máy</a></li><li><a href="#tn-gpu"><span class="num">2.4</span>GPU và tính toán song song</a></li><li><a href="#tn-qos"><span class="num">2.5</span>Chất lượng dịch vụ, di động và plugin</a></li></ol></li><li><a href="#boi-canh"><span class="num">3</span>Bối cảnh: SON và vai trò của bộ mô phỏng lan truyền</a></li><li><a href="#nen-tang"><span class="num">4</span>Nền tảng vật lý và thuật toán</a><ol><li><a href="#nt-friis"><span class="num">4.1</span>Quang hình học và suy hao không gian tự do</a></li><li><a href="#nt-vatlieu"><span class="num">4.2</span>Vật liệu và hệ số Fresnel</a></li><li><a href="#nt-sbr"><span class="num">4.3</span>Bắn và nảy tia (SBR)</a></li><li><a href="#nt-image"><span class="num">4.4</span>Image method: tìm đường phản xạ chính xác</a></li><li><a href="#nt-cir"><span class="num">4.5</span>CIR và CFR</a></li><li><a href="#nt-map"><span class="num">4.6</span>Bản đồ lan truyền 3D bằng track-length estimator</a></li><li><a href="#nt-mang-anten"><span class="num">4.7</span>Mảng anten: synthetic và theo từng phần tử</a></li></ol></li><li><a href="#khao-sat-sionna"><span class="num">5</span>Khảo sát Sionna RT</a></li><li><a href="#khao-sat-aodt"><span class="num">6</span>Khảo sát NVIDIA Aerial Omniverse Digital Twin (AODT)</a></li><li><a href="#kiem-chung"><span class="num">7</span>Kiểm chứng các nhược điểm đã nêu</a></li><li><a href="#han-che-son"><span class="num">8</span>Các hạn chế bổ sung khi dùng cho SON</a></li><li><a href="#rust"><span class="num">9</span>Đánh giá hệ sinh thái Rust</a></li><li><a href="#kien-truc"><span class="num">10</span>Kiến trúc RayTwin</a><ol><li><a href="#kt-tong-quan"><span class="num">10.1</span>Tổng quan và nguyên tắc thiết kế</a></li><li><a href="#kt-du-lieu"><span class="num">10.2</span>Mô hình dữ liệu: snapshot và manifest</a></li><li><a href="#kt-che-do"><span class="num">10.3</span>Chế độ thư viện và chế độ phân tán</a></li><li><a href="#kt-jetstream"><span class="num">10.4</span>Phân phối công việc bằng NATS JetStream Đã chốt</a></li><li><a href="#kt-api"><span class="num">10.5</span>API Python: API riêng và lớp tương thích Sionna Đã chốt</a></li><li><a href="#kt-plugin"><span class="num">10.6</span>Điểm mở rộng: không có API plugin trong 0.1 Đã chốt</a></li><li><a href="#kt-gpu"><span class="num">10.7</span>Backend CPU và GPU Đã chốt</a></li></ol></li><li><a href="#vat-lieu"><span class="num">11</span>Trường vật liệu theo vị trí và hiệu chỉnh</a><ol><li><a href="#vl-mo-hinh"><span class="num">11.1</span>Mô hình hóa</a></li><li><a href="#vl-bai-toan"><span class="num">11.2</span>Bài toán hiệu chỉnh</a></li><li><a href="#vl-pytorch"><span class="num">11.3</span>Đường đi cố định và vòng tối ưu bằng PyTorch Đã chốt</a></li><li><a href="#vl-du-lieu"><span class="num">11.4</span>Dữ liệu đầu vào</a></li><li><a href="#vl-twin"><span class="num">11.5</span>Twin experiment với MDT mô phỏng Đã chốt</a></li><li><a href="#vl-nhan-dang"><span class="num">11.6</span>Rủi ro nhận dạng và cách kiểm định</a></li><li><a href="#vl-rsrp"><span class="num">11.7</span>Đại lượng so khớp với MDT: RSRP</a></li></ol></li><li><a href="#da-bang"><span class="num">12</span>Hỗ trợ đa băng tần</a><ol><li><a href="#db-sionna"><span class="num">12.1</span>Hiện trạng ở Sionna RT</a></li><li><a href="#db-thiet-ke"><span class="num">12.2</span>Thiết kế đề xuất</a></li><li><a href="#db-loi-ich"><span class="num">12.3</span>Lợi ích cho hiệu chỉnh</a></li><li><a href="#db-gioi-han"><span class="num">12.4</span>Giới hạn</a></li><li><a href="#db-fr2"><span class="num">12.5</span>FR1 trong MVP, FR2 sau MVP Đã chốt</a></li></ol></li><li><a href="#cir"><span class="num">13</span>CIR theo từng phần tử anten</a><ol><li><a href="#cir-sionna"><span class="num">13.1</span>Sionna làm gì</a></li><li><a href="#cir-thiet-ke"><span class="num">13.2</span>Thiết kế đề xuất</a></li><li><a href="#cir-quy-trinh"><span class="num">13.3</span>Quy trình tính theo từng phần tử</a></li><li><a href="#cir-chi-phi"><span class="num">13.4</span>Chi phí tính toán</a></li><li><a href="#cir-kiem-dinh"><span class="num">13.5</span>Kiểm định và giới hạn</a></li></ol></li><li><a href="#mvp"><span class="num">14</span>Phạm vi MVP và tiêu chí hoàn thành</a><ol><li><a href="#mvp-pham-vi"><span class="num">14.1</span>Trong và ngoài MVP</a></li><li><a href="#mvp-thu-tu"><span class="num">14.2</span>Thứ tự hoàn thiện các thành phần</a></li><li><a href="#mvp-tieu-chi"><span class="num">14.3</span>Tiêu chí hoàn thành theo thành phần</a></li><li><a href="#mvp-nghiem-thu"><span class="num">14.4</span>Bốn điểm kiểm tra Đã chốt</a></li></ol></li><li><a href="#rui-ro"><span class="num">15</span>Rủi ro và biện pháp giảm thiểu</a></li><li><a href="#ket-luan"><span class="num">16</span>Kết luận và khuyến nghị</a></li><li><a href="#qos"><span class="num">17</span>Mô phỏng chất lượng dịch vụ từ MDT</a><ol><li><a href="#qos-bai-toan"><span class="num">17.1</span>Bài toán và các use case SON</a></li><li><a href="#qos-khao-sat"><span class="num">17.2</span>Khảo sát dữ liệu và cách tiếp cận</a></li><li><a href="#qos-mo-hinh"><span class="num">17.3</span>Mô hình đề xuất</a></li><li><a href="#qos-kich-ban"><span class="num">17.4</span>Kịch bản dựa trên MDT</a></li><li><a href="#qos-tich-hop"><span class="num">17.5</span>Tích hợp vào kiến trúc</a></li><li><a href="#qos-danh-gia"><span class="num">17.6</span>Tính ứng dụng và khả dụng</a></li><li><a href="#qos-tieu-chi"><span class="num">17.7</span>Tiêu chí hoàn thành bản 0.2</a></li></ol></li><li><a href="#plugin"><span class="num">18</span>API plugin</a><ol><li><a href="#pl-nguyen-tac"><span class="num">18.1</span>Nguyên tắc và hợp đồng</a></li><li><a href="#pl-danh-sach"><span class="num">18.2</span>Danh sách tính năng plugin</a></li><li><a href="#pl-co-che"><span class="num">18.3</span>Cơ chế kỹ thuật</a></li><li><a href="#pl-son"><span class="num">18.4</span>Vòng SON và cache theo Tx</a></li><li><a href="#pl-tieu-chi"><span class="num">18.5</span>Tiêu chí hoàn thành</a></li></ol></li><li><a href="#tuong-tac"><span class="num">19</span>Hướng tới digital twin tương tác</a><ol><li><a href="#tt-aodt"><span class="num">19.1</span>Khảo sát AODT</a></li><li><a href="#tt-san-sang"><span class="num">19.2</span>Mức sẵn sàng của RayTwin</a></li><li><a href="#tt-moc"><span class="num">19.3</span>Các móc mở rộng</a></li><li><a href="#tt-ui"><span class="num">19.4</span>Điều kiện trước khi có UI</a></li></ol></li><li><a href="#quyet-dinh">Phụ lục A. Nhật ký quyết định</a></li><li><a href="#tham-khao">Tài liệu tham khảo</a></li></ol>
   </nav>
   <main class="content" id="content">
     <div class="doc-head">
-  <div class="kicker">Tài liệu kỹ thuật · Phiên bản 1.1 · 29/10/2026</div>
+  <div class="kicker">Tài liệu kỹ thuật · Phiên bản 1.2 · 30/10/2026</div>
   <h1>RayTwin: bộ mô phỏng lan truyền sóng bằng ray tracing cho digital twin của SON</h1>
   <p class="sub">Khảo sát Sionna RT và NVIDIA AODT, kiến trúc đề xuất và đánh giá khả thi kỹ thuật cho một hệ thống viết bằng Rust, chạy được như một thư viện hoặc như dịch vụ phân tán.</p>
   <div class="meta">
-    <div><b>Phạm vi khảo sát:</b> Sionna RT 2.2.0 (29/9/2026), Sionna RT Technical Report v2.1, AODT 1.5 (16/6/2026)</div>
+    <div><b>Phạm vi khảo sát:</b> Sionna RT 2.2.0 (29/9/2026), Sionna RT Technical Report v2.1, AODT 1.5 (16/6/2026); 3GPP TS 37.320, TS 38.215, TS 38.331 (Rel-19); AODT 1.4 (tương tác)</div>
     <div><b>Trạng thái:</b> thiết kế cho MVP</div>
   </div>
   <div class="legend">
@@ -208,6 +208,10 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
   <li><strong>CIR theo từng phần tử anten khả thi trong MVP</strong> cho LoS, phản xạ gương và truyền qua. SBR chỉ chạy một lần cho mỗi thiết bị; image method được giải lại cho từng cặp phần tử.</li>
   <li><strong>GPU khả thi ngay trong MVP qua wgpu, với điều kiện có đường dự phòng.</strong> Ray query dùng RT core nhưng là tính năng thử nghiệm và chỉ hỗ trợ Vulkan, nên RayTwin có thêm đường compute shader tự duyệt BVH. Image method trên GPU cần f64 để đạt ngưỡng trễ 1 ps; f64 trong shader cũng chỉ có trên Vulkan, nên GPU trong MVP hỗ trợ Linux và Windows.</li>
   <li><strong>Rủi ro lớn nhất nằm ở bài toán ngược.</strong> RSRP từ MDT không có pha và vị trí kém chính xác. Vì vậy trường vật liệu dễ biến thành một "trường hiệu chỉnh" mất ý nghĩa vật lý, rồi cho kết quả sai khi đổi tilt.</li>
+  <li><strong>Mô phỏng chất lượng dịch vụ từ MDT khả thi, để xếp hạng kịch bản.</strong> Association, tải cell có ghép nhiễu, throughput flow-level và handover A3 là bước hậu xử lý rẻ trên bản đồ path gain; đổi CIO, công suất, tham số handover hay lưu lượng không cần dò lại tia. Nút thắt là dữ liệu: MDT thường thiếu throughput (M5) và vị trí GNSS. Lớp này ra ở bản 0.2 (<a href="#qos">mục 17</a>).</li>
+  <li><strong>So khớp MDT bằng RSRP, không bằng RSS.</strong> MDT báo RSRP. Suy RSRP từ RSS cần giả định về EPRE và boost SSB; sai một giả định là một độ lệch theo cell mà hiệu chỉnh sẽ hấp thụ vào vật liệu (<a href="#vl-rsrp">mục 11.7</a>).</li>
+  <li><strong>Mở rộng bằng plugin ở phía client và bằng bảng dữ liệu.</strong> Từ bản 0.2 có plugin Python cho đọc dữ liệu, mô hình QoS, KPI và xuất kết quả; từ bản 0.3 có pattern anten và vật liệu dạng bảng chạy cả trên GPU, cùng vòng SON có cache theo Tx (<a href="#plugin">mục 18</a>).</li>
+  <li><strong>Sẵn đường cho digital twin tương tác.</strong> Cấu hình phái sinh có lịch sử và rollback, các Tx độc lập nhau, kết quả tự mô tả và replay được, trình xem 3D từ bản 0.1. UI cho kỹ sư để sau bản 0.3 (<a href="#tuong-tac">mục 19</a>).</li>
 </ul>
 
 <h3 id="tom-tat-mvp"><span class="secno">1.2</span>MVP gồm gì</h3>
@@ -220,6 +224,7 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
       <li>Trường vật liệu theo vị trí, có phiên bản</li>
       <li>Nạp cảnh từ local, S3, MinIO; chế độ phân tán qua NATS JetStream</li>
       <li>API Python riêng và lớp tương thích Sionna; hiệu chỉnh bằng PyTorch</li>
+      <li>Trình xem 3D trong Jupyter, xuất glTF; kết quả có lưới, CRS và số đoạn tia; RAN config tách khỏi snapshot</li>
       <li>Phát hành bản 0.1 công khai (MIT OR Apache-2.0), wheel cho Linux, macOS, Windows</li>
     </ul>
   </div>
@@ -229,7 +234,9 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
       <li>Nhiễu xạ và tán xạ khuếch tán đã kiểm chứng</li>
       <li>FR2-1 và FR2-2</li>
       <li>Khả vi đầy đủ toàn bộ ray tracer</li>
-      <li>Nhập MDT thật, vòng lặp digital twin SON thời gian thực</li>
+      <li>Mô phỏng chất lượng dịch vụ từ MDT: association, tải cell, throughput, handover, replay (bản 0.2)</li>
+      <li>API plugin (bản 0.2); bảng pattern và vật liệu, vòng SON có cache theo Tx (bản 0.3)</li>
+      <li>Nhập MDT thật, UI tương tác cho kỹ sư, theo dõi MDT liên tục</li>
     </ul>
   </div>
 </div>
@@ -289,7 +296,7 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
 <tbody>
 <tr><td><strong>Object store</strong> (S3, MinIO)</td><td>Kho lưu đối tượng theo khóa (bucket/key) qua HTTP. MinIO là phần mềm tự triển khai tương thích API S3.</td><td><code>s3://raytwin/scenes/munich/munich.xml</code></td></tr>
 <tr><td><strong>Zarr</strong></td><td>Định dạng lưu mảng N chiều chia thành chunk. Mỗi chunk là một đối tượng riêng nên đọc ghi được từng phần trên object store.</td><td>Bản đồ <code>[băng, Tx, z, y, x]</code>, chunk theo băng và Tx.</td></tr>
-<tr><td><strong>Parquet</strong></td><td>Định dạng bảng lưu theo cột, nén tốt, phù hợp dữ liệu đo dạng bảng.</td><td>MDT đã làm sạch, đọc ở phía Python. Kết quả của RayTwin dùng Zarr (<a href="adr/0009-zarr-as-the-only-result-format.md">ADR 0009</a>).</td></tr>
+<tr><td><strong>Parquet</strong></td><td>Định dạng bảng lưu theo cột, nén tốt, phù hợp dữ liệu đo dạng bảng.</td><td>MDT đã làm sạch, đọc ở phía Python. Kết quả của RayTwin dùng Zarr (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-09</a>).</td></tr>
 <tr><td><strong>Snapshot, manifest, content hash</strong></td><td>Snapshot là ảnh chụp bất biến của mọi đầu vào. Manifest là tệp mô tả snapshot. Content hash là mã băm của nội dung, dùng làm định danh: nội dung giống nhau thì hash giống nhau.</td><td>Worker cache dữ liệu theo hash, nên không cần đồng bộ trạng thái.</td></tr>
 <tr><td><strong>NATS JetStream</strong></td><td>Hệ thống nhắn tin có lưu trữ. <em>Stream</em> lưu message; <em>consumer</em> đọc message; worker <em>ack</em> (xác nhận) khi xử lý xong.</td><td>Coordinator đưa task vào stream, worker kéo task ra xử lý.</td></tr>
 <tr><td><strong>NATS request/reply, KV</strong></td><td>Request/reply: gửi một message và chờ một message trả lời qua NATS. KV: kho khóa–giá trị nằm trên JetStream; client theo dõi (watch) được thay đổi của một khóa.</td><td>Client gửi job tới coordinator qua <code>raytwin.jobs.submit</code> và theo dõi trạng thái trong KV <code>RAYTWIN_JOBS</code>.</td></tr>
@@ -322,6 +329,28 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
 <tr><td><strong>Counter-based RNG</strong> (ví dụ Philox)</td><td>Bộ sinh số ngẫu nhiên tính số thứ n trực tiếp từ một khóa và bộ đếm, không cần trạng thái dùng chung giữa các luồng.</td><td>Khóa (seed, Tx) và bộ đếm (id tia, lần nảy) luôn cho cùng số ngẫu nhiên, không phụ thuộc job.</td></tr>
 <tr><td><strong>f32, f64</strong></td><td>Số thực 32 bit (khoảng 7 chữ số có nghĩa) và 64 bit (khoảng 16 chữ số). GPU tính f32 rất nhanh, f64 chậm hơn nhiều trên dòng GeForce.</td><td>Image method dùng f64 để đạt sai số trễ ≤ 1 ps.</td></tr>
 <tr><td><strong>VRAM</strong></td><td>Bộ nhớ riêng của GPU; dữ liệu phải nằm trong VRAM khi kernel chạy.</td><td>RTX 3050 Ti có 4 GB.</td></tr>
+</tbody></table></div>
+
+<h3 id="tn-qos"><span class="secno">2.5</span>Chất lượng dịch vụ, di động và plugin</h3>
+<p>Các thuật ngữ dưới đây dùng ở <a href="#vl-rsrp">mục 11.7</a> và ở các mục <a href="#qos">17</a>, <a href="#plugin">18</a>, <a href="#tuong-tac">19</a>.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Thuật ngữ</th><th>Giải thích dễ hiểu</th><th>Ví dụ / ghi chú</th></tr></thead>
+<tbody>
+<tr><td><strong>SS-RSRP, SS-RSRQ, RSSI</strong></td><td>SS-RSRP: công suất trung bình trên mỗi RE mang tín hiệu đồng bộ SSS của một cell, đo tại connector anten của UE. RSSI: tổng công suất thu trên băng đo, gồm mọi cell và tạp âm. SS-RSRQ = N·RSRP/RSSI, nên phụ thuộc tải của các cell lân cận.</td><td>MDT báo RSRP và RSRQ theo bước 1 dB; MDT không báo RSS.</td></tr>
+<tr><td><strong>RSS</strong> (Received Signal Strength)</td><td>Tổng công suất nhận được từ một máy phát, bằng công suất phát toàn băng nhân path gain.</td><td>Đại lượng của bản đồ Sionna; ở RayTwin chỉ là giá trị dẫn xuất.</td></tr>
+<tr><td><strong>EPRE</strong></td><td>Energy Per Resource Element: công suất phát trên mỗi RE. EPRE của SSB do mạng cấu hình (tham số <code>ss-PBCH-BlockPower</code>).</td><td>46 dBm trên 3276 sóng mang con cho EPRE ≈ 10,85 dBm.</td></tr>
+<tr><td><strong>RAN config</strong></td><td>Tài liệu riêng của RayTwin chứa các tham số vô tuyến chỉ dùng khi đọc kết quả: EPRE, hệ số tạp âm, gain UE, CIO, tham số handover. Có hash riêng, tách khỏi snapshot.</td><td>Đổi CIO không cần dò lại tia.</td></tr>
+<tr><td><strong>Toán tử đo</strong></td><td>Hàm biến giá trị mô phỏng thành đúng giá trị mà UE báo cáo: cộng EPRE và gain, gộp beam, lượng tử 1 dB, cắt theo dải báo cáo.</td><td>Công thức (19).</td></tr>
+<tr><td><strong>PRB, tải cell</strong></td><td>PRB (Physical Resource Block) là 12 sóng mang con trong một slot. Tải cell ρ là tỷ lệ PRB mà người dùng của cell cần.</td><td>273 PRB cho 100 MHz với khoảng cách sóng mang con 30 kHz.</td></tr>
+<tr><td><strong>User association, CIO</strong></td><td>Association: chọn cell phục vụ cho mỗi UE. CIO (Cell Individual Offset) là độ lệch cộng vào RSRP của một cell khi so sánh, dùng để đẩy UE sang cell khác.</td><td>CIO +3 dB làm cell "trông" mạnh hơn 3 dB.</td></tr>
+<tr><td><strong>Handover, sự kiện A3, Hys, TTT</strong></td><td>Handover: chuyển UE sang cell khác khi di chuyển. A3: cell lân cận tốt hơn cell phục vụ một khoảng offset. Hys (hysteresis) và TTT (time to trigger) chống chuyển qua chuyển lại.</td><td>Hys 1 dB, Off 3 dB, TTT 320 ms là giá trị hay gặp.</td></tr>
+<tr><td><strong>Ping-pong, RLF</strong></td><td>Ping-pong: UE quay lại cell cũ ngay sau handover. RLF (Radio Link Failure): mất kết nối vì tín hiệu quá yếu.</td><td>KPI của bài toán MRO.</td></tr>
+<tr><td><strong>M4, M5</strong> (MDT)</td><td>M4: lượng dữ liệu theo UE; M5: throughput trung bình theo UE, do gNB đo. Chỉ có khi nhà mạng bật immediate MDT.</td><td>Dùng để hiệu chỉnh mô hình tốc độ.</td></tr>
+<tr><td><strong>Load coupling</strong></td><td>Tải của cell này quyết định nhiễu sang cell kia, nên tải của các cell phải giải cùng lúc như một hệ phương trình.</td><td>Tải tăng 25% làm throughput giảm 56% trong <a href="#qos-mo-hinh">ví dụ ở mục 17.3</a>.</td></tr>
+<tr><td><strong>Processor sharing</strong></td><td>Mô hình hàng đợi trong đó mọi luồng dữ liệu đang hoạt động chia đều tài nguyên. Throughput trung bình của một luồng là R(1 − ρ).</td><td>Mô hình flow-level của bộ lập lịch proportional fair.</td></tr>
+<tr><td><strong>Kịch bản</strong> (scenario)</td><td>Tập UE, lưu lượng và quỹ đạo có seed. Kịch bản không phụ thuộc cấu hình mạng, nên hai cấu hình được so trên cùng tập UE.</td><td>Sinh từ mật độ MDT hoặc phát lại quỹ đạo MDT.</td></tr>
+<tr><td><strong>Plugin, entry point</strong></td><td>Plugin là package Python đăng ký một entry point trong một nhóm của RayTwin; RayTwin tìm plugin bằng thư viện chuẩn <code>importlib.metadata</code>.</td><td>Nhóm <code>raytwin.qos.link</code> cho mô hình SINR → tốc độ.</td></tr>
+<tr><td><strong>Config delta, reference, rollback</strong></td><td>Config delta: một thay đổi cấu hình (thêm, bớt, sửa Tx, đổi RAN). Reference: lịch sử có tên của một kế hoạch. Rollback: ghi thêm một mục trỏ về cấu hình cũ, không xóa gì.</td><td>Mục <a href="#tt-moc">19.3</a>.</td></tr>
 </tbody></table></div>
 
 <h2 id="boi-canh"><span class="secno">3</span>Bối cảnh: SON và vai trò của bộ mô phỏng lan truyền</h2>
@@ -560,6 +589,7 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
 <tr><td>Phần cứng phổ thông</td><td>Từ 1.5, GPU cỡ RTX 5070 Ti chạy được, nhưng chỉ với kịch bản nhỏ</td><td><a href="https://forums.developer.nvidia.com/t/ai-aerial-faq-6-6-simulating-6g-with-nvidia-aerial-omniverse-digital-twin/373039">FAQ 6/6</a></td></tr>
 </tbody></table></div>
 <p><span class="tag inf">Suy luận</span> Với GPU 4 GB VRAM của máy phát triển hiện có (kiến trúc SM 86 dù nằm trong danh sách hỗ trợ), AODT không phải lựa chọn thực tế để chạy cục bộ. Sionna RT chạy được, nhưng bị giới hạn kích thước cảnh và số tia.</p>
+<p>Khả năng tương tác của AODT cho kỹ sư lập kế hoạch được khảo sát ở <a href="#tt-aodt">mục 19.1</a>.</p>
 
 <h2 id="kiem-chung"><span class="secno">7</span>Kiểm chứng các nhược điểm đã nêu</h2>
 <p>Trong 6 nhược điểm, hai đúng, ba đúng một phần và một chưa chính xác. Nhược điểm "khó hiệu chỉnh" thực chất là thiếu pipeline dữ liệu, không phải thiếu năng lực toán học.</p>
@@ -568,7 +598,7 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
 <tbody>
 <tr><td>Phụ thuộc chất lượng mô hình 3D</td><td><span class="lvl mid">Đúng một phần</span></td><td>Với mô hình 3D thô, sai số lớn ở sảnh vẫn còn sau hiệu chỉnh theo vật thể; Neural Materials cho sai số đồng đều hơn (<a href="https://arxiv.org/abs/2311.18558">Hoydis et al.</a>). Đây là giới hạn chung của mọi ray tracer tất định</td><td>Trường vật liệu theo vị trí chỉ bù được một phần; không thay thế được vật cản bị thiếu hoặc thừa trong hình học</td></tr>
 <tr><td>Khó hiệu chỉnh theo dữ liệu thực</td><td><span class="lvl lo">Chưa chính xác</span></td><td>Có hướng dẫn chính thức hiệu chỉnh vật liệu bằng gradient (<a href="https://nvlabs.github.io/sionna/rt/developer/dev_custom_radio_materials.html">developer guide</a>); đã có nghiên cứu hiệu chỉnh bằng CIR và bằng RSRP drive test, MSE giảm từ 124 xuống 113,78 dB² (<a href="https://arxiv.org/abs/2509.12441">AutoPlan</a>)</td><td>Cái thiếu là pipeline MDT, xử lý sai số vị trí và chống quá khớp, không phải thuật toán gradient</td></tr>
-<tr><td>Khó mở rộng, tích hợp module mới</td><td><span class="lvl mid">Đúng một phần</span></td><td>Có API tùy biến vật liệu, anten, scattering pattern và solver (<a href="https://arxiv.org/abs/2504.21719">Technical Report</a>); nhưng phải viết theo mô hình Dr.Jit/Mitsuba, nhiều trường của <code>SurfaceInteraction3f</code> được dùng lại cho mục đích khác (<a href="https://nvlabs.github.io/sionna/rt/api/radio_materials.html">API</a>)</td><td>API dịch vụ qua NATS là điểm khác biệt có giá trị; API plugin để sau bản 0.1 (<a href="adr/0007-no-public-plugin-api-in-release-0-1.md">ADR 0007</a>)</td></tr>
+<tr><td>Khó mở rộng, tích hợp module mới</td><td><span class="lvl mid">Đúng một phần</span></td><td>Có API tùy biến vật liệu, anten, scattering pattern và solver (<a href="https://arxiv.org/abs/2504.21719">Technical Report</a>); nhưng phải viết theo mô hình Dr.Jit/Mitsuba, nhiều trường của <code>SurfaceInteraction3f</code> được dùng lại cho mục đích khác (<a href="https://nvlabs.github.io/sionna/rt/api/radio_materials.html">API</a>)</td><td>API dịch vụ qua NATS là điểm khác biệt có giá trị; API plugin từ bản 0.2 (<a href="#plugin">mục 18</a>, <a href="architecture/adr/0004-plugin-api.md">ADR 0004</a>)</td></tr>
 <tr><td>Tập trung, tốn tài nguyên, dễ nghẽn</td><td><span class="lvl hi">Đúng</span></td><td>Thư viện chạy trong một tiến trình; thời gian tăng theo số nguồn và đích (<a href="https://arxiv.org/abs/2504.21719">Technical Report</a>). Ví dụ quy mô lớn của NVIDIA dùng script ngoài: chia ô, hàng đợi file JSON, Slurm, 96 GPU L40S (<a href="https://github.com/NVlabs/sionna-large-radio-maps">sionna-large-radio-maps</a>)</td><td>Phân tán là nhu cầu có thật; cách chia theo ô và theo lô tia đã được NVIDIA chứng minh khả thi</td></tr>
 <tr><td>RadioMapSolver chỉ tính trên 2D</td><td><span class="lvl mid">Đúng một phần</span></td><td>Từ v1.1 tính trên mesh tùy ý, mỗi tam giác một ô (<a href="https://nvlabs.github.io/sionna/rt/api/radio_map_solvers.html">API</a>), tức bề mặt 2,5D; chưa có lưới thể tích. <span class="tag inf">Suy luận</span> Có thể ghép nhiều mặt phẳng thành một mesh đo, nhưng giá trị vẫn là trung bình trên mặt</td><td>Bản đồ thể tích voxel là điểm khác biệt hợp lệ, hữu ích cho UAV, tòa nhà cao tầng, beam theo độ cao</td></tr>
 <tr><td>Khó phát triển thành digital twin cho SON</td><td><span class="lvl hi">Đúng</span></td><td>Sionna SYS chỉ có PHY abstraction, link adaptation, power control, scheduler, topology (<a href="https://nvlabs.github.io/sionna/sys/index.html">Sionna SYS</a>); AODT gần hơn nhưng chưa có full RAN/UE stack, cell mobility phải tự viết (<a href="https://forums.developer.nvidia.com/t/ai-aerial-faq-6-6-simulating-6g-with-nvidia-aerial-omniverse-digital-twin/373039">FAQ</a>)</td><td>MVP chỉ cung cấp bản đồ RSRP/SINR 3D có phiên bản qua API; logic SON để cho các module sau</td></tr>
@@ -607,7 +637,7 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
 <tr><td>Hàng đợi task phân tán <span class="tag dec">Đã chốt</span></td><td><a href="https://docs.rs/async-nats/latest/async_nats/jetstream/index.html">async-nats</a>, module <code>jetstream</code></td><td>Bản 0.51.0 hỗ trợ stream, pull consumer, ack, key-value và object store (feature <code>object-store</code>)</td><td><span class="lvl lo">Thấp</span></td></tr>
 <tr><td>Python binding</td><td><a href="https://github.com/PyO3/pyo3">PyO3</a> + maturin, rust-numpy cho mảng không sao chép</td><td>Dùng trong pydantic-core, tokenizers, tiktoken</td><td><span class="lvl lo">Thấp</span></td></tr>
 <tr><td>Autodiff</td><td><code>std::autodiff</code> (Enzyme) trên nightly; burn hoặc candle</td><td><code>std::autodiff</code> còn thử nghiệm, cần cờ nightly (<a href="https://rust.googlesource.com/rust-lang/rustc-dev-guide/+/e60f2f03f8cf8babb3de043098b336d123e4be21/src/autodiff/installation.md">rustc-dev-guide</a>)</td><td><span class="lvl hi">Cao</span>; tránh bằng cách tối ưu trong PyTorch trên đường đi cố định</td></tr>
-<tr><td>Client API <span class="tag dec">Đã chốt</span></td><td>async-nats: request/reply + KV (không dùng gRPC trong MVP)</td><td>Cùng crate với hàng đợi task, không thêm stack protobuf (<a href="adr/0005-nats-as-the-client-protocol.md">ADR 0005</a>)</td><td><span class="lvl lo">Thấp</span></td></tr>
+<tr><td>Client API <span class="tag dec">Đã chốt</span></td><td>async-nats: request/reply + KV (không dùng gRPC trong MVP)</td><td>Cùng crate với hàng đợi task, không thêm stack protobuf (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-06</a>)</td><td><span class="lvl lo">Thấp</span></td></tr>
 <tr><td>Định dạng hình học</td><td>ply-rs, quick-xml cho tập con XML Mitsuba; gltf sau MVP</td><td><span class="tag inf">Suy luận</span> Phổ biến</td><td><span class="lvl lo">Thấp</span>: cảnh mẫu của Sionna chỉ dùng một tập con XML rất nhỏ</td></tr>
 </tbody></table></div>
 <p><span class="tag inf">Suy luận</span> CPU là backend tham chiếu; hai đường GPU qua wgpu chạy cùng thuật toán. Hiệu năng của cả ba backend được đo trên cùng một phép đo chuẩn, không ước lượng trước. Phần thử nghiệm của wgpu (ray query) có đường compute shader làm dự phòng.</p>
@@ -719,20 +749,21 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
 <p>Nguyên tắc thiết kế:</p>
 <ol>
   <li><strong>Tách lõi khỏi runtime.</strong> <code>raytwin-core</code> chứa toàn bộ vật lý; phân tán và Python chỉ là lớp mỏng bên ngoài. Nhờ vậy kết quả của hai chế độ trùng nhau.</li>
-  <li><strong>Snapshot bất biến, định danh bằng hash nội dung.</strong> Manifest gom hình học, trường vật liệu, anten, băng tần và tham số solver. Worker cache theo hash, nên không phải đồng bộ trạng thái phân tán. <span class="tag dec">Đã chốt</span> Định danh không gồm URI; RayTwin kiểm hash khi đọc và chỉ ghi create-only (<a href="adr/0002-snapshot-identity-and-path-based-storage.md">ADR 0002</a>).</li>
+  <li><strong>Snapshot bất biến, định danh bằng hash nội dung.</strong> Manifest gom hình học, trường vật liệu, anten, băng tần và tham số solver. Worker cache theo hash, nên không phải đồng bộ trạng thái phân tán. <span class="tag dec">Đã chốt</span> Định danh không gồm URI; RayTwin kiểm hash khi đọc và chỉ ghi create-only (<a href="architecture/adr/0002-snapshot-identity-and-path-based-storage.md">ADR 0002</a>).</li>
   <li><strong>Chia việc theo Tx × lô tia.</strong> Radio map là tổng công suất không kết hợp pha (<a href="https://arxiv.org/abs/2504.21719">Technical Report</a>). <span class="tag inf">Suy luận</span> Vì vậy cộng các bản đồ từng phần lại cho đúng bản đồ toàn phần. Vùng rất lớn thì chia thêm theo ô có vùng đệm, như <a href="https://github.com/NVlabs/sionna-large-radio-maps">sionna-large-radio-maps</a>.</li>
-  <li><strong>Trait nội bộ, không có API plugin trong 0.1.</strong> <span class="tag dec">Đã chốt</span> Trait chỉ là ranh giới nội bộ khi có từ hai cài đặt trở lên; trong MVP chỉ có <code>Backend</code> (CPU, GPU compute, GPU ray query). Vật liệu, anten, tương tác và cộng dồn bản đồ là kiểu cụ thể. API plugin để sau MVP (<a href="adr/0007-no-public-plugin-api-in-release-0-1.md">ADR 0007</a>).</li>
-  <li><strong>Tất định.</strong> <span class="tag dec">Đã chốt</span> Số ngẫu nhiên có khóa (seed của manifest, Tx) và bộ đếm (chỉ số tia toàn cục, lần nảy), không chứa job hay lô. Mọi backend và mọi part cộng dồn bằng fixed-point 64 bit. Nhờ vậy kết quả không phụ thuộc số luồng, số worker, kích thước lô hay thứ tự gộp, và hai job so hai cấu hình tilt dùng chung số ngẫu nhiên. Đây cũng là điều kiện để task chạy lại khi worker lỗi mà vẫn an toàn (<a href="adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>).</li>
+  <li><strong>Trait nội bộ, không có API plugin trong 0.1.</strong> <span class="tag dec">Đã chốt</span> Trait chỉ là ranh giới nội bộ khi có từ hai cài đặt trở lên; trong MVP chỉ có <code>Backend</code> (CPU, GPU compute, GPU ray query). Vật liệu, anten, tương tác và cộng dồn bản đồ là kiểu cụ thể. Từ bản 0.2 có plugin Python ở phía client, từ bản 0.3 có bảng dữ liệu cho GPU (<a href="#plugin">mục 18</a>, <a href="architecture/adr/0004-plugin-api.md">ADR 0004</a>).</li>
+  <li><strong>Tất định.</strong> <span class="tag dec">Đã chốt</span> Số ngẫu nhiên có khóa (seed của manifest, Tx) và bộ đếm (chỉ số tia toàn cục, lần nảy), không chứa job hay lô. Mọi backend và mọi part cộng dồn bằng fixed-point 64 bit. Nhờ vậy kết quả không phụ thuộc số luồng, số worker, kích thước lô hay thứ tự gộp, và hai job so hai cấu hình tilt dùng chung số ngẫu nhiên. Đây cũng là điều kiện để task chạy lại khi worker lỗi mà vẫn an toàn (<a href="architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>).</li>
   <li><strong>Một lần dò, nhiều băng.</strong> Hình học đường đi dùng chung; mỗi worker tính trường và cộng dồn cho mọi băng của lô tia (xem <a href="#da-bang">phần đa băng tần</a>).</li>
 </ol>
 
 <h3 id="kt-du-lieu"><span class="secno">10.2</span>Mô hình dữ liệu: snapshot và manifest</h3>
 <p>Mọi đầu vào của một lần mô phỏng được mô tả bằng một manifest. Hash của manifest là định danh của snapshot: hai lần chạy cùng hash cho cùng kết quả. Khi hiệu chỉnh tạo ra trường vật liệu mới, chỉ phần trường đổi phiên bản; hình học và anten giữ nguyên hash.</p>
-<p><span class="tag dec">Đã chốt</span> Định danh snapshot là BLAKE3 của manifest chuẩn hóa theo RFC 8785, <strong>bỏ mọi trường <code>uri</code></strong>: URI chỉ cho biết đọc ở đâu, hash cho biết phải đọc gì. Nhờ vậy cùng một cảnh trên đĩa cục bộ, MinIO hay S3 cho cùng định danh. Đầu vào nằm ở đường dẫn người dùng chọn; RayTwin kiểm hash khi đọc và báo lỗi nếu lệch. Mọi lần ghi của RayTwin là create-only, nên RayTwin không bao giờ ghi đè dữ liệu cũ. Tham số solver và seed nằm trong manifest, nên định danh snapshot phủ mọi đầu vào (<a href="adr/0002-snapshot-identity-and-path-based-storage.md">ADR 0002</a>).</p>
+<p><span class="tag dec">Đã chốt</span> Định danh snapshot là BLAKE3 của manifest chuẩn hóa theo RFC 8785, <strong>bỏ mọi trường <code>uri</code></strong>: URI chỉ cho biết đọc ở đâu, hash cho biết phải đọc gì. Nhờ vậy cùng một cảnh trên đĩa cục bộ, MinIO hay S3 cho cùng định danh. Đầu vào nằm ở đường dẫn người dùng chọn; RayTwin kiểm hash khi đọc và báo lỗi nếu lệch. Mọi lần ghi của RayTwin là create-only, nên RayTwin không bao giờ ghi đè dữ liệu cũ. Tham số solver và seed nằm trong manifest, nên định danh snapshot phủ mọi đầu vào (<a href="architecture/adr/0002-snapshot-identity-and-path-based-storage.md">ADR 0002</a>).</p>
 <p class="code-title">Ví dụ manifest (minh họa, chưa phải định dạng cố định)</p>
 <pre><code>{
   "schema": "raytwin.manifest/v1",
-  "scene":     { "uri": "s3://raytwin/scenes/munich/munich.xml", "hash": "blake3:9f2c…" },
+  "scene":     { "uri": "s3://raytwin/scenes/munich/munich.xml", "hash": "blake3:9f2c…",
+               "crs": { "epsg": 32632, "origin": [691000.0, 5334000.0, 0.0] } },
   "materials": { "prior": "itu-classes",
                  "field": { "uri": "s3://raytwin/fields/munich/v3.zarr", "hash": "blake3:7a01…" } },
   "bands": [
@@ -746,6 +777,17 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
   ],
   "solver": { "max_depth": 3, "rays_per_tx": 10000000, "seed": 42 }
 }</code></pre>
+<p><span class="tag dec">Đã chốt</span> Snapshot chỉ chứa đầu vào của bước dò tia. <code>crs</code> là tùy chọn: mã EPSG và gốc của hệ tọa độ cảnh, dùng để đổi vị trí MDT (kinh độ, vĩ độ) sang tọa độ cảnh. Các tham số vô tuyến chỉ dùng khi đọc kết quả nằm trong một tài liệu riêng, <strong>RAN config</strong> (<code>raytwin.ran/v1</code>), có hash riêng: EPRE của tín hiệu tham chiếu theo (cell, băng), cờ bật/tắt cell, hệ số tạp âm, gain và body loss của UE; từ bản 0.2 thêm CIO, tham số handover và lưới tài nguyên. Đổi RAN config không tạo snapshot mới, nên không cần dò lại tia. RSRP, SINR và kết quả QoS được định danh bằng cặp (job id, hash RAN config). Mọi chỉnh sửa cấu hình là phái sinh: một config delta tạo tài liệu mới có hash mới, kèm lịch sử và rollback (<a href="#tt-moc">mục 19.3</a>, <a href="architecture/adr/0002-snapshot-identity-and-path-based-storage.md">ADR 0002</a>).</p>
+<p class="code-title">Ví dụ RAN config (minh họa, chưa phải định dạng cố định)</p>
+<pre><code>{
+  "schema": "raytwin.ran/v1",
+  "cells": [
+    { "tx": "cell-17", "band": "n78", "active": true, "ssb_epre_dbm": 18.0,
+      "cio_db": 0.0, "n_prb": 273, "scs_khz": 30,
+      "ho": { "hys_db": 1.0, "a3_offset_db": 3.0, "ttt_ms": 320, "filter_k": 4 } }
+  ],
+  "ue": { "gain_dbi": -3.0, "body_loss_db": 3.0, "nf_db": 7.0 }
+}</code></pre>
 
 <h3 id="kt-che-do"><span class="secno">10.3</span>Chế độ thư viện và chế độ phân tán</h3>
 <div class="grid-2">
@@ -754,7 +796,7 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
   <div class="card"><h4>Chế độ phân tán</h4>
   <p>Client gửi job tới coordinator bằng NATS request/reply và theo dõi trạng thái trong KV. Coordinator chia job thành task, đưa vào NATS JetStream; worker trên một hoặc nhiều máy, mỗi worker dùng CPU hoặc GPU của máy đó, kéo task về xử lý, ghi kết quả từng phần lên object store. MVP chạy bằng Docker Compose gồm NATS, MinIO, coordinator và N worker.</p></div>
 </div>
-<p><span class="tag dec">Đã chốt</span> Hai chế độ dùng chung kiểu <code>Task</code> và hai hàm <code>run_task</code>, <code>merge</code>; không có trait <code>TaskQueue</code> hay <code>LocalQueue</code>. Lõi tính toán không biết mình đang chạy ở chế độ nào (<a href="adr/0001-one-core-two-runtime-modes.md">ADR 0001</a>).</p>
+<p><span class="tag dec">Đã chốt</span> Hai chế độ dùng chung kiểu <code>Task</code> và hai hàm <code>run_task</code>, <code>merge</code>; không có trait <code>TaskQueue</code> hay <code>LocalQueue</code>. Lõi tính toán không biết mình đang chạy ở chế độ nào (<a href="architecture/adr/0001-one-core-two-runtime-modes.md">ADR 0001</a>).</p>
 
 <h3 id="kt-jetstream"><span class="secno">10.4</span>Phân phối công việc bằng NATS JetStream <span class="tag dec">Đã chốt</span></h3>
 <p>Mô hình đã chọn là <em>pull</em>: worker rảnh thì tự kéo task, thay vì coordinator đẩy task tới từng worker. Worker nhanh tự nhận nhiều việc hơn, thêm worker không cần cấu hình lại coordinator, và task của worker bị lỗi được giao lại tự động.</p>
@@ -803,9 +845,9 @@ ul.checklist li::before{content:""; position:absolute; left:2px; top:5px; width:
 <tr><td>Message chỉ chứa tham chiếu: hash manifest, Tx, khoảng tia, khóa kết quả</td><td>Giữ message nhỏ hơn nhiều so với giới hạn 1 MB; dữ liệu lớn đi qua S3/MinIO</td></tr>
 <tr><td>Thứ tự trong worker: ghi kết quả → phát sự kiện "xong" → ack</td><td>Nếu worker chết giữa chừng, task được giao lại và tính lại ra cùng kết quả (seed tất định); lần ghi thứ hai là create-only, gặp part cùng hash thì coi là thành công; coordinator loại sự kiện trùng theo id task</td></tr>
 <tr><td>Stream <code>RAYTWIN_EVENTS</code> cho sự kiện hoàn thành và lỗi; KV bucket <code>RAYTWIN_JOBS</code> cho trạng thái job</td><td>Coordinator theo dõi tiến độ mà không phải liệt kê object store</td></tr>
-<tr><td>Subject theo job: <code>raytwin.tasks.&lt;job&gt;.&lt;task&gt;</code> <span class="tag dec">Đã chốt</span></td><td>Coordinator purge được toàn bộ task còn chờ của một job khi job bị hủy hoặc lỗi (<a href="adr/0004-work-distribution-with-nats-jetstream.md">ADR 0004</a>)</td></tr>
+<tr><td>Subject theo job: <code>raytwin.tasks.&lt;job&gt;.&lt;task&gt;</code> <span class="tag dec">Đã chốt</span></td><td>Coordinator purge được toàn bộ task còn chờ của một job khi job bị hủy hoặc lỗi (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-05</a>)</td></tr>
 <tr><td>Ba loại task <span class="tag dec">Đã chốt</span>: <code>radio_map</code> (Tx × lô tia, gộp bằng cộng số nguyên), <code>paths</code> và <code>tape</code> (Tx × nhóm Rx hoặc nhóm mẫu MDT, gộp bằng nối theo thứ tự task)</td><td>Hiệu chỉnh chạy được cả ở chế độ phân tán; <code>paths</code> và <code>tape</code> không cần loại trùng toàn cục</td></tr>
-<tr><td>Client gửi job bằng request/reply <code>raytwin.jobs.submit</code>, hủy bằng <code>raytwin.jobs.cancel</code> <span class="tag dec">Đã chốt</span></td><td>Một giao thức cho cả client lẫn worker; coordinator và worker không mở cổng nào (<a href="adr/0005-nats-as-the-client-protocol.md">ADR 0005</a>)</td></tr>
+<tr><td>Client gửi job bằng request/reply <code>raytwin.jobs.submit</code>, hủy bằng <code>raytwin.jobs.cancel</code> <span class="tag dec">Đã chốt</span></td><td>Một giao thức cho cả client lẫn worker; coordinator và worker không mở cổng nào (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-06</a>)</td></tr>
 <tr><td>Job id là hash của job spec chuẩn hóa <span class="tag dec">Đã chốt</span></td><td>Gửi lại cùng job là an toàn: đang chạy thì trả trạng thái, xong thì trả kết quả, lỗi hoặc đã hủy thì chạy lại</td></tr>
 <tr><td>Hủy job <span class="tag dec">Đã chốt</span>: coordinator đặt KV thành <code>cancelled</code> và purge task còn chờ; worker đọc trạng thái ở mỗi nhịp in-progress và dừng giữa hai lô tia con</td><td>Không task mới nào của job bắt đầu sau khi có reply; task đang chạy dừng trong khoảng một nhịp (10 giây)</td></tr>
 </tbody></table></div>
@@ -838,11 +880,20 @@ job = rt.RadioMapJob(snapshot=snap.id, grid=rt.VoxelGrid(cell=5.0, z=(0.0, 60.0)
 result = rt.run(job)                                    # chế độ thư viện
 # handle = rt.Client("nats://localhost:4222").submit(job)             # chế độ phân tán
 # result = handle.wait()                                               # handle.cancel() để hủy
-rsrp = result.rsrp(band="n78")                          # mảng [z, y, x], dBm
+ran = store.put_ran(cells=rt.read_json("ran/munich.json"),
+                    ue=rt.UeClass(gain_db=-3.0, body_loss_db=3.0, nf_db=7.0))
+rsrp = result.rsrp(band="n78", ran=ran)                 # mảng [tx, z, y, x], dBm, theo toán tử đo (19)
+cell, best = result.best_server(band="n78", ran=ran)    # cell phục vụ và RSRP của nó, [z, y, x]
 
 paths = rt.run(rt.PathJob(snapshot=snap.id, receivers=ue_points, per_element=True))
-a, tau = paths.cir(band="n78")   # a: [rx, rx_ant, tx, tx_ant, path], tau: [rx, rx_ant, tx, tx_ant, path]</code></pre>
-<p><span class="tag dec">Đã chốt</span> Client của chế độ phân tán dùng NATS (<code>nats://</code>), không dùng gRPC; <code>JobHandle</code> có <code>wait()</code> và <code>cancel()</code> (<a href="adr/0005-nats-as-the-client-protocol.md">ADR 0005</a>).</p>
+a, tau = paths.cir(band="n78")   # a: [rx, rx_ant, tx, tx_ant, path], tau: [rx, rx_ant, tx, tx_ant, path]
+
+print(snap.transmitters[0], result.grid)                # cấu hình và lưới của kết quả
+vertices, triangles, class_id, classes = scene.mesh()   # hình học cảnh dạng NumPy
+from raytwin import viz                                 # extra raytwin[viz]
+viz.preview(scene, result, band="n78", z=1.5, quantity="rsrp", paths=paths)
+viz.export_gltf("munich-n78.glb", scene, result, band="n78", z=1.5)</code></pre>
+<p><span class="tag dec">Đã chốt</span> Client của chế độ phân tán dùng NATS (<code>nats://</code>), không dùng gRPC; <code>JobHandle</code> có <code>wait()</code> và <code>cancel()</code> (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-06</a>).</p>
 <p class="code-title">Lớp tương thích (minh họa; tên lấy theo Sionna RT 2.2.0)</p>
 <pre><code>from raytwin.compat import sionna as rts
 
@@ -857,7 +908,7 @@ a, tau = paths.cir(out_type="numpy")                  # cùng dạng mảng như
 <p><span class="tag inf">Suy luận</span> Lớp tương thích chỉ nên phủ phần dùng trong CI và ví dụ (cảnh, mảng, PathSolver, RadioMapSolver), không cố bắt chước toàn bộ Sionna. Khi Sionna đổi API, chỉ lớp này phải sửa.</p>
 
 <h3 id="kt-plugin"><span class="secno">10.6</span>Điểm mở rộng: không có API plugin trong 0.1 <span class="tag dec">Đã chốt</span></h3>
-<p>Bản 0.1 không có API plugin công khai (<a href="adr/0007-no-public-plugin-api-in-release-0-1.md">ADR 0007</a>). Rà soát kiến trúc ngày 29/10/2026 cho thấy các trait plugin dự kiến không chạy được trên GPU: shader WGSL không gọi được trait object viết bằng Rust, và GPU cộng dồn bằng atomic trong VRAM nên không gọi lại một <code>RadioMapSink</code> trên CPU. Hình dạng đúng của <code>InteractionModel</code> cũng chỉ rõ sau khi thiết kế xong tán xạ khuếch tán và nhiễu xạ, vì nhiễu xạ xảy ra ở cạnh chứ không ở điểm chạm.</p>
+<p>Bản 0.1 không có API plugin công khai (<a href="architecture/adr/0004-plugin-api.md">ADR 0004</a>). Rà soát kiến trúc ngày 29/10/2026 cho thấy các trait plugin dự kiến không chạy được trên GPU: shader WGSL không gọi được trait object viết bằng Rust, và GPU cộng dồn bằng atomic trong VRAM nên không gọi lại một <code>RadioMapSink</code> trên CPU. Hình dạng đúng của <code>InteractionModel</code> cũng chỉ rõ sau khi thiết kế xong tán xạ khuếch tán và nhiễu xạ, vì nhiễu xạ xảy ra ở cạnh chứ không ở điểm chạm.</p>
 <div class="table-wrap"><table>
 <thead><tr><th>Điểm mở rộng cũ</th><th>Trong bản 0.1</th></tr></thead>
 <tbody>
@@ -879,7 +930,7 @@ pub trait Backend: Send + Sync {
     fn trace_paths(&amp;self, task: &amp;PathTask, cancel: &amp;CancelFlag) -&gt; Result&lt;Paths&gt;;
     fn trace_tape(&amp;self, task: &amp;TapeTask, cancel: &amp;CancelFlag) -&gt; Result&lt;Tape&gt;;
 }</code></pre>
-<p><span class="tag rec">Khuyến nghị</span> Hướng sau MVP: trait plugin giữ chữ ký của kiểu nội bộ, ví dụ <code>MaterialField::eval(x, class, f)</code>. Bước đầu, job dùng plugin chạy trên CPU và chế độ <code>auto</code> ghi rõ lý do. Bước sau, lõi lấy mẫu plugin thành lưới hoặc bảng khi nạp snapshot để GPU nội suy; CPU dùng cùng dữ liệu đó nên vẫn khớp trong 10<sup>−4</sup>. Một ADR mới sẽ ghi lại API plugin.</p>
+<p><span class="tag dec">Đã chốt</span> Sau MVP, RayTwin không mở trait vật lý. Từ bản 0.2 có plugin Python chạy ở phía client (đọc dữ liệu, mô hình QoS, KPI, xuất kết quả); từ bản 0.3 có pattern anten và vật liệu dạng bảng trong snapshot, được nội suy giống nhau trên CPU và GPU. Danh sách đầy đủ ở <a href="#plugin">mục 18</a> (<a href="architecture/adr/0004-plugin-api.md">ADR 0004</a>).</p>
 
 <h3 id="kt-gpu"><span class="secno">10.7</span>Backend CPU và GPU <span class="tag dec">Đã chốt</span></h3>
 <p>MVP chạy được trên cả CPU và GPU. CPU (rayon + obvhs) là backend tham chiếu. GPU dùng wgpu với hai đường, chọn khi chạy: <strong>ray query</strong> dùng RT core khi adapter là Vulkan và hỗ trợ tính năng này; <strong>compute shader</strong> tự duyệt BVH trong các trường hợp còn lại. Toàn bộ pipeline chạy trên GPU, kể cả image method cho CIR theo từng phần tử. Trong MVP, GPU được hỗ trợ trên Linux và Windows qua Vulkan; macOS chạy CPU.</p>
@@ -921,12 +972,12 @@ pub trait Backend: Send + Sync {
 <h4>Tất định trên GPU</h4>
 <p>Theo quyết định đã chốt, cùng seed thì GPU phải cho kết quả trùng từng bit giữa các lần chạy, và lệch CPU không quá 10<sup>−4</sup> tương đối. GPU chạy hàng nghìn luồng theo thứ tự không cố định, nên thiết kế phải loại bỏ mọi chỗ kết quả phụ thuộc thứ tự <span class="tag rec">Khuyến nghị</span>:</p>
 <ul>
-  <li><strong>Số ngẫu nhiên theo bộ đếm</strong> (counter-based RNG, ví dụ Philox): số ngẫu nhiên của mỗi tia được tính từ khóa (seed của manifest, Tx) và bộ đếm (id tia toàn cục, lần nảy), không phụ thuộc luồng nào chạy trước. Khóa không chứa job, nên hai job so hai cấu hình dùng chung số ngẫu nhiên (<a href="adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>).</li>
+  <li><strong>Số ngẫu nhiên theo bộ đếm</strong> (counter-based RNG, ví dụ Philox): số ngẫu nhiên của mỗi tia được tính từ khóa (seed của manifest, Tx) và bộ đếm (id tia toàn cục, lần nảy), không phụ thuộc luồng nào chạy trước. Khóa không chứa job, nên hai job so hai cấu hình dùng chung số ngẫu nhiên (<a href="architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>).</li>
   <li><strong>Cộng dồn bằng fixed-point ở mọi backend:</strong> mỗi đóng góp P·ℓ được đổi thành số nguyên rồi cộng bằng atomic 64 bit. Phép cộng số nguyên có tính giao hoán và kết hợp, nên tổng không phụ thuộc thứ tự; cộng atomic số thực thì có.</li>
   <li><strong>Danh sách đường:</strong> ghi vào append buffer (thứ tự tùy ý), sau đó sắp xếp theo khóa (Tx, Rx, chuỗi primitive) trước khi xuất. Khi loại trùng, giữ ứng viên có id tia nhỏ nhất (atomic min).</li>
 </ul>
 <div class="math-block"><div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>q</mi><mi>v</mi></msub><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><mi mathvariant="normal">round</mi><mo>⁡</mo><mtext> ⁣</mtext><mrow><mo fence="true">(</mo><mfrac><mrow><msub><mi>P</mi><mi>i</mi></msub><mtext> </mtext><msub><mi mathvariant="normal">ℓ</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>v</mi></mrow></msub></mrow><mi>s</mi></mfrac><mo fence="true">)</mo></mrow><mo>∈</mo><mtext>Z</mtext><mo separator="true">,</mo><mspace width="2em"/><msub><mover accent="true"><mi>S</mi><mo>ˉ</mo></mover><mi>v</mi></msub><mo>≈</mo><mfrac><mrow><mi>s</mi><mtext> </mtext><msub><mi>q</mi><mi>v</mi></msub></mrow><mi>V</mi></mfrac><mo separator="true">,</mo><mspace width="2em"/><mn>10</mn><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>10</mn></msub><msup><mn>2</mn><mn>63</mn></msup><mo>≈</mo><mn>190</mn><mtext> </mtext><mrow><mi mathvariant="normal">d</mi><mi mathvariant="normal">B</mi></mrow></mrow><annotation encoding="application/x-tex">q_v = \sum_{i} \operatorname{round}\!\left(\frac{P_i\,\ell_{i,v}}{s}\right) \in \text{ℤ}, \qquad \bar{S}_v \approx \frac{s\,q_v}{V}, \qquad 10\log_{10} 2^{63} \approx 190\ \mathrm{dB}</annotation></semantics></math></span></div><span class="eqno">(12)</span></div>
-<p>s là hệ số tỉ lệ chọn cho từng job từ công suất phát, số tia và kích thước voxel, sao cho tổng lớn nhất không tràn 2<sup>63</sup>. Dải động khoảng 190 dB đủ cho bản đồ RSRP; đóng góp nhỏ hơn đơn vị lượng tử s bị làm tròn về 0. Lập kế hoạch job tính s một lần, và mọi task của job mang cùng s. <span class="tag dec">Đã chốt</span> Không giả lập atomic 64 bit bằng hai atomic 32 bit: adapter thiếu atomic 64 bit dùng backend CPU (<a href="adr/0006-gpu-backends-through-wgpu.md">ADR 0006</a>).</p>
+<p>s là hệ số tỉ lệ chọn cho từng job từ công suất phát, số tia và kích thước voxel, sao cho tổng lớn nhất không tràn 2<sup>63</sup>. Dải động khoảng 190 dB đủ cho bản đồ RSRP; đóng góp nhỏ hơn đơn vị lượng tử s bị làm tròn về 0. Lập kế hoạch tính s một lần cho mỗi Tx, chỉ từ đầu vào dò tia của Tx đó, và mọi task của Tx mang cùng s; nhờ vậy kết quả của một Tx không phụ thuộc các Tx khác (<a href="architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>). <span class="tag dec">Đã chốt</span> Không giả lập atomic 64 bit bằng hai atomic 32 bit: adapter thiếu atomic 64 bit dùng backend CPU (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-07</a>).</p>
 
 <h4>Độ chính xác số cho CIR</h4>
 <p>Ngưỡng |Δτ| ≤ 1 ps tương đương 0,3 mm độ dài đường. <span class="tag inf">Suy luận</span> Với f32, khoảng cách giữa hai số liền kề quanh 500 m là 2<sup>−15</sup> ≈ 3·10<sup>−5</sup> m. Image method độ sâu 3 gồm hàng chục phép tính nối tiếp, nên sai số tích lũy có thể vượt 0,3 mm. Vì vậy image method trên GPU tính bằng f64 (<code>SHADER_F64</code>, có trên Vulkan), với tọa độ đổi về gốc cục bộ quanh Tx để giảm độ lớn các số hạng. FP64 trên GPU GeForce chậm hơn nhiều so với FP32, nhưng chỉ dùng ở bước image method; phần SBR vẫn chạy f32.</p>
@@ -964,6 +1015,7 @@ pub trait Backend: Send + Sync {
 <div class="math-block"><div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>ρ</mi><mi>κ</mi></msub><mo stretchy="false">(</mo><mi>r</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">{</mo><mtable rowspacing="0.36em" columnalign="left left" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mi>r</mi><mn>2</mn></msup><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo stretchy="false">∣</mo><mi>r</mi><mo stretchy="false">∣</mo><mo>≤</mo><mi>κ</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>κ</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mo stretchy="false">∣</mo><mi>r</mi><mo stretchy="false">∣</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>κ</mi><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mo separator="true">,</mo></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mo stretchy="false">∣</mo><mi>r</mi><mo stretchy="false">∣</mo><mo>&gt;</mo><mi>κ</mi></mrow></mstyle></mtd></mtr></mtable></mrow><mspace width="2em"/><mrow><mi mathvariant="normal">T</mi><mi mathvariant="normal">V</mi></mrow><mo stretchy="false">(</mo><mi>δ</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mo>∑</mo><mi>v</mi></munder><munder><mo>∑</mo><mrow><mi>e</mi><mo>∈</mo><mo stretchy="false">{</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo separator="true">,</mo><mi>z</mi><mo stretchy="false">}</mo></mrow></munder><msqrt><mrow><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><msub><mi>δ</mi><mrow><mi>v</mi><mo>+</mo><mi>e</mi></mrow></msub><mo>−</mo><msub><mi>δ</mi><mi>v</mi></msub><msup><mo fence="false" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo><mn>2</mn></msup><mo>+</mo><msup><mi>ϵ</mi><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex">\rho_\kappa(r) = \begin{cases} \tfrac12 r^{2}, &amp; \lvert r\rvert \le \kappa \\ \kappa\big(\lvert r\rvert - \tfrac12\kappa\big), &amp; \lvert r\rvert &gt; \kappa \end{cases} \qquad \mathrm{TV}(\delta) = \sum_{v}\sum_{e\in\{x,y,z\}} \sqrt{\big(\delta_{v+e} - \delta_v\big)^{2} + \epsilon^{2}}</annotation></semantics></math></span></div><span class="eqno">(16)</span></div>
 <div class="callout example"><div class="ct">Ví dụ: vì sao dùng Huber</div>
 <p>Chọn κ = 3 dB. Mẫu lệch 2 dB đóng góp ½·2² = 2, như bình phương thông thường. Mẫu lệch 10 dB, thường do sai vị trí, đóng góp 3·(10 − 1,5) = 25,5 thay vì ½·10² = 50. Mẫu ngoại lai vì vậy kéo nghiệm ít hơn hẳn. Số hạng ε nhỏ trong TV giúp hàm khả vi tại 0.</p></div>
+<p>RSRP<sub>m</sub> là RSRP mà UE báo cáo. Giá trị dự báo tính bằng toán tử đo (19) ở <a href="#vl-rsrp">mục 11.7</a>, với EPRE lấy từ RAN config chứ không suy từ công suất phát toàn băng.</p>
 
 <h3 id="vl-pytorch"><span class="secno">11.3</span>Đường đi cố định và vòng tối ưu bằng PyTorch <span class="tag dec">Đã chốt</span></h3>
 <p><span class="tag rec">Khuyến nghị</span> Không cần autodiff qua toàn bộ ray tracer. RayTwin (Rust) dò tia một lần với trường hiện tại và ghi lại một <em>tape</em> cho mỗi mẫu đo: các đường đi, điểm chạm, góc tới, loại tương tác, 8 chỉ số và 8 trọng số nội suy của mỗi điểm chạm, độ dài đường và gain anten. Khi giữ đường đi cố định, RSRP dự báo là một hàm giải tích của δ:</p>
@@ -1021,12 +1073,13 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
   <li><span class="tag inf">Suy luận</span> Chạy tối ưu trong PyTorch giúp thử nhanh hàm mất mát, bộ tối ưu (Adam, L-BFGS) và regularization mà không phải biên dịch lại Rust. Khi thuật toán ổn định có thể chuyển phần nóng sang Rust nếu cần.</li>
 </ul>
 
-<p><span class="tag dec">Đã chốt</span> Tape chạy ở cả hai chế độ. Chế độ thư viện: tape là mảng NumPy trỏ vào bộ nhớ Rust, không sao chép. Chế độ phân tán: job loại <code>tape</code> chia theo (Tx, nhóm mẫu MDT) và ghi tape ra Zarr; Python đọc về NumPy rồi gọi <code>torch.from_numpy</code>. Trước mỗi lần dò lại ở chế độ phân tán, δ hiện tại được ghi vào <code>calib/&lt;run&gt;/iter-&lt;k&gt;.zarr</code> (create-only) để tạo snapshot mới. Công thức Fresnel và mô hình tấm có hai bản, trong Rust và trong PyTorch; một test trong CI bắt buộc hai bản khớp nhau trong 10<sup>−6</sup> khi δ = 0 (<a href="adr/0008-calibration-on-frozen-paths-in-pytorch.md">ADR 0008</a>).</p>
+<p><span class="tag dec">Đã chốt</span> Tape chạy ở cả hai chế độ. Chế độ thư viện: tape là mảng NumPy trỏ vào bộ nhớ Rust, không sao chép. Chế độ phân tán: job loại <code>tape</code> chia theo (Tx, nhóm mẫu MDT) và ghi tape ra Zarr; Python đọc về NumPy rồi gọi <code>torch.from_numpy</code>. Trước mỗi lần dò lại ở chế độ phân tán, δ hiện tại được ghi vào <code>calib/&lt;run&gt;/iter-&lt;k&gt;.zarr</code> (create-only) để tạo snapshot mới. Công thức Fresnel và mô hình tấm có hai bản, trong Rust và trong PyTorch; một test trong CI bắt buộc hai bản khớp nhau trong 10<sup>−6</sup> khi δ = 0 (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-08</a>).</p>
 
 <h3 id="vl-du-lieu"><span class="secno">11.4</span>Dữ liệu đầu vào</h3>
 <ul>
   <li><strong>MDT:</strong> vị trí chi tiết (GNSS) chỉ có khi UE sẵn có; nếu không, mẫu chỉ mang cell ID và RF fingerprint (<a href="https://itecspec.com/3gpp/37.320/s/5.1.1.3.3">TS 37.320 §5.1.1.3.3</a>). Sai số vị trí hạn chế mạnh giá trị của MDT cho bản đồ phủ sóng và cần bộ lọc mẫu (<a href="https://riuma.uma.es/entities/publication/eb4888b3-22d4-4b70-b997-74687973bc0b">Sánchez et al.</a>).</li>
   <li><strong>Cấu hình mạng (CM):</strong> công suất, tilt, azimuth, pattern anten phải đúng. <span class="tag inf">Suy luận</span> Sai CM sẽ bị trường vật liệu "hấp thụ" thành sai số vật liệu giả.</li>
+  <li><strong>Schema MDT chuẩn:</strong> <span class="tag dec">Đã chốt</span> Từ bản 0.1, module <code>raytwin.mdt</code> định nghĩa schema MDT: tọa độ theo hệ của cảnh, độ tin cậy vị trí, trace id bí danh, và các cột QoS tùy chọn (M4, M5, M6, M7, RLF). Bảng cột ở <a href="#qos-kich-ban">mục 17.4</a>.</li>
   <li><strong>Ảnh:</strong> dùng làm prior vật liệu. VisRFTwin dịch đặc trưng VLM từ ảnh nhiều góc thành ε<sub>r</sub>, σ ban đầu và giảm tới 10 lần số phép đo cần thiết, nhưng ở dải mmWave (<a href="https://arxiv.org/abs/2603.13383">An et al., 2026</a>). Dựng hình học từ ảnh nằm ngoài MVP.</li>
 </ul>
 
@@ -1050,7 +1103,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 <ol>
   <li>Tạo "trường vật liệu thật" trên <code>munich</code>: gán vật liệu ITU khác nhau, hoặc nhiễu ε<sub>r</sub> và σ, theo từng nhóm tòa nhà. RayTwin bắt đầu từ prior đồng nhất theo lớp.</li>
   <li>Sinh RSRP bằng Sionna RT tại các vị trí UE dọc đường phố, cho nhiều cell, nhiều tilt và ít nhất hai băng FR1.</li>
-  <li>Thêm sai số: nhiễu đo, lượng tử hóa theo bảng ánh xạ báo cáo của 3GPP, sai số vị trí. Tỷ lệ mẫu có GNSS là một tham số được quét.</li>
+  <li>Thêm sai số: nhiễu đo, lượng tử hóa theo bảng ánh xạ báo cáo của 3GPP, sai số vị trí, và sai EPRE theo cell để đo phần sai số CM rò vào trường vật liệu (<a href="#vl-rsrp">mục 11.7</a>). Tỷ lệ mẫu có GNSS là một tham số được quét.</li>
   <li>Hiệu chỉnh trên một phần cell và tilt, đánh giá trên phần để dành. Báo cáo RMSE của RSRP, sai số tham số vật liệu theo tòa nhà và độ đúng thứ hạng giữa các cấu hình.</li>
 </ol>
 <p><span class="tag inf">Suy luận</span> Sinh dữ liệu bằng Sionna thay vì bằng chính RayTwin giúp tránh "inverse crime": dùng cùng mô hình để vừa sinh vừa đảo dữ liệu sẽ cho kết quả tốt giả tạo (<a href="https://arxiv.org/abs/math-ph/0401050">Wirgin, 2004</a>). Sionna gán vật liệu theo vật thể, còn RayTwin dùng lưới, nên thí nghiệm còn kiểm tra được khả năng biểu diễn của trường. Tuy vậy, hai bộ mô phỏng dùng chung công thức ITU và cùng hình học, nên kết quả chỉ là cận trên. Cần MDT hoặc drive test thật trước khi kết luận về chất lượng hiệu chỉnh.</p>
@@ -1064,6 +1117,37 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 <div class="math-block"><div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>ρ</mi><mi>s</mi></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mrow><mn>6</mn><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msubsup><mi>d</mi><mi>i</mi><mn>2</mn></msubsup></mrow><mrow><mi>n</mi><mtext> </mtext><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">\rho_s = 1 - \frac{6\sum_{i=1}^{n} d_i^{2}}{n\,(n^{2} - 1)}</annotation></semantics></math></span></div><span class="eqno">(18)</span></div>
 <div class="callout example"><div class="ct">Ví dụ: vì sao đo thứ hạng</div>
 <p>SON chọn tilt tốt nhất trong 5 phương án. Nếu thứ hạng dự báo là (2, 1, 3, 4, 5) trong khi thứ hạng thật là (1, 2, 3, 4, 5), thì Σd² = 2 và ρ<sub>s</sub> = 1 − 6·2/(5·24) = 0,9. Với SON, đúng thứ hạng quan trọng hơn sai số tuyệt đối nhỏ: đổi chỗ hai phương án đầu nghĩa là áp dụng nhầm cấu hình.</p></div>
+
+<h3 id="vl-rsrp"><span class="secno">11.7</span>Đại lượng so khớp với MDT: RSRP, không dùng RSS <span class="tag dec">Đã chốt</span></h3>
+<p>Câu hỏi: khi so mô phỏng với MDT (để hiệu chỉnh ở mục 11, và để kiểm định ở <a href="#qos">mục 17</a>), RayTwin nên tính RSS như bản đồ của Sionna, hay tính RSRP? Kết luận: tính <strong>RSRP báo cáo</strong> qua một toán tử đo. RSS chỉ là giá trị dẫn xuất.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Đại lượng</th><th>Định nghĩa <span class="tag fact">Sự kiện</span></th><th>Nguồn</th></tr></thead>
+<tbody>
+<tr><td>Dữ liệu MDT</td><td>M1 là chất lượng tín hiệu đường xuống của cell phục vụ và cell lân cận (RSRP, RSRQ, theo cell và theo beam ở NR). MDT không có đại lượng RSS</td><td><a href="https://itecspec.com/3gpp/37.320/s/5.4.1.1">TS 37.320 §5.4.1.1</a></td></tr>
+<tr><td>SS-RSRP</td><td>Trung bình tuyến tính công suất (W) trên các RE mang SSS; có thể thêm PBCH DM-RS hoặc CSI-RS. Ở FR1, điểm tham chiếu là connector anten của UE. Khi UE thu phân tập, giá trị báo cáo không được thấp hơn giá trị của nhánh nào</td><td><a href="https://itecspec.com/3gpp/38.215/s/5.1.1">TS 38.215 §5.1.1</a></td></tr>
+<tr><td>SS-RSRQ, RSSI</td><td>SS-RSRQ = N·SS-RSRP / RSSI. RSSI là trung bình công suất thu trên N RB, từ mọi nguồn: cell phục vụ, cell cùng kênh, nhiễu kênh lân cận, tạp âm nhiệt</td><td><a href="https://www.itecspec.com/3gpp/38.215/s/5.1.3">TS 38.215 §5.1.3</a></td></tr>
+<tr><td>Chất lượng cell từ beam SSB</td><td>Lấy beam tốt nhất; hoặc trung bình tuyến tính của tối đa <code>nrofSS-BlocksToAverage</code> beam vượt ngưỡng <code>absThreshSS-BlocksConsolidation</code></td><td><a href="https://itecspec.com/3gpp/38.331/s/5.5.3.3">TS 38.331 §5.5.3.3</a></td></tr>
+<tr><td>Dải báo cáo L3</td><td>SS-RSRP từ −156 đến −31 dBm, bước 1 dB (theo bản nháp CR của TS 38.133)</td><td><a href="https://3gpp.org/ftp/tsg_ran/WG4_Radio/TSGR4_98bis_e/Inbox/Drafts/%5B98bis-e%5D%5B212%5D%20NR_CSIRS_L3meas_1/documents/R4-21XXXX%20revised%20CR%20on%20CSI-RSRP%20report%20mapping.docx">R4 CR, TS 38.133</a></td></tr>
+<tr><td>RSS của Sionna RT</td><td>RSS bằng công suất phát của transmitter nhân path gain trung bình của ô</td><td><a href="https://nvlabs.github.io/sionna/rt/api/radio_map_solvers.html">Radio Map Solvers</a></td></tr>
+</tbody></table></div>
+<p><span class="tag inf">Suy luận</span> Ba lý do chọn RSRP:</p>
+<ol>
+  <li><strong>Mô hình đo phải dự báo đúng đại lượng được quan sát.</strong> UE báo RSRP, nên mô hình thuận tính RSRP thì so khớp trực tiếp, không cần giả định trung gian.</li>
+  <li><strong>Đổi RSS sang RSRP cần giả định về công suất.</strong> Phải giả định EPRE đều trên mọi RE, SSB không được tăng công suất (boost) và SSB dùng cùng pattern với kênh dữ liệu. Sai một giả định là sai một hằng số cho cả cell. Bài toán hiệu chỉnh sẽ hấp thụ hằng số đó vào trường vật liệu, đúng rủi ro "sai CM bị hấp thụ" ở <a href="#rui-ro">mục 15</a>. RSRP dùng thẳng EPRE của SSB (<code>ss-PBCH-BlockPower</code>), là tham số có sẵn trong CM.</li>
+  <li><strong>Về vật lý, hai đại lượng như nhau.</strong> Bản đồ cộng không kết hợp cho công suất trung bình cục bộ; RSRP sau lọc L1/L3 cũng xấp xỉ đại lượng đó. Vì vậy lõi không đổi: bản đồ vẫn lưu path gain cho 1 W, chỉ bước chuẩn hóa lúc đọc khác.</li>
+</ol>
+<p>Toán tử đo cho cell c, băng b tại điểm <strong>x</strong>, với Q là phép lượng tử 1 dB và cắt theo dải báo cáo:</p>
+<div class="math-block"><div class="eq"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mover><mi mathvariant="normal">RSRP</mi><mo>^</mo></mover><mrow><mi>c</mi><mo>,</mo><mi>b</mi></mrow></msub><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>Q</mi><mo>[</mo><msub><mi mathvariant="normal">EPRE</mi><mrow><mi>c</mi><mo>,</mo><mi>b</mi></mrow></msub><mo>+</mo><mn>10</mn><msub><mi>log</mi><mn>10</mn></msub><msub><mi>g</mi><mrow><mi>c</mi><mo>,</mo><mi>b</mi></mrow></msub><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>G</mi><mi mathvariant="normal">UE</mi></msub><mo>−</mo><msub><mi>L</mi><mi mathvariant="normal">body</mi></msub><mo>]</mo></mrow></math></div><span class="eqno">(19)</span></div>
+<p>g<sub>c,b</sub> là path gain của bản đồ, đã gồm pattern anten phát. EPRE, G<sub>UE</sub> và L<sub>body</sub> nằm trong RAN config (<a href="#kt-du-lieu">mục 10.2</a>). Loss của bài toán hiệu chỉnh (<a href="#vl-bai-toan">mục 11.2</a>) so RSRP từ (19) với RSRP của MDT.</p>
+<div class="callout example"><div class="ct">Ví dụ: sai số khi suy RSRP từ RSS</div>
+<p>Cell phát 46 dBm trên 3276 sóng mang con. Nếu coi EPRE đều thì EPRE ≈ 46 − 10·log<sub>10</sub>3276 ≈ 10,85 dBm. <span class="tag ass">Giả định</span> Nhà mạng boost SSB thêm 3 dB, nên EPRE thật của SSB là 13,85 dBm. Suy RSRP từ RSS sẽ thấp hơn RSRP đo 3 dB tại mọi điểm của cell này. Hiệu chỉnh giảm suy hao vật liệu quanh cell để bù 3 dB; trường vật liệu sai, và sai thêm khi đổi tilt. Dùng thẳng <code>ss-PBCH-BlockPower</code> = 13,85 dBm thì không có độ lệch này.</p></div>
+<ul>
+  <li><strong>Beam SSB của cell massive MIMO.</strong> <span class="tag rec">Khuyến nghị</span> Bản 0.3 nạp pattern bao (envelope) của các beam SSB bằng bảng pattern (PL-08, <a href="#pl-danh-sach">mục 18.2</a>). <span class="tag inf">Suy luận</span> Pattern bao cho cận trên của RSRP theo beam tốt nhất, và bằng đúng khi các đường tới cùng nằm trong một beam. Nếu sai lệch lớn ở vùng NLoS nhiều đường, bước sau là tính một bản đồ cho mỗi beam trong cùng một lần dò, giống cách làm đa băng.</li>
+  <li><strong>Thu phân tập ở UE.</strong> <span class="tag inf">Suy luận</span> Quy tắc "không thấp hơn nhánh nào" làm RSRP báo cáo cao hơn một chút so với một anten đẳng hướng. RayTwin gộp độ lệch này vào G<sub>UE</sub> của từng lớp UE.</li>
+  <li><strong>RSRQ.</strong> RSRQ phụ thuộc tải các cell, nên ở bản 0.2 nó là một tín hiệu để kiểm định mô hình tải (<a href="#qos-danh-gia">mục 17.6</a>), ưu tiên thấp.</li>
+  <li><strong>RSS.</strong> RSS chỉ được tính để hiển thị và trong <code>raytwin.compat</code>; không dùng để hiệu chỉnh.</li>
+  <li><strong>Twin experiment.</strong> MDT mô phỏng thêm một loại lỗi: sai EPRE theo cell. Nhờ vậy đo được phần sai số CM bị rò vào trường vật liệu.</li>
+</ul>
 
 <h2 id="da-bang"><span class="secno">12</span>Hỗ trợ đa băng tần</h2>
 <p><span class="tag inf">Suy luận</span> Đa băng tần khả thi với chi phí tăng thêm nhỏ. Trong quang hình học, quỹ đạo tia không phụ thuộc tần số, nên một lần dò tia phục vụ được nhiều băng. Chỉ phần tính trường (hệ số Fresnel, pattern anten, bước sóng, cộng dồn) phải lặp lại theo băng.</p>
@@ -1100,7 +1184,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 <tr><td>Băng rộng</td><td>MVP dùng tần số trung tâm; khi cần, chia băng thành n<sub>sub</sub> tần số con và cộng công suất</td></tr>
 </tbody></table></div>
 <p>Vì loại tương tác được chọn ngẫu nhiên theo tần số tham chiếu, công suất của tia ở băng b phải nhân trọng số quan trọng (importance weight) để ước lượng vẫn không chệch:</p>
-<div class="math-block"><div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mover accent="true"><mi>S</mi><mo>ˉ</mo></mover><mrow><mi>v</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><mi>V</mi></mfrac><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>P</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mtext> </mtext><msub><mi mathvariant="normal">ℓ</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>v</mi></mrow></msub><mo separator="true">,</mo><mspace width="2em"/><msub><mi>P</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mo>=</mo><mfrac><mrow><msub><mi>P</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mtext> </mtext><msub><mi>G</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>θ</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>φ</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><mi>N</mi></mfrac><munder><mo>∏</mo><mi>k</mi></munder><mfrac><mrow><mo stretchy="false">∣</mo><msub><mi>c</mi><mrow><mi>k</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><msup><mo stretchy="false">∣</mo><mn>2</mn></msup></mrow><msub><mi>q</mi><mi>k</mi></msub></mfrac></mrow><annotation encoding="application/x-tex">\bar{S}_{v,b} = \frac{1}{V}\sum_{i} P_{i,b}\,\ell_{i,v}, \qquad P_{i,b} = \frac{P_{t,b}\,G_{t,b}(\theta_i,\varphi_i)}{N}\prod_{k}\frac{\lvert c_{k,b}\rvert^{2}}{q_k}</annotation></semantics></math></span></div><span class="eqno">(19)</span></div>
+<div class="math-block"><div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mover accent="true"><mi>S</mi><mo>ˉ</mo></mover><mrow><mi>v</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><mi>V</mi></mfrac><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>P</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mtext> </mtext><msub><mi mathvariant="normal">ℓ</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>v</mi></mrow></msub><mo separator="true">,</mo><mspace width="2em"/><msub><mi>P</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mo>=</mo><mfrac><mrow><msub><mi>P</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mtext> </mtext><msub><mi>G</mi><mrow><mi>t</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mo stretchy="false">(</mo><msub><mi>θ</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>φ</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><mi>N</mi></mfrac><munder><mo>∏</mo><mi>k</mi></munder><mfrac><mrow><mo stretchy="false">∣</mo><msub><mi>c</mi><mrow><mi>k</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><msup><mo stretchy="false">∣</mo><mn>2</mn></msup></mrow><msub><mi>q</mi><mi>k</mi></msub></mfrac></mrow><annotation encoding="application/x-tex">\bar{S}_{v,b} = \frac{1}{V}\sum_{i} P_{i,b}\,\ell_{i,v}, \qquad P_{i,b} = \frac{P_{t,b}\,G_{t,b}(\theta_i,\varphi_i)}{N}\prod_{k}\frac{\lvert c_{k,b}\rvert^{2}}{q_k}</annotation></semantics></math></span></div><span class="eqno">(20)</span></div>
 <p>c<sub>k,b</sub> là hệ số của tương tác thứ k trên tia i ở băng b; q<sub>k</sub> là xác suất đã chọn tương tác đó, tính ở tần số tham chiếu. <span class="tag inf">Suy luận</span> Cách này giống kỹ thuật lấy mẫu phổ trong render đồ họa. Điều kiện là q<sub>k</sub> &gt; 0 ở mọi nơi hệ số của một băng nào đó khác 0.</p>
 <div class="callout example"><div class="ct">Ví dụ: trọng số theo băng</div>
 <p>Một tia chạm tường bê tông. Ở tần số tham chiếu, giả sử |r|² = 0,16 và |t|² = 0,84, nên thuật toán chọn phản xạ với xác suất q = 0,16. Nếu ở băng b khác |r<sub>b</sub>|² = 0,20, công suất phản xạ của tia ở băng b được nhân 0,20/0,16 = 1,25. Trung bình trên nhiều tia, phần năng lượng phản xạ ở băng b vẫn là 0,20, tức ước lượng không chệch.</p></div>
@@ -1144,7 +1228,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 
 <h2 id="cir"><span class="secno">13</span>CIR theo từng phần tử anten</h2>
 <p><span class="tag rec">Khuyến nghị</span> Đưa CIR vào MVP cho LoS, phản xạ gương và truyền qua, dùng cùng thuật toán với Sionna: SBR tìm ứng viên, image method tinh chỉnh, hash loại đường trùng. Tán xạ khuếch tán và nhiễu xạ để sau MVP. Đường gương là tất định, nên CIR còn là phép kiểm vật lý chặt hơn bản đồ Monte Carlo và nên làm trước.</p>
-<div class="math-block"><div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>h</mi><mi>b</mi></msub><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>a</mi><mrow><mi>n</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mtext> </mtext><mi>δ</mi><mo stretchy="false">(</mo><mi>τ</mi><mo>−</mo><msub><mi>τ</mi><mi>n</mi></msub><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><msub><mi>H</mi><mi>b</mi></msub><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>a</mi><mrow><mi>n</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mtext> </mtext><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mn>2</mn><mi>π</mi><mi>f</mi><msub><mi>τ</mi><mi>n</mi></msub></mrow></msup><mo separator="true">,</mo><mspace width="2em"/><msub><mi>a</mi><mrow><mi>n</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mo>=</mo><mfrac><msub><mi>λ</mi><mi>b</mi></msub><mrow><mn>4</mn><mi>π</mi></mrow></mfrac><mtext> </mtext><msubsup><mi mathvariant="bold">C</mi><mrow><mi>R</mi><mo separator="true">,</mo><mi>b</mi></mrow><mi mathvariant="sans-serif">H</mi></msubsup><mtext> </mtext><msub><mi>A</mi><mi>n</mi></msub><mtext> </mtext><msubsup><mi mathvariant="bold">T</mi><mrow><mi>n</mi><mo separator="true">,</mo><mi>b</mi></mrow><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">ℓ</mi><mo stretchy="false">)</mo></mrow></msubsup><mo>⋯</mo><msubsup><mi mathvariant="bold">T</mi><mrow><mi>n</mi><mo separator="true">,</mo><mi>b</mi></mrow><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup><mtext> </mtext><msub><mi mathvariant="bold">C</mi><mrow><mi>T</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub></mrow><annotation encoding="application/x-tex">h_b(\tau) = \sum_{n=1}^{N} a_{n,b}\,\delta(\tau-\tau_n), \qquad H_b(f) = \sum_{n=1}^{N} a_{n,b}\,e^{-j2\pi f\tau_n}, \qquad a_{n,b} = \frac{\lambda_b}{4\pi}\,\mathbf{C}_{R,b}^{\mathsf{H}}\,A_n\,\mathbf{T}^{(\ell)}_{n,b}\cdots\mathbf{T}^{(1)}_{n,b}\,\mathbf{C}_{T,b}</annotation></semantics></math></span></div><span class="eqno">(20)</span></div>
+<div class="math-block"><div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>h</mi><mi>b</mi></msub><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>a</mi><mrow><mi>n</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mtext> </mtext><mi>δ</mi><mo stretchy="false">(</mo><mi>τ</mi><mo>−</mo><msub><mi>τ</mi><mi>n</mi></msub><mo stretchy="false">)</mo><mo separator="true">,</mo><mspace width="2em"/><msub><mi>H</mi><mi>b</mi></msub><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mi>a</mi><mrow><mi>n</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mtext> </mtext><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mn>2</mn><mi>π</mi><mi>f</mi><msub><mi>τ</mi><mi>n</mi></msub></mrow></msup><mo separator="true">,</mo><mspace width="2em"/><msub><mi>a</mi><mrow><mi>n</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub><mo>=</mo><mfrac><msub><mi>λ</mi><mi>b</mi></msub><mrow><mn>4</mn><mi>π</mi></mrow></mfrac><mtext> </mtext><msubsup><mi mathvariant="bold">C</mi><mrow><mi>R</mi><mo separator="true">,</mo><mi>b</mi></mrow><mi mathvariant="sans-serif">H</mi></msubsup><mtext> </mtext><msub><mi>A</mi><mi>n</mi></msub><mtext> </mtext><msubsup><mi mathvariant="bold">T</mi><mrow><mi>n</mi><mo separator="true">,</mo><mi>b</mi></mrow><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">ℓ</mi><mo stretchy="false">)</mo></mrow></msubsup><mo>⋯</mo><msubsup><mi mathvariant="bold">T</mi><mrow><mi>n</mi><mo separator="true">,</mo><mi>b</mi></mrow><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup><mtext> </mtext><msub><mi mathvariant="bold">C</mi><mrow><mi>T</mi><mo separator="true">,</mo><mi>b</mi></mrow></msub></mrow><annotation encoding="application/x-tex">h_b(\tau) = \sum_{n=1}^{N} a_{n,b}\,\delta(\tau-\tau_n), \qquad H_b(f) = \sum_{n=1}^{N} a_{n,b}\,e^{-j2\pi f\tau_n}, \qquad a_{n,b} = \frac{\lambda_b}{4\pi}\,\mathbf{C}_{R,b}^{\mathsf{H}}\,A_n\,\mathbf{T}^{(\ell)}_{n,b}\cdots\mathbf{T}^{(1)}_{n,b}\,\mathbf{C}_{T,b}</annotation></semantics></math></span></div><span class="eqno">(21)</span></div>
 <p>τ<sub>n</sub> là trễ của đường n; A<sub>n</sub> là hệ số trải rộng (với đường gương bằng 1/L<sub>n</sub>); <strong>T</strong><sup>(k)</sup> là ma trận Jones 2 × 2 của tương tác thứ k; <strong>C</strong><sub>T</sub>, <strong>C</strong><sub>R</sub> là pattern hai phân cực của anten phát và thu. Ở dạng đa băng, τ<sub>n</sub>, góc đi, góc đến và A<sub>n</sub> dùng chung; chỉ <strong>T</strong>, <strong>C</strong> và λ tính lại theo băng b.</p>
 
 <h3 id="cir-sionna"><span class="secno">13.1</span>Sionna làm gì</h3>
@@ -1163,7 +1247,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 <div class="table-wrap"><table>
 <thead><tr><th>Thành phần</th><th>Thiết kế <span class="tag rec">Khuyến nghị</span></th></tr></thead>
 <tbody>
-<tr><td>Đầu ra <code>Paths</code></td><td>Theo (Tx, Rx, đường): a theo băng và theo cặp phần tử anten, τ, góc đi và góc đến (θ, φ), chuỗi loại tương tác, đỉnh, id primitive, Doppler; lưu Zarr (mảng đặc, có đệm theo trục đường và mặt nạ hợp lệ, <a href="adr/0009-zarr-as-the-only-result-format.md">ADR 0009</a>), trả về Python dưới dạng mảng NumPy</td></tr>
+<tr><td>Đầu ra <code>Paths</code></td><td>Theo (Tx, Rx, đường): a theo băng và theo cặp phần tử anten, τ, góc đi và góc đến (θ, φ), chuỗi loại tương tác, đỉnh, id primitive, Doppler; lưu Zarr (mảng đặc, có đệm theo trục đường và mặt nạ hợp lệ, <a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-09</a>), trả về Python dưới dạng mảng NumPy</td></tr>
 <tr><td>Tìm ứng viên</td><td>Dùng chung vòng SBR với bản đồ 3D; ứng viên chuỗi gương ghi theo (đích, hash); cầu thu nới thêm bán kính mảng Rx</td></tr>
 <tr><td>Loại trùng</td><td>Hash mặt phẳng lượng tử hóa như Sionna. <span class="tag inf">Suy luận</span> Trên CPU dùng bảng hash động, nên tránh được việc mất đường do va chạm</td></tr>
 <tr><td>Image method</td><td>Tính ảnh nguồn qua từng mặt phản xạ, truy ngược từ đích, kiểm tra trúng primitive đồng phẳng và đoạn không bị che</td></tr>
@@ -1201,7 +1285,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 
 <h3 id="cir-chi-phi"><span class="secno">13.4</span>Chi phí tính toán</h3>
 <p>Với k = 1 (chỉ tâm) hoặc 5 (tâm và 4 góc), N<sub>S</sub> là số tia, d là độ sâu, N<sub>c</sub> là số ứng viên, M là số vị trí phần tử:</p>
-<div class="math-block"><div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>C</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">B</mi><mi mathvariant="normal">R</mi></mrow></msub><mo>∝</mo><mi>k</mi><mtext> </mtext><msub><mi>N</mi><mi>S</mi></msub><mtext> </mtext><mi>d</mi><mo separator="true">,</mo><mspace width="2em"/><msub><mi>C</mi><mrow><mi mathvariant="normal">I</mi><mi mathvariant="normal">M</mi></mrow></msub><mo>∝</mo><msub><mi>N</mi><mi>c</mi></msub><mtext> </mtext><msub><mi>M</mi><mrow><mi>t</mi><mi>x</mi></mrow></msub><mtext> </mtext><msub><mi>M</mi><mrow><mi>r</mi><mi>x</mi></mrow></msub><mtext> </mtext><mi>d</mi></mrow><annotation encoding="application/x-tex">C_{\mathrm{SBR}} \propto k\,N_S\,d, \qquad C_{\mathrm{IM}} \propto N_c\,M_{tx}\,M_{rx}\,d</annotation></semantics></math></span></div><span class="eqno">(21)</span></div>
+<div class="math-block"><div class="eq"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>C</mi><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">B</mi><mi mathvariant="normal">R</mi></mrow></msub><mo>∝</mo><mi>k</mi><mtext> </mtext><msub><mi>N</mi><mi>S</mi></msub><mtext> </mtext><mi>d</mi><mo separator="true">,</mo><mspace width="2em"/><msub><mi>C</mi><mrow><mi mathvariant="normal">I</mi><mi mathvariant="normal">M</mi></mrow></msub><mo>∝</mo><msub><mi>N</mi><mi>c</mi></msub><mtext> </mtext><msub><mi>M</mi><mrow><mi>t</mi><mi>x</mi></mrow></msub><mtext> </mtext><msub><mi>M</mi><mrow><mi>r</mi><mi>x</mi></mrow></msub><mtext> </mtext><mi>d</mi></mrow><annotation encoding="application/x-tex">C_{\mathrm{SBR}} \propto k\,N_S\,d, \qquad C_{\mathrm{IM}} \propto N_c\,M_{tx}\,M_{rx}\,d</annotation></semantics></math></span></div><span class="eqno">(22)</span></div>
 <div class="callout example"><div class="ct">Ví dụ: cấu hình đã chốt</div>
 <p>Tx 64T64R tức M<sub>tx</sub> = 32 vị trí phân cực kép; UE tối đa 4 anten, lấy M<sub>rx</sub> = 4; N<sub>c</sub> = 100, d = 3. Phần image method cần khoảng 32 · 4 · 100 · 3 = 38 400 phép kiểm tra mỗi liên kết, nhỏ so với N<sub>S</sub> = 10<sup>6</sup> tia của SBR. <span class="tag inf">Suy luận</span> Ở Sionna khi <code>synthetic_array=False</code>, phần SBR nhân theo M<sub>tx</sub> vì mỗi phần tử bắn <code>samples_per_src</code> tia.</p>
 <p>Đầu ra a có 64 × 4 hệ số mỗi đường và mỗi băng: với 100 đường và complex64 (8 byte) là 64 · 4 · 100 · 8 = 204 800 byte, khoảng 200 KB cho mỗi liên kết và mỗi băng. Vì vậy CIR theo từng phần tử chỉ tính tại các điểm thu rời rạc. <span class="tag ass">Giả định</span> 64T64R được mô hình theo cổng anten (64 anten phân cực tuyến tính), chưa mô hình từng phần tử vật lý trong subarray.</p></div>
@@ -1229,9 +1313,11 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 <tr><td>Vật liệu</td><td>Prior theo lớp + lưới hiệu chỉnh δ lưu Zarr</td><td>Hash encoding hoặc MLP; prior từ ảnh</td></tr>
 <tr><td>Nạp cảnh</td><td>XML Mitsuba + PLY như cảnh mẫu của Sionna; local, S3, MinIO</td><td>glTF, CityGML, OSM tự động, cập nhật hình học từ ảnh</td></tr>
 <tr><td>Thực thi</td><td>CPU (rayon) và GPU qua wgpu: ray query trên Vulkan có RT core, compute shader khi không có, chọn khi chạy; GPU trên Linux và Windows; coordinator và worker qua NATS JetStream; Docker Compose + MinIO</td><td>GPU trên macOS (Metal) và DX12; tối ưu hiệu năng GPU; Kubernetes, autoscaling</td></tr>
-<tr><td>API và phát hành</td><td>Rust crate; Python (PyO3) với API riêng và <code>raytwin.compat</code>; giao thức job qua NATS (gửi, theo dõi, hủy); wheel cho Linux, macOS, Windows; bản 0.1 công khai</td><td>Gateway gRPC/REST, API plugin</td></tr>
+<tr><td>API và phát hành</td><td>Rust crate; Python (PyO3) với API riêng và <code>raytwin.compat</code>; giao thức job qua NATS (gửi, theo dõi, hủy); wheel cho Linux, macOS, Windows; bản 0.1 công khai</td><td>Gateway gRPC/REST; API plugin từ bản 0.2 (<a href="#plugin">mục 18</a>)</td></tr>
 <tr><td>Hiệu chỉnh</td><td>Twin experiment với MDT mô phỏng từ Sionna RT; tối ưu bằng PyTorch</td><td>Nhập MDT thật (CSV/Parquet, lọc vị trí), hiệu chỉnh liên tục, đồng hiệu chỉnh CM và vật liệu</td></tr>
 <tr><td>Đa băng tần</td><td>Nhiều băng FR1 trong một lần dò; vật liệu ITU theo tần số có kiểm tra dải hiệu lực; anten theo (cell, băng); bản đồ có trục băng</td><td>FR2-1 và FR2-2; chia băng rộng thành nhiều tần số con; vật liệu dưới 1 GHz đã hiệu chỉnh</td></tr>
+<tr><td>Chất lượng dịch vụ</td><td>Schema MDT chuẩn có cột QoS tùy chọn; RAN config (EPRE, NF, gain UE); RSRP qua toán tử đo</td><td>Bản 0.2: <code>raytwin.qos</code> (association, tải cell, throughput, handover, replay), kịch bản từ MDT; bản 0.3: vòng SON (<a href="#qos">mục 17</a>)</td></tr>
+<tr><td>Xem và tương tác</td><td>Trình xem 3D <code>raytwin.viz</code> trong Jupyter, xuất glTF; kết quả có lưới, CRS, số đoạn tia; cấu hình đọc được từ Python</td><td>Bản 0.2: chỉnh sửa phái sinh, lịch sử, rollback; sau 0.3: UI web cho kỹ sư (<a href="#tuong-tac">mục 19</a>)</td></tr>
 </tbody></table></div>
 
 <h3 id="mvp-thu-tu"><span class="secno">14.2</span>Thứ tự hoàn thiện các thành phần</h3>
@@ -1296,6 +1382,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
   <li>Đọc được tập con XML mà các cảnh mẫu dùng: <code>shape type="ply"</code>, <code>face_normals</code>, tham chiếu <code>bsdf</code>; <code>bsdf type="itu-radio-material"</code> với <code>type</code> và <code>thickness</code>. Gặp phần tử không hỗ trợ thì báo lỗi rõ ràng, không lặng lẽ bỏ qua.</li>
   <li>Cùng một cảnh đọc từ đĩa cục bộ, từ MinIO và từ URI S3 cho cùng hash nội dung.</li>
   <li>Hash manifest ổn định: chạy lại, đổi máy hay đổi thứ tự khóa JSON đều không đổi hash (manifest được chuẩn hóa trước khi băm).</li>
+  <li><span class="tag dec">Đã chốt</span> Manifest nhận trường <code>crs</code> tùy chọn (mã EPSG và gốc tọa độ của cảnh). <code>Scene.mesh()</code> trả đỉnh, tam giác và lớp vật liệu dạng mảng NumPy.</li>
 </ul>
 </div>
 
@@ -1320,7 +1407,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
   <li>So với Sionna khi <code>synthetic_array=False</code>, từ mảng 2 × 2 đến 64T64R trên <code>simple_street_canyon</code>, UE 4 anten: cùng tiêu chí trên cho từng cặp phần tử.</li>
   <li>Chỉ số đường giữ nguyên giữa các cặp phần tử; mặt nạ hợp lệ theo cặp được trả về cùng kết quả.</li>
   <li>H(f) tính trực tiếp từ danh sách đường khớp DFT của CIR lấy mẫu, trong sai số số học.</li>
-  <li>Đầu ra có đúng dạng mảng đã mô tả (a[rx, rx_ant, tx, tx_ant, path, band], τ[rx, rx_ant, tx, tx_ant, path]) và đọc lại được từ Zarr (<a href="adr/0009-zarr-as-the-only-result-format.md">ADR 0009</a>).</li>
+  <li>Đầu ra có đúng dạng mảng đã mô tả (a[rx, rx_ant, tx, tx_ant, path, band], τ[rx, rx_ant, tx, tx_ant, path]) và đọc lại được từ Zarr (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-09</a>).</li>
 </ul>
 </div>
 
@@ -1334,6 +1421,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
   <li>Cộng không kết hợp |a<sub>n</sub>|² của CIR tại tâm ô khớp bản đồ voxel: sai lệch trung vị ≤ 1 dB.</li>
   <li>Một lần dò cho K băng khớp K lần dò riêng từng băng, trong biên nhiễu Monte Carlo.</li>
   <li>Bản đồ lưu dạng Zarr <code>[băng, Tx, z, y, x]</code>, chunk theo băng và Tx; chunk rỗng không được ghi.</li>
+  <li><span class="tag dec">Đã chốt</span> Mọi mảng kết quả có thuộc tính lưới (gốc, bước, dạng, trục), id băng, id Tx, CRS, snapshot id và job id. Bản đồ có thêm mảng <code>segments</code> (u32, <code>[tx, z, y, x]</code>) đếm số đoạn tia mỗi ô. Hệ số s tính theo từng Tx.</li>
 </ul>
 </div>
 
@@ -1343,7 +1431,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 <ul class="checklist">
   <li><span class="tag dec">Đã chốt</span> Mọi pull request chạy đủ bộ so sánh, gồm các cảnh đơn giản và <code>munich</code> ở hai băng. PR bị chặn nếu không đạt ngưỡng Gate 1.</li>
   <li>Phiên bản Sionna (2.2.0), seed và cấu hình được ghim. Kết quả tham chiếu của Sionna được cache theo (hash cảnh, phiên bản Sionna, cấu hình), nên mỗi PR chỉ phải chạy RayTwin.</li>
-  <li><span class="tag dec">Đã chốt</span> Một runner tự host có GPU chạy cả hai đường GPU (ray query và compute shader) cho PR tin cậy: tự chạy với PR của chủ repo và collaborator; PR từ fork chỉ chạy khi chủ repo đọc diff rồi gắn nhãn <code>gpu-ok</code>, và mỗi commit mới cần gắn nhãn lại. Runner chạy dưới user hệ điều hành riêng, không có secret. Runner GitHub thường chạy phần CPU cho mọi PR (<a href="adr/0010-trusted-pull-requests-on-the-gpu-runner.md">ADR 0010</a>).</li>
+  <li><span class="tag dec">Đã chốt</span> Một runner tự host có GPU chạy cả hai đường GPU (ray query và compute shader) cho PR tin cậy: tự chạy với PR của chủ repo và collaborator; PR từ fork chỉ chạy khi chủ repo đọc diff rồi gắn nhãn <code>gpu-ok</code>, và mỗi commit mới cần gắn nhãn lại. Runner chạy dưới user hệ điều hành riêng, không có secret. Runner GitHub thường chạy phần CPU cho mọi PR (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-10</a>).</li>
   <li>Mỗi lần chạy xuất báo cáo: phân bố sai lệch path gain, danh sách đường bị thiếu hoặc thừa, thời gian chạy của từng backend.</li>
   <li><span class="tag inf">Suy luận</span> Chạy <code>munich</code> trên CPU mỗi PR có thể vượt giới hạn của runner CI miễn phí; nếu vậy cần runner tự host. Thời gian thực tế sẽ có từ phép đo của thành phần 2. Laptop dual-boot chỉ chạy một hệ điều hành tại một thời điểm, nên kiểm thử GPU trên Windows cần máy thứ hai hoặc chạy khi khởi động vào Windows.</li>
 </ul>
@@ -1375,6 +1463,8 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
   <li><span class="tag dec">Đã chốt</span> Wheel dựng bằng maturin cho Linux x86_64, macOS (arm64) và Windows x86_64; CI cài bằng <code>pip install</code> và chạy smoke test trên cả ba hệ điều hành. Wheel Linux và Windows có backend GPU; wheel macOS chỉ có CPU.</li>
   <li>Ví dụ API riêng (bản đồ và CIR) chạy được. Ví dụ kiểu Sionna (<code>load_scene</code>, <code>PlanarArray</code>, <code>PathSolver</code> với <code>synthetic_array=False</code>, <code>cir(out_type="numpy")</code>) chạy qua <code>raytwin.compat</code> chỉ với thay đổi ở dòng import, và trả về mảng cùng dạng với Sionna.</li>
   <li>Tape xuất sang NumPy không sao chép: <code>torch.from_numpy</code> dùng chung bộ nhớ với mảng do Rust cấp.</li>
+  <li><span class="tag dec">Đã chốt</span> RAN config (<code>raytwin.ran/v1</code>) có hash riêng; <code>result.rsrp(band, ran)</code> tính theo toán tử đo (19); đổi RAN config không đổi snapshot id. <code>Snapshot</code> đọc được cấu hình (<code>manifest</code>, <code>transmitters</code>, <code>bands</code>, <code>solver</code>). Module <code>raytwin.mdt</code> chứa schema MDT chuẩn và <code>read_mdt</code>.</li>
+  <li><span class="tag dec">Đã chốt</span> <code>raytwin.viz</code> (extra <code>raytwin[viz]</code>): <code>preview</code> và <code>export_gltf</code> cho cảnh <code>munich</code> cùng một lát cắt bản đồ chạy được trong smoke test có extra; ô không đủ tia để trong suốt. Smoke test không có extra vẫn import được <code>raytwin</code>.</li>
 </ul>
 </div>
 
@@ -1382,7 +1472,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 <h4>8. Chế độ phân tán (Gate 2)</h4>
 <p class="comp-goal">Mục tiêu: chạy phân tán cho đúng kết quả của chạy đơn máy, nhanh hơn và chịu được lỗi worker.</p>
 <ul class="checklist">
-  <li><span class="tag dec">Đã chốt</span> Kết quả 4 worker khớp kết quả 1 worker với cùng seed, sai lệch tương đối ≤ 10<sup>−6</sup>. Với fixed-point 64 bit ở mọi nơi, kết quả thực tế trùng từng bit (<a href="adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>).</li>
+  <li><span class="tag dec">Đã chốt</span> Kết quả 4 worker khớp kết quả 1 worker với cùng seed, sai lệch tương đối ≤ 10<sup>−6</sup>. Với fixed-point 64 bit ở mọi nơi, kết quả thực tế trùng từng bit (<a href="architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>).</li>
   <li><span class="tag dec">Đã chốt</span> Thời gian giảm ít nhất 3 lần khi tăng từ 1 lên 4 worker, mỗi worker dùng cùng số luồng CPU.</li>
   <li><span class="tag dec">Đã chốt</span> Dừng một worker giữa chừng: JetStream giao lại task sau AckWait, kết quả cuối không đổi và không phần nào bị cộng hai lần.</li>
   <li>Một job có cả worker GPU và worker CPU cho kết quả khớp job chỉ dùng CPU, lệch tương đối ≤ 10<sup>−4</sup>.</li>
@@ -1402,6 +1492,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
   <li><span class="tag dec">Đã chốt</span> Trên cell và tilt để dành: RMSE của RSRP giảm ít nhất 30% so với chỉ dùng prior.</li>
   <li><span class="tag dec">Đã chốt</span> Hệ số Spearman ρ<sub>s</sub> ≥ 0,8 khi xếp hạng các cấu hình tilt theo KPI dự báo so với KPI "thật" của twin experiment.</li>
   <li>Báo cáo kèm theo: RMSE theo tỷ lệ mẫu có GNSS, và sai số tham số vật liệu theo tòa nhà (để tham khảo, không phải ngưỡng).</li>
+  <li>MDT mô phỏng ghi đúng schema chuẩn, gồm cell phục vụ và dấu thời gian dọc quỹ đạo. Tham số lỗi có thêm sai EPRE theo cell; báo cáo phần sai số rò vào trường vật liệu.</li>
 </ul>
 </div>
 
@@ -1409,7 +1500,7 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 <h4>10. Tài liệu và phát hành</h4>
 <p class="comp-goal">Mục tiêu: người ngoài dự án cài được và đọc được tài liệu.</p>
 <ul class="checklist">
-  <li><span class="tag dec">Đã chốt</span> Bản 0.1 không có API plugin công khai, nên không có plugin mẫu (<a href="adr/0007-no-public-plugin-api-in-release-0-1.md">ADR 0007</a>).</li>
+  <li><span class="tag dec">Đã chốt</span> Bản 0.1 không có API plugin công khai, nên không có plugin mẫu (<a href="architecture/adr/0004-plugin-api.md">ADR 0004</a>).</li>
   <li>Tài liệu: rustdoc cho API công khai, tham chiếu API Python, và hướng dẫn cho bốn trường hợp: chế độ thư viện, chế độ phân tán, lớp tương thích, hiệu chỉnh.</li>
   <li><span class="tag dec">Đã chốt</span> Repo công khai, giấy phép <code>MIT OR Apache-2.0</code> (có cả hai tệp LICENSE). Phát hành bản 0.1.0 lên crates.io và PyPI (wheel cho ba hệ điều hành), kèm CHANGELOG và GitHub release.</li>
   <li>Trước khi phát hành: tra cứu nhãn hiệu "RayTwin" ở nhóm Nice 9 và 42, kiểm tra lại tên crate và package còn trống.</li>
@@ -1446,13 +1537,21 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 <tr><td>wgpu ray query có lỗi hoặc đổi API (tính năng thử nghiệm, chỉ Vulkan)</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl mid">Trung bình</span></td><td>Làm đường compute shader trước, ray query chỉ thay bước tìm giao điểm; ghim phiên bản wgpu; CPU làm tham chiếu</td></tr>
 <tr><td>CPU và GPU lệch nhau ở tia sượt cạnh tam giác, vượt ngưỡng 10<sup>−4</sup></td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl lo">Thấp</span></td><td>Cùng thuật toán giao tia kín ở CPU và compute shader; đo trên ô đủ tia; báo cáo tỷ lệ tia trúng/trượt khác nhau</td></tr>
 <tr><td>FP64 trên GPU GeForce chậm làm image method trên GPU chậm</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl lo">Thấp</span></td><td>Chỉ dùng f64 ở bước image method; tọa độ đổi về gốc cục bộ; đo riêng thời gian bước này</td></tr>
-<tr><td>Runner GPU tự host chạy mã từ PR của fork trên laptop phát triển</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl hi">Cao</span></td><td>Chỉ tự chạy GPU cho PR tin cậy; PR từ fork cần nhãn <code>gpu-ok</code> sau khi đọc diff; runner dưới user riêng, không secret (<a href="adr/0010-trusted-pull-requests-on-the-gpu-runner.md">ADR 0010</a>)</td></tr>
+<tr><td>Runner GPU tự host chạy mã từ PR của fork trên laptop phát triển</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl hi">Cao</span></td><td>Chỉ tự chạy GPU cho PR tin cậy; PR từ fork cần nhãn <code>gpu-ok</code> sau khi đọc diff; runner dưới user riêng, không secret (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-10</a>)</td></tr>
 <tr><td>Runner GPU tự host là điểm lỗi duy nhất của kiểm thử GPU</td><td><span class="lvl lo">Thấp</span></td><td><span class="lvl mid">Trung bình</span></td><td>Phần CPU vẫn chạy trên runner GitHub; ghi rõ khi PR được merge mà chưa qua kiểm thử GPU</td></tr>
 <tr><td>Sionna và AODT bổ sung tính năng tương tự</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl mid">Trung bình</span></td><td>Tập trung vào khác biệt: thư viện nhẹ, phân tán, bản đồ thể tích, trường vật liệu có phiên bản, đa băng một lần dò</td></tr>
 <tr><td>Dựng wheel cho macOS và Windows tốn công sửa lỗi build</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl lo">Thấp</span></td><td>Đưa ma trận build ba hệ điều hành vào CI ngay từ đầu; tránh phụ thuộc C/C++ ở lõi (obvhs thay cho Embree)</td></tr>
 <tr><td>Bộ nhớ và lưu trữ tăng tuyến tính theo số băng</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl lo">Thấp</span></td><td>Chunk theo băng và Tx, bỏ chunk rỗng, lưu dài hạn bằng float16</td></tr>
 <tr><td>Thêm NATS JetStream là thêm một dịch vụ cần vận hành</td><td><span class="lvl lo">Thấp</span></td><td><span class="lvl lo">Thấp</span></td><td>Chế độ thư viện không cần NATS; MVP dùng một node JetStream trong Docker Compose</td></tr>
 <tr><td>Parser cảnh (XML Mitsuba) thiếu tính năng</td><td><span class="lvl lo">Thấp</span></td><td><span class="lvl lo">Thấp</span></td><td>Cảnh mẫu của Sionna chỉ dùng shape PLY và <code>itu-radio-material</code> (type, thickness); glTF để sau MVP, chuyển đổi offline bằng Blender</td></tr>
+<tr><td>MDT thiếu M4–M7 hoặc chỉ có M1</td><td><span class="lvl hi">Cao</span></td><td><span class="lvl mid">Trung bình</span></td><td>Lớp QoS chạy được chỉ với M1; hiệu chỉnh mô hình tốc độ từ PM theo cell; báo cáo dạng xếp hạng kịch bản (<a href="#qos-danh-gia">mục 17.6</a>)</td></tr>
+<tr><td>Association sai vì vị trí MDT sai</td><td><span class="lvl hi">Cao</span></td><td><span class="lvl mid">Trung bình</span></td><td>Trọng số theo độ tin cậy vị trí; chỉ dùng mẫu có GNSS để kiểm cell phục vụ; mẫu không GNSS chỉ cho mật độ thô</td></tr>
+<tr><td>Mô hình tốc độ lệch scheduler và beamforming của nhà cung cấp</td><td><span class="lvl hi">Cao</span></td><td><span class="lvl mid">Trung bình</span></td><td>Fit α, SE<sub>max</sub>, G<sub>bf</sub> theo cell từ M5 hoặc PM; thay mô hình qua plugin PL-03; không công bố throughput tuyệt đối</td></tr>
+<tr><td>Nhiễu Monte Carlo và thiếu fast fading làm sai KPI di động</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl mid">Trung bình</span></td><td>KPI chỉ tính trên ô đủ tia; so sánh giữa kịch bản với CRN; RLF chỉ là proxy</td></tr>
+<tr><td>Quyền riêng tư của MDT</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl hi">Cao</span></td><td>Chỉ nhận trace id bí danh; không lưu IMSI, SUPI, IMEI; kịch bản để chia sẻ dùng mật độ</td></tr>
+<tr><td>Chính sách SON khai thác nhiễu hoặc khiếm khuyết của mô hình</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl mid">Trung bình</span></td><td>Kiểm tra seed cuối vòng SON; tăng số tia cho các ứng viên tốt nhất</td></tr>
+<tr><td>Lớp QoS, plugin và vòng SON làm phình phạm vi</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl hi">Cao</span></td><td>Chỉ bắt đầu sau bản 0.1; plugin chỉ ở client; không có plugin vật lý; vòng SON chỉ gồm propose/evaluate, cache, ngân sách</td></tr>
+<tr><td>Pattern bao của beam SSB cho RSRP thiên cao ở vùng NLoS nhiều đường</td><td><span class="lvl mid">Trung bình</span></td><td><span class="lvl lo">Thấp</span></td><td>Báo cáo sai lệch theo vùng; tính bản đồ theo từng beam khi cần (<a href="#vl-rsrp">mục 11.7</a>)</td></tr>
 </tbody></table></div>
 
 <h2 id="ket-luan"><span class="secno">16</span>Kết luận và khuyến nghị</h2>
@@ -1463,10 +1562,465 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
   <li><strong>Xây hiệu chỉnh quanh frozen paths và kiểm định theo cấu hình.</strong> Đây là nơi giá trị khoa học và rủi ro cùng tập trung, cũng là điểm khác biệt so với hiệu chỉnh SS-RSRP của AODT. Tối ưu trong PyTorch để thử nghiệm nhanh.</li>
   <li><strong>Chuẩn bị dữ liệu song song với phát triển.</strong> MVP dùng cảnh mẫu của Sionna và MDT mô phỏng; trong lúc đó chuẩn bị dần một khu vực thật có MDT kèm GNSS, CM chính xác và một đợt drive test RTK làm tập kiểm định.</li>
   <li><strong>Ưu tiên ngay sau MVP:</strong> nhiễu xạ UTD bậc 1 và tán xạ khuếch tán cho CIR; tối ưu hiệu năng GPU và GPU trên macOS; rồi FR2.</li>
+  <li><strong>Bản 0.2 và 0.3:</strong> lớp chất lượng dịch vụ từ MDT để xếp hạng kịch bản (association, tải cell, throughput, handover, replay), API plugin ở phía client, chỉnh sửa có lịch sử và rollback; bản 0.3 thêm bảng pattern và vật liệu, nhập cảnh, vòng SON có cache theo Tx. So khớp MDT bằng RSRP qua toán tử đo, không bằng RSS. Thiết kế giữ sẵn các móc cho UI tương tác ở giai đoạn sau (<a href="#qos">mục 17</a> đến <a href="#tuong-tac">mục 19</a>).</li>
 </ol>
 
+<h2 id="qos"><span class="secno">17</span>Mô phỏng chất lượng dịch vụ từ MDT (bản 0.2)</h2>
+<p class="lead"><strong>Kết luận: khả thi và có ích, nếu dùng để xếp hạng kịch bản chứ không để dự báo throughput tuyệt đối.</strong> Lớp chất lượng dịch vụ (QoS) là bước hậu xử lý trên bản đồ path gain: chọn cell phục vụ, giải tải cell có ghép nhiễu, đổi SINR thành tốc độ, chia tài nguyên và mô phỏng handover theo quỹ đạo. Chi phí tính toán nhỏ so với một lần dò tia; phần lớn câu hỏi what-if không cần dò lại. Nút thắt là dữ liệu: MDT thường thiếu throughput (M5) và vị trí GNSS. Lớp này ra ở bản 0.2, viết bằng Python với NumPy, và mỗi mô hình là một plugin thay được (<a href="#plugin">mục 18</a>).</p>
+
+<h3 id="qos-bai-toan"><span class="secno">17.1</span>Bài toán và các use case SON</h3>
+<p>Bản đồ RSRP và SINR trả lời câu hỏi vùng phủ và nhiễu. SON còn cần biết người dùng nhận được gì: tốc độ, tải của cell, số lần handover. <span class="tag fact">Sự kiện</span> TS 28.313 (SON cho 5G) mô tả các use case CCO (tối ưu vùng phủ và dung lượng), cân bằng tải và MRO (tối ưu độ bền di động); các use case này dùng số đo MDT, RLF report và KPI (<a href="https://www.3gpp.org/ftp/tsg_SA/WG5_TM/Draft_Specs/28313-k00.docx">TS 28.313</a>).</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Use case</th><th>Câu hỏi what-if</th><th>Núm điều chỉnh</th><th>KPI cần</th></tr></thead>
+<tbody>
+<tr><td>Cân bằng tải (MLB)</td><td>Tăng CIO của cell 17 thêm 3 dB thì tải cell 12 giảm bao nhiêu?</td><td>CIO</td><td>Tải cell, throughput P10, số UE theo cell</td></tr>
+<tr><td>CCO</td><td>Tăng tilt 2° thì vùng phủ và throughput mép cell đổi thế nào?</td><td>Tilt, azimuth, công suất</td><td>Outage, SINR, throughput P10</td></tr>
+<tr><td>MRO</td><td>Giảm TTT từ 320 ms xuống 160 ms thì ping-pong tăng bao nhiêu?</td><td>Hys, Off, TTT, hệ số lọc L3</td><td>Số HO, ping-pong, proxy RLF</td></tr>
+<tr><td>Tiết kiệm năng lượng</td><td>Tắt cell 31 lúc 2 giờ sáng thì cell lân cận có quá tải không?</td><td>Bật hoặc tắt cell</td><td>Tải cell, outage</td></tr>
+<tr><td>Quy hoạch dung lượng</td><td>Lưu lượng tăng 25% hoặc thêm site mới thì cell nào quá tải?</td><td>Lưu lượng, site</td><td>Tải cell, nhu cầu không phục vụ được</td></tr>
+</tbody></table></div>
+
+<h3 id="qos-khao-sat"><span class="secno">17.2</span>Khảo sát: dữ liệu có sẵn và các cách tiếp cận</h3>
+<p><span class="tag fact">Sự kiện</span> Các số đo immediate MDT của NR (<a href="https://itecspec.com/3gpp/37.320/s/5.4.1.1">TS 37.320 §5.4.1.1</a>, Rel-19):</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Số đo</th><th>Nội dung</th><th>Bên đo</th><th>Dùng cho QoS</th></tr></thead>
+<tbody>
+<tr><td>M1</td><td>RSRP, RSRQ của cell phục vụ và lân cận, theo cell và theo beam</td><td>UE</td><td>Hiệu chỉnh bản đồ; kiểm tra cell phục vụ; RSRQ kiểm tra tải lân cận</td></tr>
+<tr><td>M2</td><td>Power headroom</td><td>UE</td><td>Đường lên, sau bản 0.2</td></tr>
+<tr><td>M4</td><td>Lượng dữ liệu PDCP theo DRB và theo UE</td><td>gNB</td><td>Nhu cầu lưu lượng d<sub>u</sub></td></tr>
+<tr><td>M5</td><td>Throughput trung bình theo DRB và theo UE ("by gNB")</td><td>gNB</td><td>Hiệu chỉnh và kiểm định mô hình tốc độ</td></tr>
+<tr><td>M6, M7</td><td>Độ trễ gói, tỷ lệ mất gói</td><td>gNB (UE báo excess delay đường lên)</td><td>Sau bản 0.2</td></tr>
+<tr><td>M10</td><td>L1 RSRP</td><td>UE</td><td>Theo beam</td></tr>
+<tr><td>RLF report</td><td>Thông tin của lần mất kết nối gần nhất (nội dung theo TS 38.331)</td><td>UE</td><td>Kiểm định KPI di động</td></tr>
+</tbody></table></div>
+<p><span class="tag fact">Sự kiện</span> Khi dữ liệu MDT gắn được với một thuê bao, nhà mạng phải có sự đồng ý của người dùng trước khi kích hoạt MDT; MDT theo quản lý (management-based) chỉ chọn UE có cờ cho phép (<a href="https://itecspec.com/3gpp/32.422/s/4.1.1.2a">TS 32.422</a>). <span class="tag inf">Suy luận</span> M4 đến M7 chỉ có khi nhà mạng bật immediate MDT, và tỷ lệ mẫu có GNSS thấp (<a href="#vl-du-lieu">mục 11.4</a>). Vì vậy lớp QoS phải chạy được khi chỉ có M1, dùng bộ đếm PM (PRB utilization, số UE hoạt động, bộ đếm handover) thay cho M5.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Cách tiếp cận</th><th>Hiện trạng</th><th>Nguồn</th><th>Đánh giá cho RayTwin</th></tr></thead>
+<tbody>
+<tr><td>Monte Carlo snapshot trong công cụ quy hoạch</td><td><span class="tag fact">Sự kiện</span> Atoll rải UE từ bản đồ lưu lượng và danh sách thuê bao, chạy nhiều snapshot, báo tải và throughput theo cell. Cố định khởi tạo bộ sinh số ngẫu nhiên thì giữ nguyên vị trí UE giữa các lần mô phỏng để so cấu hình</td><td><a href="https://www.telecomhall.net/t/monte-carlo-simulation-in-atoll/8789">telecomhall</a>, <a href="https://jurnalet.brin.go.id/jet/article/view/251">Jurnal Elektronika dan Telekomunikasi</a></td><td>Cùng hướng với thiết kế dưới đây. RayTwin thêm bản đồ 3D đã hiệu chỉnh, kịch bản từ MDT và tất định theo seed</td></tr>
+<tr><td>Mô phỏng mức slot (TTI)</td><td><span class="tag fact">Sự kiện</span> Sionna SYS có PHY abstraction (EESM), link adaptation OLLA và bộ lập lịch PF. AODT có chế độ RAN với scheduler PF hoặc RR, telemetry theo slot (PRB, MCS, layer, SINR)</td><td><a href="https://nvlabs.github.io/sionna/sys/api/link_adaptation.html">Sionna SYS</a>, <a href="https://docs.nvidia.com/aerial/aerial-dt/archive/1.4.1/text/ran_digital_twin.html">AODT RAN</a></td><td>Chính xác hơn ở mức liên kết nhưng cần kênh theo UE và theo slot. Quá nặng cho vòng what-if nhiều kịch bản; chỉ nối qua plugin liên kết (PL-03)</td></tr>
+<tr><td>Load coupling</td><td><span class="tag fact">Sự kiện</span> Mô hình hệ phương trình phi tuyến giữa tải các cell, cho topology bất kỳ và lưu lượng không đều; điều kiện có nghiệm suy ra từ một hệ tuyến tính xấp xỉ</td><td><a href="https://arxiv.org/abs/1201.4116">Siomina &amp; Yuan, IEEE TWC 2012</a></td><td>Lõi của mô hình tải (26)</td></tr>
+<tr><td>Flow-level, processor sharing</td><td><span class="tag fact">Sự kiện</span> Lập lịch PF đánh giá được bằng mô hình processor sharing nhiều lớp; throughput của luồng giảm gần tuyến tính theo tải cell</td><td><a href="https://researchportal.ip-paris.fr/en/publications/flow-level-performance-and-capacity-of-wireless-networks-with-use/">Bonald et al., Queueing Systems 2009</a></td><td>Công thức throughput (27)</td></tr>
+<tr><td>Hồi quy học máy từ MDT</td><td><span class="tag fact">Sự kiện</span> Có các mô hình dự báo bản đồ throughput từ dữ liệu địa lý và số đo thưa</td><td><a href="https://www.themoonlight.io/en/review/geo2commap-deep-learning-based-mimo-throughput-prediction-using-geographic-data">Geo2ComMap</a></td><td><span class="tag inf">Suy luận</span> Tốt ở nơi có dữ liệu, nhưng không trả lời được cho cấu hình chưa từng đo. Chỉ dùng như một plugin liên kết</td></tr>
+</tbody></table></div>
+
+<h3 id="qos-mo-hinh"><span class="secno">17.3</span>Mô hình đề xuất</h3>
+<p><span class="tag rec">Khuyến nghị</span> Mô hình quasi-static, flow-level. Mỗi bước thời gian là một snapshot; trong một bước, tải các cell được giải đến điểm bất động. Ký hiệu: u là UE, c là cell (cặp Tx, băng), RSRP<sub>c</sub>(u) tính bằng (19) tại vị trí UE.</p>
+<p><strong>Association.</strong> UE chọn cell cùng tần số có RSRP cộng CIO lớn nhất; nếu RSRP của cell đó dưới ngưỡng RSRP<sub>min</sub> thì UE mất phục vụ (outage):</p>
+<div class="math-block"><div class="eq"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msup><mi>c</mi><mo>*</mo></msup><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo>=</mo><munder><mrow><mi>arg</mi><mo>⁡</mo><mi>max</mi></mrow><mi>c</mi></munder><mo>[</mo><msub><mi mathvariant="normal">RSRP</mi><mi>c</mi></msub><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi mathvariant="normal">CIO</mi><mi>c</mi></msub><mo>]</mo></mrow></math></div><span class="eqno">(23)</span></div>
+<p><strong>SINR có ghép tải.</strong> Cell lân cận j chỉ gây nhiễu trên phần tài nguyên nó đang dùng, tức tỷ lệ ρ<sub>j</sub>. S<sub>u</sub> và I<sub>j,u</sub> là công suất trên một RE (tuyến tính), N là tạp âm trên một RE:</p>
+<div class="math-block"><div class="eq"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi mathvariant="normal">SINR</mi><mi>u</mi></msub><mo stretchy="false">(</mo><mi mathvariant="bold">ρ</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><msub><mi>S</mi><mi>u</mi></msub><mrow><munder><mo>∑</mo><mrow><mi>j</mi><mo>≠</mo><msup><mi>c</mi><mo>*</mo></msup></mrow></munder><msub><mi>ρ</mi><mi>j</mi></msub><mspace width="0.2em"/><msub><mi>I</mi><mrow><mi>j</mi><mo>,</mo><mi>u</mi></mrow></msub><mo>+</mo><mi>N</mi></mrow></mfrac></mrow></math></div><span class="eqno">(24)</span></div>
+<p><strong>Tốc độ đỉnh.</strong> Shannon có hệ số suy giảm và chặn hai đầu. <span class="tag fact">Sự kiện</span> TR 36.942 Phụ lục A.1 và TR 38.803 dùng α = 0,6 cho đường xuống và SINR<sub>min</sub> = −10 dB (<a href="https://www.itecspec.com/3gpp/36.942/s/a.1">TR 36.942</a>, <a href="https://itecspec.com/3gpp/38.803/s/5.2.7">TR 38.803</a>); overhead OH = 0,14 cho FR1 đường xuống (<a href="https://www.itecspec.com/3gpp/38.306/s/4.1.2">TS 38.306 §4.1.2</a>); hiệu suất phổ lớn nhất của bảng CQI 256QAM là 7,4063 bit/s/Hz (<a href="https://www.itecspec.com/3gpp/38.214/s/5.2.2.1">TS 38.214 bảng 5.2.2.1-3</a>):</p>
+<div class="math-block"><div class="eq"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>R</mi><mi>u</mi></msub><mo>=</mo><msub><mi>N</mi><mi mathvariant="normal">PRB</mi></msub><mspace width="0.15em"/><msub><mi>B</mi><mi mathvariant="normal">PRB</mi></msub><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi mathvariant="normal">OH</mi><mo stretchy="false">)</mo><mspace width="0.15em"/><mi>min</mi><mo>⁡</mo><mo>[</mo><mi>α</mi><msub><mi>log</mi><mn>2</mn></msub><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><msub><mi mathvariant="normal">SINR</mi><mi>u</mi></msub><mo stretchy="false">)</mo><mo>,</mo><msub><mi mathvariant="normal">SE</mi><mi>max</mi></msub><mo>]</mo><mo>,</mo><mspace width="1em"/><msub><mi>R</mi><mi>u</mi></msub><mo>=</mo><mn>0</mn><mspace width="0.4em"/><mtext>khi</mtext><mspace width="0.4em"/><msub><mi mathvariant="normal">SINR</mi><mi>u</mi></msub><mo>&lt;</mo><msub><mi mathvariant="normal">SINR</mi><mi>min</mi></msub></mrow></math></div><span class="eqno">(25)</span></div>
+<p><span class="tag rec">Khuyến nghị</span> α, SE<sub>max</sub> và một độ lợi beamforming G<sub>bf</sub> cộng vào SINR được fit theo từng cell từ M5 hoặc PM. Bản đồ công suất trung bình không thấy độ lợi beamforming của kênh dữ liệu ở cell massive MIMO, nên G<sub>bf</sub> là tham số bắt buộc phải hiệu chỉnh.</p>
+<p><strong>Tải cell.</strong> d<sub>u</sub> là nhu cầu (bit/s) của UE u. Tải của cell c là phần tài nguyên mà các UE của nó cần:</p>
+<div class="math-block"><div class="eq"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>ρ</mi><mi>c</mi></msub><mo>=</mo><mi>min</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><mn>1</mn><mo>,</mo><munder><mo>∑</mo><mrow><mi>u</mi><mo>:</mo><msup><mi>c</mi><mo>*</mo></msup><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo>=</mo><mi>c</mi></mrow></munder><mfrac><msub><mi>d</mi><mi>u</mi></msub><mrow><msub><mi>R</mi><mi>u</mi></msub><mo stretchy="false">(</mo><mi mathvariant="bold">ρ</mi><mo stretchy="false">)</mo></mrow></mfrac><mo fence="true">)</mo></mrow></mrow></math></div><span class="eqno">(26)</span></div>
+<p><span class="tag inf">Suy luận</span> Vế phải tăng đơn điệu theo <strong>ρ</strong>: tải lân cận tăng làm SINR giảm, tốc độ giảm, tải tăng. Lặp từ <strong>ρ</strong> = 0 cho một dãy tăng, bị chặn bởi 1, nên hội tụ về điểm bất động nhỏ nhất. Cell chạm ρ = 1 là cell quá tải; phần nhu cầu vượt quá được báo là không phục vụ được. Siomina &amp; Yuan phân tích điều kiện tồn tại nghiệm của hệ này.</p>
+<p><strong>Throughput người dùng.</strong> Hai mô hình lưu lượng: full buffer (n<sub>c</sub> UE luôn có dữ liệu, chia đều thời gian) và lưu lượng đàn hồi theo processor sharing:</p>
+<div class="math-block"><div class="eq"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>T</mi><mi>u</mi></msub><mo>=</mo><mfrac><msub><mi>R</mi><mi>u</mi></msub><msub><mi>n</mi><mi>c</mi></msub></mfrac><mspace width="0.5em"/><mtext>(full buffer)</mtext><mo>,</mo><mspace width="2em"/><msub><mi>T</mi><mi>u</mi></msub><mo>=</mo><msub><mi>R</mi><mi>u</mi></msub><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msub><mi>ρ</mi><mi>c</mi></msub><mo stretchy="false">)</mo><mspace width="0.5em"/><mtext>(đàn hồi)</mtext></mrow></math></div><span class="eqno">(27)</span></div>
+<p><strong>Handover theo quỹ đạo.</strong> <span class="tag fact">Sự kiện</span> Kết quả đo được lọc L3: F<sub>n</sub> = (1 − a)F<sub>n−1</sub> + a·M<sub>n</sub>, a = 1/2<sup>k/4</sup>, với k là <code>filterCoefficient</code>; bộ lọc giữ đặc tính thời gian ứng với chu kỳ đo L1 (<a href="https://itecspec.com/3gpp/38.331/s/5.5.3.2">TS 38.331 §5.5.3.2</a>). Sự kiện A3 vào khi M<sub>n</sub> + Ofn + Ocn − Hys &gt; M<sub>p</sub> + Ofp + Ocp + Off (<a href="https://itecspec.com/3gpp/38.331/s/5.5.4.4">§5.5.4.4</a>). Mô hình kích hoạt handover khi điều kiện A3 giữ suốt TTT:</p>
+<div class="math-block"><div class="eq"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>F</mi><mi>n</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>a</mi><mo stretchy="false">)</mo><msub><mi>F</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>a</mi><msub><mi>M</mi><mi>n</mi></msub><mo>,</mo><mspace width="0.6em"/><mi>a</mi><mo>=</mo><msup><mn>2</mn><mrow><mo>−</mo><mi>k</mi><mo>/</mo><mn>4</mn></mrow></msup><mo>;</mo><mspace width="1.2em"/><msubsup><mi>F</mi><mi>n</mi><mrow><mi>nb</mi></mrow></msubsup><mo>+</mo><mi>Ofn</mi><mo>+</mo><mi>Ocn</mi><mo>−</mo><mi>Hys</mi><mo>&gt;</mo><msubsup><mi>F</mi><mi>n</mi><mrow><mi>sv</mi></mrow></msubsup><mo>+</mo><mi>Ofp</mi><mo>+</mo><mi>Ocp</mi><mo>+</mo><mi>Off</mi><mspace width="0.4em"/><mtext>trong TTT</mtext></mrow></math></div><span class="eqno">(28)</span></div>
+<p>KPI di động: số handover trên UE và trên phút; ping-pong (quay về cell cũ trong một cửa sổ, mặc định 1 s); proxy RLF (SINR của cell phục vụ dưới ngưỡng Q<sub>out</sub> trong một khoảng thời gian). <span class="tag ass">Giả định</span> Q<sub>out</sub> và cửa sổ ping-pong là tham số của plugin di động, phải đặt theo quy ước KPI của nhà mạng.</p>
+
+<figure class="svgfig">
+<svg viewBox="0 0 760 500" role="img" aria-label="Luồng của lớp chất lượng dịch vụ: kịch bản và bản đồ path gain vào; RSRP tại UE, association, vòng lặp tải và SINR, tốc độ, chia tài nguyên và handover; kết quả là chuỗi thời gian trong Zarr">
+  <defs>
+    <marker id="qos-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker>
+  </defs>
+  <g style="font-family:Arial, 'Liberation Sans', sans-serif">
+    <rect x="20" y="20" width="200" height="50" rx="8" style="fill:var(--rec-bg);stroke:var(--rec)"/>
+    <text x="120" y="41" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">MDT · PM · CM</text>
+    <text x="120" y="60" text-anchor="middle" style="font-size:12px;fill:var(--muted)">Parquet, id bí danh</text>
+    <rect x="280" y="20" width="200" height="50" rx="8" style="fill:var(--rec-bg);stroke:var(--rec)"/>
+    <text x="380" y="41" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">Bản đồ path gain</text>
+    <text x="380" y="60" text-anchor="middle" style="font-size:12px;fill:var(--muted)">Zarr [band, tx, z, y, x]</text>
+    <rect x="540" y="20" width="200" height="50" rx="8" style="fill:var(--rec-bg);stroke:var(--rec)"/>
+    <text x="640" y="41" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">RAN config</text>
+    <text x="640" y="60" text-anchor="middle" style="font-size:12px;fill:var(--muted)">EPRE, CIO, HO, PRB, bật/tắt</text>
+
+    <rect x="20" y="110" width="200" height="50" rx="8" style="fill:var(--bg);stroke:var(--faint)"/>
+    <text x="120" y="131" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">Kịch bản (PL-06)</text>
+    <text x="120" y="150" text-anchor="middle" style="font-size:12px;fill:var(--muted)">UE, lưu lượng, quỹ đạo, seed</text>
+    <rect x="280" y="110" width="200" height="50" rx="8" style="fill:var(--bg);stroke:var(--faint)"/>
+    <text x="380" y="131" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">RSRP tại UE</text>
+    <text x="380" y="150" text-anchor="middle" style="font-size:12px;fill:var(--muted)">toán tử đo (19)</text>
+
+    <rect x="20" y="190" width="200" height="50" rx="8" style="fill:var(--bg);stroke:var(--faint)"/>
+    <text x="120" y="211" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">Di động, HO (PL-05)</text>
+    <text x="120" y="230" text-anchor="middle" style="font-size:12px;fill:var(--muted)">lọc L3, A3, TTT (28)</text>
+    <rect x="280" y="190" width="200" height="50" rx="8" style="fill:var(--bg);stroke:var(--faint)"/>
+    <text x="380" y="211" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">Association (PL-02)</text>
+    <text x="380" y="230" text-anchor="middle" style="font-size:12px;fill:var(--muted)">RSRP + CIO lớn nhất (23)</text>
+
+    <rect x="280" y="270" width="200" height="50" rx="8" style="fill:var(--accent-soft);stroke:var(--accent);stroke-width:2"/>
+    <text x="380" y="291" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">Tải ρ và SINR</text>
+    <text x="380" y="310" text-anchor="middle" style="font-size:12px;fill:var(--muted)">lặp điểm bất động (24), (26)</text>
+    <rect x="540" y="270" width="200" height="50" rx="8" style="fill:var(--bg);stroke:var(--faint)"/>
+    <text x="640" y="291" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">Tốc độ (PL-03)</text>
+    <text x="640" y="310" text-anchor="middle" style="font-size:12px;fill:var(--muted)">Shannon có chặn (25)</text>
+
+    <rect x="280" y="350" width="200" height="50" rx="8" style="fill:var(--bg);stroke:var(--faint)"/>
+    <text x="380" y="371" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">Chia tài nguyên (PL-04)</text>
+    <text x="380" y="390" text-anchor="middle" style="font-size:12px;fill:var(--muted)">R/n hoặc R(1 − ρ) (27)</text>
+
+    <rect x="280" y="430" width="200" height="50" rx="8" style="fill:var(--rec-bg);stroke:var(--rec)"/>
+    <text x="380" y="451" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">qos/&lt;run&gt;.zarr</text>
+    <text x="380" y="470" text-anchor="middle" style="font-size:12px;fill:var(--muted)">chuỗi thời gian UE, cell, HO</text>
+    <rect x="540" y="430" width="200" height="50" rx="8" style="fill:var(--bg);stroke:var(--faint)"/>
+    <text x="640" y="451" text-anchor="middle" style="font-size:14px;font-weight:700;fill:var(--text)">KPI, exporter (PL-07)</text>
+    <text x="640" y="470" text-anchor="middle" style="font-size:12px;fill:var(--muted)">viz, replay, vòng SON (PL-11)</text>
+
+    <g style="fill:none;stroke:var(--muted);stroke-width:1.4">
+      <path d="M120 70V106" marker-end="url(#qos-arrow)"/>
+      <path d="M380 70V106" marker-end="url(#qos-arrow)"/>
+      <path d="M600 70V135H484" marker-end="url(#qos-arrow)"/>
+      <path d="M700 70V266" marker-end="url(#qos-arrow)"/>
+      <path d="M220 135H276" marker-end="url(#qos-arrow)"/>
+      <path d="M120 160V186" marker-end="url(#qos-arrow)"/>
+      <path d="M380 160V186" marker-end="url(#qos-arrow)"/>
+      <path d="M220 215H276" marker-end="url(#qos-arrow)" style="stroke-dasharray:5 4"/>
+      <path d="M380 240V266" marker-end="url(#qos-arrow)"/>
+      <path d="M480 288H536" marker-end="url(#qos-arrow)"/>
+      <path d="M540 302H484" marker-end="url(#qos-arrow)"/>
+      <path d="M60 160V170H8V295H276" marker-end="url(#qos-arrow)" style="stroke-dasharray:5 4"/>
+      <path d="M380 320V346" marker-end="url(#qos-arrow)"/>
+      <path d="M380 400V426" marker-end="url(#qos-arrow)"/>
+      <path d="M480 455H536" marker-end="url(#qos-arrow)"/>
+    </g>
+    <g style="font-size:12px;fill:var(--muted)">
+      <text x="250" y="128" text-anchor="middle">vị trí</text>
+      <text x="128" y="180">quỹ đạo</text>
+      <text x="250" y="208" text-anchor="middle">theo t</text>
+      <text x="150" y="288">nhu cầu d</text>
+      <text x="542" y="128" text-anchor="middle">EPRE, gain</text>
+      <text x="708" y="200">PRB, OH</text>
+    </g>
+  </g>
+</svg>
+<figcaption><span class="fig-no">Hình 13.</span>Luồng của lớp chất lượng dịch vụ (bản 0.2). Ô nhấn là vòng lặp điểm bất động của tải. Mỗi ô ghi nhóm plugin thay được và công thức tương ứng. Đổi RAN config hoặc kịch bản không cần dò lại tia.</figcaption>
+</figure>
+
+<div class="callout example"><div class="ct">Ví dụ: tải tăng 25% làm throughput giảm 56%</div>
+<p><span class="tag ass">Giả định</span> Hai cell n78 đối xứng, 100 MHz, 273 PRB, khoảng cách sóng mang con 30 kHz (B<sub>PRB</sub> = 360 kHz), OH = 0,14, α = 0,6, SE<sub>max</sub> = 7,4063. Mọi UE của mỗi cell có cùng hình học: RSRP cell phục vụ −90 dBm, cell kia −96 dBm, tạp âm −122,2 dBm trên một RE (NF 7 dB, như <a href="#nt-friis">ví dụ ở mục 4.1</a>).</p>
+<p>Khi cell kia đầy tải (ρ = 1), SINR ≈ 6,0 dB và R ≈ 117,3 Mbit/s. Với nhu cầu 80 Mbit/s mỗi cell, lặp (26) từ ρ = 0 hội tụ sau khoảng 15 vòng về ρ ≈ 0,50; khi đó SINR ≈ 9,0 dB, R ≈ 160,2 Mbit/s, và throughput đàn hồi theo (27) là 160,2 × (1 − 0,50) ≈ 80,2 Mbit/s. Tăng nhu cầu lên 100 Mbit/s (+25%) cho ρ ≈ 0,74, SINR ≈ 7,3 dB, R ≈ 135,6 Mbit/s và throughput ≈ 35,6 Mbit/s, tức giảm 56%.</p>
+<p><span class="tag inf">Suy luận</span> Throughput đổi mạnh hơn nhiều so với tải, vì tải của cell này làm giảm SINR của cell kia. Bản đồ SINR với tải cố định không thấy hiệu ứng này; đó là lý do lớp QoS phải giải tải và SINR cùng lúc.</p></div>
+
+<h3 id="qos-kich-ban"><span class="secno">17.4</span>Kịch bản dựa trên MDT</h3>
+<p>Kịch bản là tập UE, lưu lượng và quỹ đạo có seed. <span class="tag dec">Đã chốt</span> Bộ sinh số ngẫu nhiên của kịch bản có khóa (seed kịch bản, id mô hình) và không chứa cấu hình mạng, nên hai cấu hình được so trên đúng cùng tập UE (<a href="architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>). Cách này giống việc cố định khởi tạo bộ sinh số trong công cụ quy hoạch, và giống common random numbers của dò tia.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Nguồn kịch bản (plugin PL-06)</th><th>Cách dựng</th><th>Ghi chú</th></tr></thead>
+<tbody>
+<tr><td>Phát lại vị trí MDT</td><td>Mỗi mẫu MDT có vị trí đủ tin cậy là một UE tại thời điểm của mẫu</td><td>Kiểm tra trực tiếp cell phục vụ dự báo với cell trong MDT</td></tr>
+<tr><td>Mật độ từ MDT</td><td>Ước lượng mật độ UE theo voxel và theo giờ từ mẫu MDT có trọng số tin cậy vị trí; chuẩn hóa tổng số UE theo bộ đếm PM của từng cell</td><td><span class="tag inf">Suy luận</span> MDT lệch về UE ngoài trời và UE đồng ý tham gia; chuẩn hóa theo PM bù một phần</td></tr>
+<tr><td>Quỹ đạo logged MDT</td><td>Chuỗi mẫu cùng trace id bí danh, sắp theo thời gian, nội suy giữa các mẫu</td><td>Dùng cho handover và replay</td></tr>
+<tr><td>Waypoint, mobility đường phố</td><td>Quỹ đạo theo điểm đi qua, hoặc theo mạng đường (plugin ngoài, ví dụ dựa trên SUMO)</td><td>Cho khu vực chưa có MDT</td></tr>
+<tr><td>Biến đổi what-if</td><td>Nhân lưu lượng, thêm hotspot, đổi tỷ lệ UE trong nhà</td><td>Giữ seed để so sánh</td></tr>
+</tbody></table></div>
+<p><span class="tag dec">Đã chốt</span> Schema MDT chuẩn có từ bản 0.1, trong module <code>raytwin.mdt</code>; các cột QoS là tùy chọn, nên bản 0.2 không phải đổi định dạng:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Cột</th><th>Kiểu</th><th>Bắt buộc</th><th>Nguồn</th></tr></thead>
+<tbody>
+<tr><td><code>trace_id</code></td><td>chuỗi bí danh</td><td>Có</td><td>Ẩn danh từ trace MDT; không bao giờ là IMSI, SUPI hay IMEI</td></tr>
+<tr><td><code>t</code></td><td>thời điểm UTC</td><td>Có</td><td>Mẫu MDT</td></tr>
+<tr><td><code>x, y, z</code></td><td>m, hệ tọa độ của cảnh</td><td>Có</td><td>Reader (PL-01) chuyển từ <code>lon, lat</code> theo CRS của cảnh</td></tr>
+<tr><td><code>pos_sigma</code>, <code>pos_source</code></td><td>m; GNSS, ước lượng, cell</td><td>Có</td><td>Độ tin cậy vị trí, cho trọng số w<sub>m</sub></td></tr>
+<tr><td><code>cell_id</code>, <code>band</code></td><td>chuỗi</td><td>Có</td><td>Cell đo; cờ <code>serving</code> cho cell phục vụ</td></tr>
+<tr><td><code>rsrp</code>, <code>rsrq</code></td><td>dBm, dB</td><td><code>rsrp</code> có</td><td>M1</td></tr>
+<tr><td><code>dl_volume</code>, <code>dl_thr</code></td><td>byte, bit/s</td><td>Không</td><td>M4, M5</td></tr>
+<tr><td><code>delay</code>, <code>loss</code></td><td>ms, tỷ lệ</td><td>Không</td><td>M6, M7</td></tr>
+<tr><td><code>rlf</code></td><td>cờ</td><td>Không</td><td>RLF report</td></tr>
+</tbody></table></div>
+
+<h3 id="qos-tich-hop"><span class="secno">17.5</span>Tích hợp vào kiến trúc</h3>
+<p><span class="tag dec">Đã chốt</span> Lớp QoS là module Python <code>raytwin.qos</code> trong tiến trình client, chỉ dùng NumPy. Nó đọc kết quả bản đồ qua cùng API ở cả hai chế độ, không thêm loại task và không đổi <code>raytwin-core</code> (<a href="architecture/adr/0001-one-core-two-runtime-modes.md">ADR 0001</a>). Tham số vô tuyến nằm trong RAN config, tách khỏi snapshot (<a href="architecture/adr/0002-snapshot-identity-and-path-based-storage.md">ADR 0002</a>). Vì vậy phần lớn câu hỏi what-if không cần dò lại tia:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Thay đổi</th><th>Dò lại tia?</th><th>Lý do</th></tr></thead>
+<tbody>
+<tr><td>CIO, Hys, Off, TTT, hệ số lọc</td><td>Không</td><td>RAN config</td></tr>
+<tr><td>Công suất, EPRE</td><td>Không</td><td>Bản đồ lưu path gain cho 1 W</td></tr>
+<tr><td>Tắt hoặc bật cell</td><td>Không</td><td>Cờ bật/tắt trong RAN config; cell tắt bị bỏ khi đọc</td></tr>
+<tr><td>Lưu lượng, số UE, quỹ đạo</td><td>Không</td><td>Kịch bản</td></tr>
+<tr><td>Tilt, azimuth, anten của một cell</td><td>Có, chỉ cell đó (từ bản 0.3)</td><td>Các Tx độc lập nhau; cache theo Tx (<a href="#pl-son">mục 18.4</a>)</td></tr>
+<tr><td>Site mới</td><td>Có, chỉ site mới (từ bản 0.3)</td><td>Như trên</td></tr>
+<tr><td>Hình học, trường vật liệu, số tia</td><td>Có, mọi Tx</td><td>Đổi đường đi của tia</td></tr>
+</tbody></table></div>
+<p class="code-title">API QoS (minh họa; tên hàm chưa cố định)</p>
+<pre><code>import raytwin as rt
+from raytwin import mdt, qos, viz
+
+store = rt.Store("s3://raytwin", endpoint="http://localhost:9000")
+scene = rt.Scene.from_mitsuba("scenes/munich/munich.xml")
+snap = store.snapshot("munich@v3")
+ran = store.put_ran(cells=rt.read_json("ran/munich.json"),
+                    ue=rt.UeClass(gain_db=-3.0, body_loss_db=3.0, nf_db=7.0))
+result = rt.run(rt.RadioMapJob(snapshot=snap.id, grid=rt.VoxelGrid(cell=5.0, z=(0.0, 60.0))))
+
+samples = mdt.read_mdt("s3://raytwin/mdt/area-7/2026-10.parquet")
+scen = qos.Scenario(source="mdt-density", mdt=samples, users=20_000, seed=7,
+                    traffic={"mean_mbps": 4.0}, duration_s=600, dt_s=0.1)
+base = qos.evaluate(result, ran, scen)                  # chuỗi thời gian, lưu Zarr
+
+plan = store.ref("area-7")
+ran2 = ran.derive(rt.Delta.set_cell("cell-17", band="n78", cio_db=3.0))
+plan.commit(snap, ran2, message="CIO cell-17 +3 dB")
+alt = qos.evaluate(result, ran2, scen)                  # không dò lại tia, cùng tập UE
+print(qos.kpi(base, "thr_p10"), qos.kpi(alt, "thr_p10"), qos.kpi(alt, "max_cell_load"))
+
+viz.preview(scene, result, band="n78", z=1.5, qos_run=alt, t=120)   # một khung hình
+plan.rollback(seq=0, message="quay lại cấu hình gốc")              # không xóa gì</code></pre>
+<p><span class="tag dec">Đã chốt</span> Kết quả của một lần chạy QoS luôn là chuỗi thời gian lưu Zarr (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-09, D-11</a>); kịch bản tĩnh có một bước thời gian. Nhờ vậy một trình xem hay UI sau này phát lại (replay) được kịch bản để quan sát UE và cell theo thời gian:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Mảng</th><th>Dạng</th><th>Nội dung</th></tr></thead>
+<tbody>
+<tr><td><code>ue_pos</code></td><td><code>[t, ue, 3]</code></td><td>Vị trí UE</td></tr>
+<tr><td><code>ue_cell</code></td><td><code>[t, ue]</code></td><td>Cell phục vụ; −1 khi mất phục vụ</td></tr>
+<tr><td><code>ue_rsrp</code>, <code>ue_sinr</code>, <code>ue_thr</code></td><td><code>[t, ue]</code></td><td>RSRP, SINR, throughput</td></tr>
+<tr><td><code>cell_load</code>, <code>cell_ues</code></td><td><code>[t, cell]</code></td><td>Tải và số UE theo cell</td></tr>
+<tr><td><code>handovers</code></td><td><code>[event]</code></td><td>Trường <code>t</code>, <code>ue</code>, <code>src</code>, <code>dst</code>, <code>kind</code> (HO, ping-pong, proxy RLF)</td></tr>
+</tbody></table></div>
+<p>Thuộc tính gồm <code>ue_ids</code>, <code>cell_ids</code>, <code>t0</code>, <code>dt</code>, seed kịch bản và danh tính các plugin. Id của run là hash của (job id, hash RAN config, kịch bản, danh tính plugin), nên chạy lại cho kết quả trùng từng bit. <span class="tag inf">Suy luận</span> Bước di động vốn tính các giá trị này ở mỗi bước thời gian, nên lưu lại gần như không tốn thêm.</p>
+
+<h3 id="qos-danh-gia"><span class="secno">17.6</span>Đánh giá tính ứng dụng và khả dụng</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Use case</th><th>Mức ứng dụng <span class="tag inf">Suy luận</span></th><th>Lý do</th><th>Giới hạn</th></tr></thead>
+<tbody>
+<tr><td>Cân bằng tải (CIO)</td><td><span class="lvl lo">Cao</span></td><td>CIO → association → tải là đúng chuỗi của mô hình; không dò lại tia</td><td>Phụ thuộc phân bố UE từ MDT</td></tr>
+<tr><td>Tiết kiệm năng lượng</td><td><span class="lvl lo">Cao</span></td><td>Tắt cell là bỏ một cột khi đọc; thấy ngay tải và outage của lân cận</td><td>Không mô hình thời gian bật lại cell</td></tr>
+<tr><td>CCO (tilt, công suất)</td><td><span class="lvl lo">Cao</span></td><td>Bản đồ 3D đã hiệu chỉnh cộng tải cho cả vùng phủ lẫn dung lượng</td><td>Tilt cần dò lại; rẻ khi có cache theo Tx (bản 0.3)</td></tr>
+<tr><td>Quy hoạch dung lượng</td><td><span class="lvl lo">Cao</span></td><td>Tăng lưu lượng, thêm site, xem cell quá tải và nhu cầu không phục vụ</td><td>Mô hình lưu lượng là giả định</td></tr>
+<tr><td>MRO (Hys, TTT, Off)</td><td><span class="lvl mid">Trung bình</span></td><td>Lọc L3, A3, TTT trên quỹ đạo cho số HO và ping-pong theo cặp cell</td><td>Không có fast fading; RLF chỉ là proxy; nhiễu Monte Carlo ≈ 0,4 dB có thể gây ping-pong giả</td></tr>
+<tr><td>Throughput tuyệt đối của một UE</td><td><span class="lvl hi">Thấp</span></td><td>—</td><td>Scheduler, link adaptation, MIMO rank và beamforming khác theo nhà cung cấp</td></tr>
+</tbody></table></div>
+<ul>
+  <li><strong>Chi phí tính toán.</strong> <span class="tag inf">Suy luận</span> 10<sup>5</sup> UE × 50 cell là ma trận RSRP f32 khoảng 20 MB; mỗi vòng lặp điểm bất động là vài phép toán trên ma trận đó, dưới 1 giây với NumPy. 1000 UE di động trong 10 phút với bước 100 ms là 3·10<sup>8</sup> giá trị (UE × bước × cell), xử lý theo từng đoạn thời gian. Con số thật được đo ở bản 0.2 (QA-13 trong ARCHITECTURE).</li>
+  <li><strong>Dữ liệu là nút thắt.</strong> Không có M5 thì mô hình tốc độ chỉ hiệu chỉnh được từ PM theo cell. Vị trí sai làm association sai; mẫu không có GNSS chỉ nên dùng cho mật độ thô.</li>
+  <li><strong>Độ chính xác.</strong> Bản đồ công suất trung bình đủ cho association, SINR trung bình và lọc L3. Nó không cho fast fading, không cho độ lợi beamforming của kênh dữ liệu. Vì vậy kết quả được báo cáo dưới dạng so sánh giữa kịch bản; KPI di động chỉ tính trên ô đủ tia.</li>
+  <li><strong>Quyền riêng tư.</strong> RayTwin chỉ nhận trace id bí danh, không lưu IMSI, SUPI hay IMEI. Kịch bản để chia sẻ dùng mật độ, không dùng quỹ đạo thô.</li>
+</ul>
+<p><span class="tag rec">Khuyến nghị</span> Kiểm định trên dữ liệu thật, tách theo thời gian và theo cấu hình như <a href="#vl-nhan-dang">mục 11.6</a>:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Chỉ số</th><th>So với</th><th>Ngưỡng đề xuất</th></tr></thead>
+<tbody>
+<tr><td>Tỷ lệ khớp cell phục vụ</td><td>Cờ <code>serving</code> của mẫu MDT có GNSS</td><td><span class="tag ass">Giả định</span> ≥ 80%, xác nhận khi có dữ liệu</td></tr>
+<tr><td>PRB utilization theo cell</td><td>Bộ đếm PM cùng giờ</td><td><span class="tag ass">Giả định</span> sai số tuyệt đối trung bình ≤ 10 điểm phần trăm</td></tr>
+<tr><td>Phân bố throughput UE</td><td>M5 (nếu có)</td><td>Báo cáo P10, P50; không đặt ngưỡng</td></tr>
+<tr><td>Số HO theo cặp cell</td><td>Bộ đếm HO của PM</td><td>Spearman ρ<sub>s</sub> ≥ 0,8</td></tr>
+<tr><td>Thứ hạng kịch bản</td><td>Các thay đổi cấu hình đã thật sự xảy ra trong lịch sử CM, và KPI trước, sau thay đổi</td><td>Spearman ρ<sub>s</sub> ≥ 0,8 của ΔKPI, như nghiệm thu hiệu chỉnh</td></tr>
+<tr><td>RSRQ</td><td>M1</td><td>Báo cáo; ưu tiên thấp</td></tr>
+</tbody></table></div>
+
+<h3 id="qos-tieu-chi"><span class="secno">17.7</span>Thành phần và tiêu chí hoàn thành của bản 0.2</h3>
+<p>Các thành phần dưới đây bắt đầu sau khi phát hành bản 0.1. Tiêu chí là <span class="tag rec">Khuyến nghị</span>, có thể chỉnh khi bắt tay làm.</p>
+<div class="comp" id="tc-q1">
+<h4>Q1. Dữ liệu vào và RAN config</h4>
+<p class="comp-goal">Mục tiêu: đọc MDT, PM, CM thật vào schema chuẩn và RAN config đầy đủ.</p>
+<ul class="checklist">
+  <li>Reader mặc định (PL-01) đọc Parquet theo schema ở mục 17.4; mẫu thiếu cột bắt buộc bị từ chối kèm lý do.</li>
+  <li>Chuyển <code>lon, lat</code> sang tọa độ cảnh theo CRS; một điểm kiểm tra đã biết sai lệch dưới 0,1 m.</li>
+  <li>RAN config có CIO, Hys, Off, TTT, hệ số lọc, N<sub>PRB</sub>, SCS, cờ bật/tắt; đổi RAN config không đổi snapshot id.</li>
+</ul>
+</div>
+<div class="comp" id="tc-q2">
+<h4>Q2. Đánh giá tĩnh</h4>
+<p class="comp-goal">Mục tiêu: association, tải, tốc độ, throughput đúng công thức và tất định.</p>
+<ul class="checklist">
+  <li>Ví dụ hai cell của mục 17.3 cho đúng các số đã nêu, sai lệch dưới 0,1 Mbit/s.</li>
+  <li>Hai cell đối xứng có cùng tải ở điểm bất động; tải bằng 1 khi nhu cầu vượt tốc độ ở tải đầy.</li>
+  <li>Chạy hai lần, và đổi thứ tự UE, cho kết quả trùng từng bit.</li>
+  <li>Đo và báo cáo thời gian cho 10<sup>5</sup> UE × 50 cell (QA-13).</li>
+</ul>
+</div>
+<div class="comp" id="tc-q3">
+<h4>Q3. Di động và handover</h4>
+<p class="comp-goal">Mục tiêu: KPI di động có ý nghĩa so sánh giữa cấu hình.</p>
+<ul class="checklist">
+  <li>Lọc L3 khớp công thức (28) với k = 0, 4, 8 (a = 1; 0,5; 0,25).</li>
+  <li>Một UE đi thẳng giữa hai cell đối xứng có đúng một handover khi Hys &gt; 0, và vị trí handover dời theo Off.</li>
+  <li>KPI di động chỉ tính trên ô đủ tia; báo cáo tỷ lệ bước thời gian rơi vào ô thiếu tia.</li>
+  <li>Kết quả lưu Zarr theo bảng ở mục 17.5; <code>viz.preview(..., t=…)</code> vẽ được một khung hình.</li>
+</ul>
+</div>
+<div class="comp" id="tc-q4">
+<h4>Q4. Kịch bản</h4>
+<p class="comp-goal">Mục tiêu: kịch bản tái lập được và không phụ thuộc cấu hình.</p>
+<ul class="checklist">
+  <li>Cùng seed cho cùng vị trí và lưu lượng UE dưới hai cấu hình khác nhau (QA-12).</li>
+  <li>Ba nguồn: phát lại vị trí MDT, mật độ từ MDT chuẩn hóa theo PM, waypoint.</li>
+  <li>Không lưu id thật của thuê bao; kịch bản dạng mật độ không chứa quỹ đạo thô.</li>
+</ul>
+</div>
+<div class="comp" id="tc-q5">
+<h4>Q5. Chỉnh sửa, lịch sử và kiểm định</h4>
+<p class="comp-goal">Mục tiêu: kỹ sư thử nhiều phương án và quay lại được.</p>
+<ul class="checklist">
+  <li><code>derive</code>, <code>diff</code>, <code>ref.commit</code>, <code>ref.rollback</code> chạy ở cả hai chế độ; rollback không xóa object nào và dùng lại kết quả cũ theo job id.</li>
+  <li>Báo cáo kiểm định theo bảng ở mục 17.6 chạy được trên dữ liệu thật khi có.</li>
+</ul>
+</div>
+
+
+<h2 id="plugin"><span class="secno">18</span>API plugin (bản 0.2 và 0.3) <span class="tag dec">Đã chốt</span></h2>
+<p class="lead">Bản 0.1 vẫn không có API plugin (<a href="#kt-plugin">mục 10.6</a>). Từ bản 0.2, RayTwin mở rộng được ở những chỗ không chạm tới kernel dò tia: đọc dữ liệu, các mô hình của lớp QoS, KPI, xuất kết quả, nhập cảnh và chính sách SON. Những gì GPU cần (pattern anten, vật liệu) đi vào dưới dạng bảng dữ liệu, không phải code. Chủ dự án chấp nhận PL-01 đến PL-11 và bỏ PL-12 ngày 30/10/2026 (<a href="architecture/adr/0004-plugin-api.md">ADR 0004</a>).</p>
+
+<h3 id="pl-nguyen-tac"><span class="secno">18.1</span>Nguyên tắc và hợp đồng</h3>
+<ul>
+  <li><strong>Code plugin chỉ chạy ở client Python.</strong> Các crate Rust không nạp code plugin; worker không bao giờ chạy plugin. Vì vậy plugin không làm hỏng được tính tất định của dò tia hay độ khớp CPU–GPU.</li>
+  <li><strong>Plugin dạng bảng cho GPU.</strong> Pattern anten (PL-08) và vật liệu (PL-09) là bảng lấy mẫu, nằm trong snapshot như mọi đầu vào khác, có hash. CPU và GPU nội suy bảng theo cùng một quy tắc. Đây là bước 3 của hướng đi đã ghi trong ADR từ bản 0.1.</li>
+  <li><strong>Danh tính vào hash.</strong> Mỗi plugin khai báo <code>api_version</code>, <code>name</code>, <code>version</code>; tham số là giá trị JSON. Bộ (tên, phiên bản, tham số) đi vào id của run, nên đổi plugin thì kết quả cache không bị dùng nhầm. Exporter không đổi kết quả nên không vào hash.</li>
+  <li><strong>Tất định.</strong> Plugin chỉ dùng <code>numpy.random.Generator</code> do host cấp; không đọc đồng hồ, mạng hay trạng thái ngẫu nhiên toàn cục. Bộ kiểm tra <code>raytwin.plugins.check</code> chạy plugin hai lần và một lần với thứ tự dòng đầu vào đảo; đầu ra phải trùng từng bit.</li>
+  <li><strong>Phiên bản API.</strong> Host từ chối plugin có <code>api_version</code> không hỗ trợ và ghi rõ lý do. Mô hình có sẵn của RayTwin cũng đăng ký qua cùng cơ chế.</li>
+</ul>
+
+<h3 id="pl-danh-sach"><span class="secno">18.2</span>Danh sách tính năng plugin</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>#</th><th>Plugin</th><th>Nhóm entry point</th><th>Chạy ở</th><th>Bản</th><th>Lý do</th></tr></thead>
+<tbody>
+<tr><td>PL-01</td><td>Bộ đọc MDT, PM, CM về schema chuẩn</td><td><code>raytwin.mdt_readers</code></td><td>Client</td><td>0.2</td><td>Định dạng trace và bộ đếm khác nhau theo nhà cung cấp; dữ liệu là nút thắt của QoS</td></tr>
+<tr><td>PL-02</td><td>Chính sách association (RSRP + CIO, SINR, theo tải)</td><td><code>raytwin.qos.association</code></td><td>Client</td><td>0.2</td><td>Mỗi nhà mạng và mỗi thuật toán MLB chọn cell khác nhau</td></tr>
+<tr><td>PL-03</td><td>Mô hình liên kết SINR → tốc độ (Shannon có chặn, bảng CQI, adapter tới bộ mô phỏng mức slot, mô hình fit từ M5)</td><td><code>raytwin.qos.link</code></td><td>Client</td><td>0.2</td><td>Độ chính xác của throughput nằm chủ yếu ở mô hình này</td></tr>
+<tr><td>PL-04</td><td>Chia tài nguyên, scheduler (RR, PF, processor sharing, GBR, slicing)</td><td><code>raytwin.qos.sharing</code></td><td>Client</td><td>0.2</td><td>Scheduler khác theo nhà cung cấp và theo dịch vụ</td></tr>
+<tr><td>PL-05</td><td>Di động, handover (A3, A5, CHO), nguồn quỹ đạo</td><td><code>raytwin.qos.mobility</code></td><td>Client</td><td>0.2</td><td>MRO cần thử nhiều chính sách handover</td></tr>
+<tr><td>PL-06</td><td>Sinh kịch bản và lưu lượng</td><td><code>raytwin.qos.scenario</code></td><td>Client</td><td>0.2</td><td>Mật độ MDT, quỹ đạo, hotspot, mobility đường phố</td></tr>
+<tr><td>PL-07</td><td>KPI và exporter (GeoTIFF, Parquet, dashboard)</td><td><code>raytwin.kpi</code>, <code>raytwin.exporters</code></td><td>Client</td><td>0.2</td><td>Mỗi nhà mạng định nghĩa KPI riêng (P5 hay P10, cửa sổ ping-pong); GeoTIFF cần GDAL, phụ thuộc nặng không nên vào wheel gốc. Zarr vẫn là định dạng kết quả duy nhất</td></tr>
+<tr><td>PL-08</td><td>Pattern anten dạng bảng từ file nhà cung cấp</td><td><code>raytwin.pattern_readers</code> + <code>AntennaPattern::Table</code></td><td>Reader ở client; bảng chạy CPU và GPU</td><td>0.3</td><td>Tilt là núm chính của SON; búp phụ và null fill quyết định vùng phủ đổi theo tilt. Pattern TR 38.901 là xấp xỉ chung nên có thể xếp sai thứ hạng tilt. Bảng lưới 1° khoảng 260 KB cho mỗi pattern và băng</td></tr>
+<tr><td>PL-09</td><td>Bảng vật liệu ε<sub>r</sub>(f), σ(f) theo lớp</td><td>Dữ liệu trong manifest</td><td>CPU và GPU</td><td>0.3</td><td>Vật liệu dưới 1 GHz và ở FR2 nằm ngoài dải ITU</td></tr>
+<tr><td>PL-10</td><td>Nhập cảnh CityGML, OSM, glTF</td><td><code>raytwin.scene_importers</code></td><td>Công cụ offline</td><td>0.3</td><td>Khu vực thật không có sẵn cảnh Mitsuba</td></tr>
+<tr><td>PL-11</td><td>Chính sách SON vòng kín</td><td><code>raytwin.son.policies</code></td><td>Client; job radio map có thể phân tán</td><td>0.3</td><td>Đánh giá thuật toán SON trên twin trước khi chạm mạng thật (<a href="#pl-son">mục 18.4</a>)</td></tr>
+<tr><td>PL-12</td><td>Mô hình vật lý (nhiễu xạ, khuếch tán) dạng crate Rust</td><td>—</td><td>—</td><td>Bỏ</td><td>Chủ dự án quyết định nhiễu xạ và khuếch tán chỉ làm trong lõi</td></tr>
+</tbody></table></div>
+<p>Các phương án không làm: plugin shader WGSL (giao diện shader thành API công khai, khó kiểm tính tất định); thư viện Rust nạp lúc chạy (Rust không có ABI ổn định); sandbox WebAssembly trên worker (không cần, vì worker không chạy code plugin; xét lại nếu phải chạy code bên thứ ba trên worker).</p>
+
+<h3 id="pl-co-che"><span class="secno">18.3</span>Cơ chế kỹ thuật</h3>
+<p><span class="tag fact">Sự kiện</span> Theo đặc tả entry point của PyPA, một distribution khai báo đối tượng trong một nhóm có tên; bên dùng tìm bằng <code>importlib.metadata.entry_points(group=…)</code> của thư viện chuẩn và gọi <code>.load()</code> (<a href="https://packaging.python.org/specifications/entry-points">Entry points specification</a>). RayTwin không thêm phụ thuộc nào cho việc tìm plugin.</p>
+<p class="code-title">Khai báo plugin trong pyproject.toml của package bên ngoài (minh họa)</p>
+<pre><code>[project.entry-points."raytwin.qos.link"]
+cqi-table = "acme_raytwin.link:CqiTableLink"
+
+[project.entry-points."raytwin.mdt_readers"]
+acme-trace = "acme_raytwin.mdt:read_acme_trace"</code></pre>
+<p class="code-title">Một plugin liên kết (minh họa; giao diện chưa cố định)</p>
+<pre><code>import numpy as np
+
+class CqiTableLink:
+    api_version = 1
+    name, version = "cqi-table", "0.1.0"
+
+    def __init__(self, table_db: list[float], se: list[float]):
+        self.table_db, self.se = np.asarray(table_db), np.asarray(se)
+
+    def rate(self, sinr_db: np.ndarray, n_prb: np.ndarray, b_prb_hz: float) -&gt; np.ndarray:
+        idx = np.searchsorted(self.table_db, sinr_db, side="right") - 1
+        se = np.where(idx &gt;= 0, self.se[np.clip(idx, 0, None)], 0.0)
+        return n_prb * b_prb_hz * se          # không dùng RNG, không đọc đồng hồ</code></pre>
+<p class="code-title">Plugin dạng bảng trong manifest (minh họa, bản 0.3)</p>
+<pre><code>"transmitters": [
+  { "id": "cell-17", "position": [8.5, 21.0, 27.0], "azimuth_deg": 120, "tilt_deg": 6,
+    "bands": ["n78"],
+    "array": { "rows": 4, "cols": 8, "dual_pol": true, "spacing_lambda": [0.5, 0.5],
+               "pattern": { "table": { "uri": "s3://raytwin/patterns/acme-aau-n78-t6.zarr",
+                                       "hash": "blake3:51c0…" } } } }
+]</code></pre>
+
+<h3 id="pl-son"><span class="secno">18.4</span>Vòng SON và cache theo Tx (PL-11, bản 0.3)</h3>
+<p>Chính sách SON của người dùng (MLB, MRO, CCO, tiết kiệm năng lượng) đề xuất cấu hình; RayTwin đánh giá trên twin và trả KPI; vòng lặp chạy tới khi chính sách dừng hoặc hết ngân sách số lần đánh giá. RayTwin đóng vai "môi trường", giống <code>reset/step</code> trong học tăng cường. Đây là vòng SON của <a href="#fig-son-loop">Hình 1</a>, ở dạng chạy được.</p>
+<pre><code>class SonPolicy(Protocol):
+    def propose(self, history: list[Evaluation], rng) -&gt; list[ConfigDelta] | None: ...
+
+history = raytwin.son.run(policy, baseline, scenario, budget=200)</code></pre>
+<p>Phần host lo, tức phần mỗi nhà nghiên cứu sẽ phải tự viết và dễ sai:</p>
+<ol>
+  <li><strong>Tách thay đổi.</strong> Đổi CIO, công suất, tham số HO hoặc lưu lượng chỉ cần tính lại QoS. Đổi tilt, azimuth, anten hoặc thêm site chỉ dò lại các Tx bị đổi.</li>
+  <li><strong>Common random numbers.</strong> Mọi ứng viên dùng cùng seed kịch bản, cùng tập UE và cùng seed tia, nên chênh lệch KPI đến từ cấu hình chứ không từ nhiễu.</li>
+  <li><strong>Cache theo id.</strong> Không ứng viên nào được đánh giá hai lần.</li>
+  <li><strong>Song song.</strong> Job radio map chạy ở chế độ phân tán; phần QoS chạy song song bằng nhiều process.</li>
+  <li><strong>Kiểm tra seed.</strong> Cuối vòng, đánh giá lại các ứng viên tốt nhất bằng seed khác. Nếu thứ hạng đổi, chính sách có thể đang khai thác nhiễu Monte Carlo hoặc khiếm khuyết của mô hình.</li>
+</ol>
+<p><span class="tag dec">Đã chốt</span> Cache theo Tx: kết quả của một Tx được lưu dưới khóa là hash các đầu vào dò tia của riêng Tx đó (cảnh, trường vật liệu, Tx, băng, solver, lưới), không gồm RAN config. Hệ số tỉ lệ s tính theo từng Tx, và khóa số ngẫu nhiên chỉ chứa id của Tx, nên kết quả của một Tx không phụ thuộc các Tx khác (<a href="architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>).</p>
+<div class="callout example"><div class="ct">Ví dụ: MLB và CCO trên vùng 50 cell</div>
+<p>MLB: chính sách tăng CIO của cell quá tải 1 dB mỗi bước cho tới khi tải lớn nhất dưới 0,8. Không cần dò lại tia, nên một bước chỉ là một lần đánh giá QoS.</p>
+<p>CCO: tối ưu Bayes trên tilt của 3 cell, mỗi cell 5 giá trị, tổng 5<sup>3</sup> = 125 tổ hợp. Không có cache theo Tx, mỗi tổ hợp là một job dò lại cả 50 cell: 125 × 50 = 6250 lần dò một Tx. Có cache theo Tx, chỉ cần 3 × 5 = 15 lần dò một Tx, tức ít hơn khoảng 400 lần.</p></div>
+<p><span class="tag rec">Khuyến nghị</span> Giữ phạm vi gọn: chỉ vòng propose/evaluate, cache, ngân sách và kiểm tra seed. Chính sách có sẵn duy nhất là grid search để tham chiếu; không phụ thuộc thư viện RL (một wrapper kiểu Gymnasium có thể tự là một plugin).</p>
+
+<h3 id="pl-tieu-chi"><span class="secno">18.5</span>Tiêu chí hoàn thành</h3>
+<div class="comp" id="tc-p1">
+<h4>Bản 0.2: plugin client</h4>
+<ul class="checklist">
+  <li><code>raytwin.plugins.load</code> tìm plugin qua entry point, kiểm <code>api_version</code>, từ chối plugin sai phiên bản kèm lý do.</li>
+  <li>Mô hình có sẵn của PL-01 đến PL-07 đăng ký qua cùng cơ chế và qua bộ kiểm tra tất định.</li>
+  <li>Đổi phiên bản hoặc tham số của một plugin làm đổi id của run; đổi exporter thì không.</li>
+  <li>Một package plugin mẫu bên ngoài repo cài bằng <code>pip install</code> và chạy được trong ví dụ QoS.</li>
+</ul>
+</div>
+<div class="comp" id="tc-p2">
+<h4>Bản 0.3: bảng dữ liệu, nhập cảnh, vòng SON</h4>
+<ul class="checklist">
+  <li>Pattern dạng bảng lấy mẫu lại từ TR 38.901 cho bản đồ khớp pattern giải tích trong sai số nội suy; CPU và GPU khớp trong 10<sup>−4</sup>.</li>
+  <li>Bảng vật liệu với tham số ITU cho kết quả trùng từng bit với vật liệu ITU có sẵn.</li>
+  <li>Đổi tilt của k cell chỉ dò lại k Tx; kết quả các Tx khác trùng từng bit (QA-15).</li>
+  <li><code>raytwin.son.run</code> với grid search trên 3 cell × 5 tilt chạy đủ 125 ứng viên với 15 lần dò một Tx, và báo cáo kết quả kiểm tra seed.</li>
+</ul>
+</div>
+
+
+<h2 id="tuong-tac"><span class="secno">19</span>Hướng tới digital twin tương tác cho kỹ sư lập kế hoạch</h2>
+<p class="lead">Mục tiêu xa hơn của RayTwin là một digital twin mà kỹ sư tương tác trực tiếp: đặt site, chỉnh anten, xem vùng phủ và chất lượng dịch vụ, phát lại kịch bản người dùng, so phương án rồi quay lại. Chưa bản nào có UI. Mục này khảo sát AODT về khả năng tương tác, đánh giá RayTwin đã sẵn sàng tới đâu, và chốt các "móc" trong thiết kế để những mở rộng đó không phải sửa kiến trúc.</p>
+
+<h3 id="tt-aodt"><span class="secno">19.1</span>Khảo sát: AODT cho kỹ sư làm gì</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Khả năng</th><th>Hiện trạng <span class="tag fact">Sự kiện</span></th><th>Nguồn</th></tr></thead>
+<tbody>
+<tr><td>Đặt thiết bị trên bản đồ</td><td>Bản 1.3–1.4: menu chuột phải Deploy RU, Deploy DU, Deploy UE, Deploy Spawn Zone; RU dời được bằng Move; tạo panel anten bằng Create Panel, có tính AEP gồm mutual coupling</td><td><a href="https://docs.nvidia.com/aerial/aerial-dt/archive/1.4.1/text/ran_digital_twin.html">RAN Digital Twin 1.4</a>, <a href="https://docs.nvidia.com/aerial/aerial-dt/archive/1.3.0/text/gui.html">GUI 1.3</a></td></tr>
+<tr><td>UE và di động</td><td>UE đặt tay theo waypoint (tốc độ, hướng, thời gian dừng); UE thủ tục với tỷ lệ UE trong nhà; urban mobility dùng SUMO và dữ liệu đường OSM; nhập GPX; seed cho mobility</td><td><a href="https://docs.nvidia.com/aerial/aerial-dt/archive/1.4.1/text/ran_digital_twin.html">RAN Digital Twin 1.4</a></td></tr>
+<tr><td>Vật liệu</td><td>Gán vật liệu bề mặt theo tòa nhà hoặc mặt đất; bật hoặc tắt RF, nhiễu xạ, khuếch tán cho từng tài sản</td><td>Như trên</td></tr>
+<tr><td>Chạy và xem kết quả</td><td>Generate, Start, Pause, Stop mobility; kết quả trong ClickHouse (bảng <code>cfrs</code>, <code>raypaths</code>, <code>telemetry</code> theo slot: PRB, MCS, layer, SINR); GUI hiển thị throughput, MCS theo UE và theo RU</td><td>Như trên</td></tr>
+<tr><td>Mô phỏng lại</td><td>Dừng, sinh lại mobility rồi chạy lại; replay headless ghi sang database mới</td><td>Như trên</td></tr>
+<tr><td>Bản 1.5</td><td>Chạy headless trước tiên; S3; UI viết lại bằng CesiumJS; client C++ và Python qua gRPC; worker bằng Docker Compose; viewer địa không gian; hiệu chỉnh EM từ SS-RSRP; UE 3D cho UAV</td><td><a href="https://forums.developer.nvidia.com/t/announcement-nvidia-aodt-1-5-and-aodt-client-on-github-release-notification/373528">Thông báo 1.5</a>, <a href="https://github.com/NVIDIA/aerial-omniverse-digital-twin">GitHub</a></td></tr>
+</tbody></table></div>
+<p><span class="tag inf">Suy luận</span> Tài liệu không cho thấy chỉnh tilt hay azimuth của RU trên GUI. Mỗi thay đổi kịch bản dẫn tới chạy lại mô phỏng. Hai điểm này là chỗ RayTwin có lợi thế thiết kế: cấu hình phái sinh có hash, các Tx độc lập nhau, và tham số vô tuyến tách khỏi snapshot.</p>
+
+<h3 id="tt-san-sang"><span class="secno">19.2</span>Mức sẵn sàng của RayTwin</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Tính năng tương tác</th><th>AODT</th><th>RayTwin</th><th>Đường mở rộng</th></tr></thead>
+<tbody>
+<tr><td>Xem cảnh, bản đồ, tia</td><td>GUI 3D, CesiumJS</td><td>Đã lên kế hoạch, bản 0.1: <code>raytwin.viz</code> trong Jupyter, xuất <code>.glb</code></td><td>UI web đọc <code>.glb</code> và Zarr</td></tr>
+<tr><td>Đặt, dời, xóa site; chỉnh tilt, azimuth, chiều cao</td><td>Deploy, Move</td><td>Móc mở rộng: config delta và <code>derive</code> (bản 0.2)</td><td>UI gửi delta; chỉ Tx đổi được dò lại (bản 0.3)</td></tr>
+<tr><td>Đặt anten trên mái, UE trên đường</td><td>Thao tác trên bản đồ</td><td>Móc mở rộng: lõi có BVH</td><td>Mở <code>raycast</code>, <code>height_at</code> khi cần</td></tr>
+<tr><td>Pattern, panel anten</td><td>Create Panel, AEP</td><td>Đã lên kế hoạch: bảng pattern (PL-08, bản 0.3)</td><td>—</td></tr>
+<tr><td>Gán vật liệu theo tòa nhà</td><td>Có</td><td>Có: lớp vật liệu và trường δ; bảng vật liệu (PL-09, bản 0.3)</td><td>—</td></tr>
+<tr><td>Triển khai UE (tay, thủ tục, GPX, mobility)</td><td>Có</td><td>Đã lên kế hoạch: kịch bản PL-06, quỹ đạo PL-05 (bản 0.2)</td><td>Plugin mobility đường phố</td></tr>
+<tr><td>Chạy job, xem tiến độ, hủy</td><td>Generate, Start, Stop</td><td>Có: job qua NATS, tiến độ trong KV, hủy job</td><td>UI theo dõi KV qua NATS WebSocket hoặc gateway</td></tr>
+<tr><td>KPI, telemetry</td><td>Theo slot</td><td>Đã lên kế hoạch: flow-level theo bước thời gian (bản 0.2)</td><td>Adapter mức slot qua PL-03</td></tr>
+<tr><td>Replay kịch bản, quan sát UE và cell</td><td>Replay database</td><td>Đã lên kế hoạch: chuỗi thời gian Zarr, khung hình trong viz (bản 0.2)</td><td>Thanh thời gian trong UI</td></tr>
+<tr><td>So phương án A/B, quay lại</td><td>Chạy lại vào database mới</td><td>Đã lên kế hoạch: reference log, rollback (bản 0.2); tất định và CRN có sẵn</td><td>—</td></tr>
+<tr><td>Hiệu chỉnh từ RSRP</td><td>Từ SS-RSRP</td><td>Có: twin experiment ở MVP; MDT thật sau</td><td>—</td></tr>
+<tr><td>Headless, API, S3</td><td>Có từ 1.5</td><td>Có: chế độ thư viện và phân tán, object store</td><td>—</td></tr>
+<tr><td>Nhiều người dùng, xác thực</td><td>Theo triển khai</td><td>Chưa: NATS chưa có account và TLS</td><td>Điều kiện của UI (mục 19.4)</td></tr>
+</tbody></table></div>
+
+<h3 id="tt-moc"><span class="secno">19.3</span>Các móc mở rộng chốt ngay trong thiết kế <span class="tag dec">Đã chốt</span></h3>
+<p>Các móc dưới đây gần như không tốn thêm việc cho MVP, nhưng nếu bỏ qua bây giờ thì sau này phải sửa kiến trúc:</p>
+<ol>
+  <li><strong>Chỉnh sửa là phái sinh, có lịch sử và rollback.</strong> Mọi thay đổi (thêm, bớt, sửa Tx; đổi RAN) là một config delta, tạo snapshot hoặc RAN config mới có hash mới; không sửa tại chỗ. Một reference có tên là nhật ký chỉ ghi thêm <code>refs/&lt;name&gt;/&lt;seq&gt;.json</code>; rollback ghi thêm một mục trỏ về cặp (snapshot, RAN config) cũ, không xóa gì, và dùng lại kết quả cũ theo job id. Chạy ở cả chế độ thư viện, không cần database (<a href="architecture/adr/0002-snapshot-identity-and-path-based-storage.md">ADR 0002</a>).</li>
+  <li><strong>Các Tx độc lập nhau.</strong> Khóa số ngẫu nhiên chỉ chứa id của Tx; hệ số s tính theo từng Tx. Phải chốt từ bản 0.1, vì đổi s sau khi phát hành sẽ làm đổi kết quả từng bit (<a href="architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>).</li>
+  <li><strong>Id ổn định</strong> cho cell (cặp Tx, băng), Tx, UE (số thứ tự hoặc trace id bí danh), kịch bản và job.</li>
+  <li><strong>Tiến độ và kết quả từng phần.</strong> Tiến độ job nằm trong KV; part theo Tx nằm trong object store, nên UI hiển thị dần được.</li>
+  <li><strong>Dữ liệu tự mô tả.</strong> CRS của cảnh, thuộc tính lưới của mọi mảng Zarr, mảng <code>segments</code>, JSON Schema công bố cho manifest, RAN config và job.</li>
+  <li><strong>Xem và xuất.</strong> <code>raytwin.viz</code> và <code>.glb</code> (bản 0.1).</li>
+  <li><strong>Replay.</strong> Kết quả QoS là chuỗi thời gian có id ổn định (<a href="#qos-tich-hop">mục 17.5</a>).</li>
+</ol>
+
+<h3 id="tt-ui"><span class="secno">19.4</span>Điều kiện trước khi có UI</h3>
+<p><span class="tag rec">Khuyến nghị</span> UI web là một client nữa, không thay đổi lõi: form sinh từ JSON Schema; gửi job, theo dõi, hủy qua NATS (WebSocket) hoặc một gateway REST mỏng; cảnh và lát cắt bản đồ từ <code>.glb</code>, hiển thị bằng three.js hoặc CesiumJS khi có CRS; mảng Zarr đọc qua HTTP. Trước khi mở UI cho người dùng cần:</p>
+<ul>
+  <li>NATS account và TLS, hoặc gateway có xác thực;</li>
+  <li>URL ký sẵn (presigned URL) cho object store;</li>
+  <li>danh mục kịch bản và reference để UI liệt kê;</li>
+  <li>truy vấn cảnh (<code>raycast</code>, <code>height_at</code>) cho thao tác đặt site và UE.</li>
+</ul>
+<p>UI và theo dõi MDT liên tục (so đo và dự báo theo thời gian) thuộc giai đoạn sau bản 0.3 và chưa gắn số bản.</p>
+
 <h2 id="quyet-dinh">Phụ lục A. Nhật ký quyết định</h2>
-<p>Các quyết định dưới đây được xác nhận ngày 29/10/2026. Phiên bản 1.1 thêm kết quả của buổi rà soát kiến trúc cùng ngày. Các quyết định ảnh hưởng toàn hệ thống được ghi thành ADR trong <a href="adr/README.md"><code>docs/adr/</code></a>; tài liệu kiến trúc nằm ở <a href="architecture/ARCHITECTURE.md"><code>docs/architecture/ARCHITECTURE.md</code></a>. Hiện không còn câu hỏi mở nào chặn việc bắt đầu.</p>
+<p>Các quyết định dưới đây được xác nhận ngày 29/10/2026 và 30/10/2026. Phiên bản 1.1 thêm kết quả của buổi rà soát kiến trúc ngày 29/10/2026. Phiên bản 1.2 (30/10/2026) thêm mô phỏng chất lượng dịch vụ, API plugin, đại lượng so khớp MDT và các móc cho digital twin tương tác. Bốn quyết định quan trọng nhất có ADR trong <a href="architecture/adr/README.md"><code>docs/architecture/adr/</code></a>; mọi quyết định khác là một hàng ở <a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">mục 10 của <code>docs/architecture/ARCHITECTURE.md</code></a>. Hiện không còn câu hỏi mở nào chặn việc bắt đầu.</p>
 <div class="table-wrap"><table>
 <thead><tr><th>Chủ đề</th><th>Quyết định</th><th>Ảnh hưởng tới RayTwin</th></tr></thead>
 <tbody>
@@ -1475,15 +2029,15 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 <tr><td>Khu vực thử và nguồn MDT</td><td>Cảnh mẫu của Sionna RT; MDT mô phỏng; dữ liệu thật ở giai đoạn sau</td><td>Parser chỉ cần tập con XML Mitsuba + PLY; hiệu chỉnh v0 là twin experiment</td></tr>
 <tr><td>Băng tần</td><td>Hỗ trợ FR1 và FR2; MVP chỉ FR1; sau MVP làm cả FR2-1 và FR2-2</td><td>Kiến trúc giữ trục băng tổng quát; FR2 cần vật liệu trên 40 GHz, suy hao khí quyển, tán xạ khuếch tán</td></tr>
 <tr><td>CIR</td><td>Theo từng phần tử anten; Tx đến 64T64R (32 vị trí phân cực kép), UE đến 4 anten</td><td>Đầu ra có trục phần tử như <code>synthetic_array=False</code>; CIR chỉ tính tại điểm thu rời rạc</td></tr>
-<tr><td>API Python</td><td>API riêng (Manifest → Job → Result) + lớp tương thích <code>raytwin.compat</code></td><td>CI so sánh qua lớp tương thích; khi Sionna đổi API chỉ phải sửa lớp này. Client chế độ phân tán dùng NATS, không dùng gRPC (<a href="adr/0005-nats-as-the-client-protocol.md">ADR 0005</a>)</td></tr>
-<tr><td>Phân phối công việc</td><td>NATS JetStream</td><td>Worker kéo task; retention WorkQueue; in-progress ack cho task dài; MaxDeliver hữu hạn; message chỉ mang tham chiếu; subject theo job; ba loại task <code>radio_map</code>, <code>paths</code>, <code>tape</code> (<a href="adr/0004-work-distribution-with-nats-jetstream.md">ADR 0004</a>)</td></tr>
-<tr><td>Vòng tối ưu hiệu chỉnh</td><td>PyTorch qua PyO3</td><td>Rust xuất tape đường đi cố định dạng NumPy không sao chép; tối ưu bằng Adam hoặc L-BFGS; vật lý cường độ cài trong PyTorch, test khớp Rust ≤ 10<sup>−6</sup> (<a href="adr/0008-calibration-on-frozen-paths-in-pytorch.md">ADR 0008</a>)</td></tr>
+<tr><td>API Python</td><td>API riêng (Manifest → Job → Result) + lớp tương thích <code>raytwin.compat</code></td><td>CI so sánh qua lớp tương thích; khi Sionna đổi API chỉ phải sửa lớp này. Client chế độ phân tán dùng NATS, không dùng gRPC (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-06</a>)</td></tr>
+<tr><td>Phân phối công việc</td><td>NATS JetStream</td><td>Worker kéo task; retention WorkQueue; in-progress ack cho task dài; MaxDeliver hữu hạn; message chỉ mang tham chiếu; subject theo job; ba loại task <code>radio_map</code>, <code>paths</code>, <code>tape</code> (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-05</a>)</td></tr>
+<tr><td>Vòng tối ưu hiệu chỉnh</td><td>PyTorch qua PyO3</td><td>Rust xuất tape đường đi cố định dạng NumPy không sao chép; tối ưu bằng Adam hoặc L-BFGS; vật lý cường độ cài trong PyTorch, test khớp Rust ≤ 10<sup>−6</sup> (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-08</a>)</td></tr>
 <tr><td>Backend GPU</td><td>Có trong MVP: wgpu với cả ray query (Vulkan, RT core) và compute shader, chọn khi chạy</td><td>Bố cục SoA, pipeline wavefront dùng chung cho hai đường GPU; CPU làm tham chiếu</td></tr>
 <tr><td>Phạm vi GPU</td><td>Toàn bộ pipeline, kể cả image method</td><td>Image method dùng f64 trong shader (<code>SHADER_F64</code>, chỉ Vulkan) để giữ |Δτ| ≤ 1 ps</td></tr>
-<tr><td>Tất định GPU</td><td>Trùng từng bit giữa các lần chạy; lệch CPU ≤ 10<sup>−4</sup></td><td>RNG theo bộ đếm với khóa (seed, Tx), không chứa job; cộng dồn fixed-point 64 bit ở mọi backend và mọi part; sắp xếp danh sách đường trước khi xuất (<a href="adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>)</td></tr>
+<tr><td>Tất định GPU</td><td>Trùng từng bit giữa các lần chạy; lệch CPU ≤ 10<sup>−4</sup></td><td>RNG theo bộ đếm với khóa (seed, Tx), không chứa job; cộng dồn fixed-point 64 bit ở mọi backend và mọi part; sắp xếp danh sách đường trước khi xuất (<a href="architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>)</td></tr>
 <tr><td>Hiệu năng GPU</td><td>Chỉ đo và báo cáo</td><td>Cùng phép đo chuẩn với CPU, kèm số đo Sionna CUDA</td></tr>
 <tr><td>Nền tảng GPU</td><td>Linux và Windows qua Vulkan; macOS chạy CPU</td><td>Wheel macOS chỉ có backend CPU trong MVP</td></tr>
-<tr><td>CI cho GPU</td><td>Runner tự host có GPU, chỉ cho PR tin cậy hoặc PR từ fork đã gắn nhãn <code>gpu-ok</code> (sửa trong buổi rà soát kiến trúc)</td><td>Kiểm thử cả hai đường GPU trên phần cứng thật mà không chạy mã lạ trên laptop (<a href="adr/0010-trusted-pull-requests-on-the-gpu-runner.md">ADR 0010</a>)</td></tr>
+<tr><td>CI cho GPU</td><td>Runner tự host có GPU, chỉ cho PR tin cậy hoặc PR từ fork đã gắn nhãn <code>gpu-ok</code> (sửa trong buổi rà soát kiến trúc)</td><td>Kiểm thử cả hai đường GPU trên phần cứng thật mà không chạy mã lạ trên laptop (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-10</a>)</td></tr>
 <tr><td>Hiệu năng lõi SBR (thành phần 2)</td><td>Chỉ đo và báo cáo</td><td>Phép đo chuẩn trên <code>munich</code>, kèm số đo Sionna LLVM</td></tr>
 <tr><td>Bản đồ 3D (thành phần 4)</td><td>Voxel 5 m; ô đủ tia ≥ 100 đoạn</td><td>Khoảng 1,92 MB cho mỗi Tx và mỗi băng trên vùng 1 km² × 60 m; nhiễu cỡ 0,4 dB ở ô đủ tia</td></tr>
 <tr><td>Ngưỡng Gate 1</td><td>Giữ đề xuất; thêm |Δτ| ≤ 1 ps</td><td>Path gain lệch trung vị ≤ 1 dB, P90 ≤ 3 dB; CIR tìm đủ đường gương của Sionna, |a| lệch ≤ 0,1 dB, |Δτ| ≤ 1 ps</td></tr>
@@ -1492,12 +2046,21 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
 <tr><td>Gate 2 (thành phần 8)</td><td>Như đề xuất</td><td>≤ 10<sup>−6</sup> tương đối (thực tế trùng từng bit nhờ fixed-point mọi nơi); tăng tốc ≥ 3 lần từ 1 lên 4 worker; chịu được việc dừng một worker</td></tr>
 <tr><td>Nghiệm thu hiệu chỉnh v0 (thành phần 9)</td><td>RMSE giảm ≥ 30% và đúng thứ hạng</td><td>Trên cell và tilt để dành; Spearman ρ<sub>s</sub> ≥ 0,8</td></tr>
 <tr><td>Phát hành (thành phần 10)</td><td>Repo công khai, bản 0.1, giấy phép MIT OR Apache-2.0</td><td>Đăng crates.io và PyPI sau khi tra cứu nhãn hiệu RayTwin</td></tr>
-<tr><td>Định danh snapshot</td><td>Hash của manifest chuẩn hóa, không gồm URI; lưu theo đường dẫn người dùng chọn</td><td>Kiểm hash khi đọc; mọi lần ghi của RayTwin là create-only (<a href="adr/0002-snapshot-identity-and-path-based-storage.md">ADR 0002</a>)</td></tr>
-<tr><td>Giao thức client</td><td>Chỉ NATS: request/reply cho submit và cancel, KV cho trạng thái</td><td>Không có gRPC trong MVP; job id là hash của job spec, nên gửi lại an toàn (<a href="adr/0005-nats-as-the-client-protocol.md">ADR 0005</a>)</td></tr>
-<tr><td>Hủy job</td><td>Có trong MVP</td><td>Purge task theo subject của job; worker dừng ở nhịp in-progress; sự kiện tới muộn bị bỏ qua (<a href="adr/0005-nats-as-the-client-protocol.md">ADR 0005</a>)</td></tr>
-<tr><td>API plugin</td><td>Không có trong 0.1; trait chỉ dùng nội bộ khi có từ hai cài đặt trở lên</td><td>Thành phần 10 bỏ plugin mẫu; sau MVP: plugin chạy CPU trước, rồi lấy mẫu thành dữ liệu cho GPU (<a href="adr/0007-no-public-plugin-api-in-release-0-1.md">ADR 0007</a>)</td></tr>
-<tr><td>Định dạng kết quả</td><td>Chỉ Zarr; Parquet chỉ cho MDT ở phía Python</td><td>Lõi Rust không phụ thuộc arrow hay parquet (<a href="adr/0009-zarr-as-the-only-result-format.md">ADR 0009</a>)</td></tr>
-<tr><td>Hiệu chỉnh ở chế độ phân tán</td><td>Có: job loại <code>tape</code></td><td>Tape lưu Zarr; δ trung gian ghi vào <code>calib/</code> trước mỗi lần dò lại (<a href="adr/0008-calibration-on-frozen-paths-in-pytorch.md">ADR 0008</a>)</td></tr>
+<tr><td>Định danh snapshot</td><td>Hash của manifest chuẩn hóa, không gồm URI; lưu theo đường dẫn người dùng chọn</td><td>Kiểm hash khi đọc; mọi lần ghi của RayTwin là create-only (<a href="architecture/adr/0002-snapshot-identity-and-path-based-storage.md">ADR 0002</a>)</td></tr>
+<tr><td>Giao thức client</td><td>Chỉ NATS: request/reply cho submit và cancel, KV cho trạng thái</td><td>Không có gRPC trong MVP; job id là hash của job spec, nên gửi lại an toàn (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-06</a>)</td></tr>
+<tr><td>Hủy job</td><td>Có trong MVP</td><td>Purge task theo subject của job; worker dừng ở nhịp in-progress; sự kiện tới muộn bị bỏ qua (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-06</a>)</td></tr>
+<tr><td>API plugin</td><td>Không có trong 0.1; trait chỉ dùng nội bộ khi có từ hai cài đặt trở lên</td><td>Thành phần 10 bỏ plugin mẫu; sau MVP xem hàng "API plugin từ bản 0.2" bên dưới (<a href="architecture/adr/0004-plugin-api.md">ADR 0004</a>)</td></tr>
+<tr><td>Định dạng kết quả</td><td>Chỉ Zarr; Parquet chỉ cho MDT ở phía Python</td><td>Lõi Rust không phụ thuộc arrow hay parquet (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-09</a>)</td></tr>
+<tr><td>Hiệu chỉnh ở chế độ phân tán</td><td>Có: job loại <code>tape</code></td><td>Tape lưu Zarr; δ trung gian ghi vào <code>calib/</code> trước mỗi lần dò lại (<a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-08</a>)</td></tr>
+<tr><td>Mô phỏng chất lượng dịch vụ (30/10/2026)</td><td>Sau MVP, bản 0.2; flow-level, viết bằng Python; kết quả là chuỗi thời gian để replay</td><td>Association, tải ghép nhiễu, Shannon có chặn, processor sharing, A3; dùng để xếp hạng kịch bản; không thêm loại task (<a href="#qos">mục 17</a>, <a href="architecture/ARCHITECTURE.md#10-decisions-and-rationale">quyết định D-11</a>)</td></tr>
+<tr><td>Đại lượng so khớp MDT</td><td>RSRP qua toán tử đo; RSS chỉ là giá trị dẫn xuất</td><td>EPRE từ RAN config, gộp beam SSB, lượng tử 1 dB (<a href="#vl-rsrp">mục 11.7</a>, quyết định D-14)</td></tr>
+<tr><td>RAN config</td><td>Tài liệu riêng có hash, tách khỏi snapshot</td><td>Đổi công suất, CIO, tham số handover, bật/tắt cell không cần dò lại tia (<a href="architecture/adr/0002-snapshot-identity-and-path-based-storage.md">ADR 0002</a>)</td></tr>
+<tr><td>Dữ liệu trả về và trình xem</td><td>Thuộc tính lưới, CRS, mảng <code>segments</code>, <code>Scene.mesh</code>, accessor cấu hình; <code>raytwin.viz</code> từ bản 0.1</td><td>Đủ cho trình xem và UI sau này (quyết định D-16)</td></tr>
+<tr><td>API plugin từ bản 0.2</td><td>0.1 không có; 0.2: plugin Python ở client (PL-01 đến PL-07); 0.3: PL-08 đến PL-11; bỏ PL-12</td><td>Worker không chạy code plugin; GPU chỉ thấy bảng dữ liệu (<a href="#plugin">mục 18</a>, <a href="architecture/adr/0004-plugin-api.md">ADR 0004</a>)</td></tr>
+<tr><td>Các Tx độc lập, cache theo Tx</td><td>s theo Tx từ bản 0.1; cache từ bản 0.3</td><td>Đổi tilt của k cell chỉ dò lại k Tx (<a href="architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md">ADR 0003</a>)</td></tr>
+<tr><td>Chỉnh sửa, lịch sử, rollback</td><td>Config delta; reference log chỉ ghi thêm; rollback không xóa</td><td>Bản 0.2 (<a href="#tt-moc">mục 19.3</a>, <a href="architecture/adr/0002-snapshot-identity-and-path-based-storage.md">ADR 0002</a>)</td></tr>
+<tr><td>UI tương tác, theo dõi MDT liên tục</td><td>Chưa làm; giữ các móc trong thiết kế</td><td>Giai đoạn sau bản 0.3 (<a href="#tuong-tac">mục 19</a>)</td></tr>
+<tr><td>Tổ chức ADR</td><td>Giai đoạn thiết kế: 4 ADR trong <code>docs/architecture/adr/</code>, sửa trực tiếp, đánh số liên tục</td><td>Quyết định khác là một hàng ở mục 10 của tài liệu kiến trúc</td></tr>
 </tbody></table></div>
 
 <h2 id="tham-khao">Tài liệu tham khảo</h2>
@@ -1510,12 +2073,14 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
   <li><a href="https://nvlabs.github.io/sionna/rt/developer/dev_custom_radio_materials.html">Understanding Radio Materials</a>, <a href="https://nvlabs.github.io/sionna/rt/tutorials/Scene-Edit.html">Tutorial on Loading and Editing of Scenes</a>, <a href="https://nvlabs.github.io/sionna/sys/index.html">Sionna SYS</a></li>
   <li>Mã nguồn sionna-rt 2.2.0 (commit 15b5ee0, 29/9/2026): <a href="https://github.com/NVlabs/sionna-rt/blob/main/src/sionna/rt/scene.py">scene.py</a>, <a href="https://github.com/NVlabs/sionna-rt/blob/main/src/sionna/rt/radio_materials/itu.py">itu.py</a>, <a href="https://github.com/NVlabs/sionna-rt/tree/main/src/sionna/rt/scenes">thư mục scenes</a></li>
   <li><a href="https://github.com/NVlabs/sionna-large-radio-maps">sionna-large-radio-maps</a></li>
+  <li>Sionna SYS: <a href="https://nvlabs.github.io/sionna/sys/api/link_adaptation.html">Link adaptation</a>, <a href="https://nvlabs.github.io/sionna/sys/api/abstraction.html">PHY Abstraction</a></li>
 </ul>
 <h4>NVIDIA AODT</h4>
 <ul class="refs">
   <li><a href="https://github.com/NVIDIA/aerial-omniverse-digital-twin">AODT trên GitHub</a>, <a href="https://developer.nvidia.com/topics/telecommunications/ai-aerial">NVIDIA AI Aerial</a></li>
   <li><a href="https://forums.developer.nvidia.com/t/announcement-nvidia-aodt-1-5-and-aodt-client-on-github-release-notification/373528">Thông báo AODT 1.5 (16/6/2026)</a>, <a href="https://forums.developer.nvidia.com/t/ai-aerial-faq-6-6-simulating-6g-with-nvidia-aerial-omniverse-digital-twin/373039">AI Aerial FAQ 6/6</a></li>
   <li><a href="https://docs.nvidia.com/aerial/aerial-dt/text/installation.html">AODT Installation</a>, <a href="https://docs.nvidia.com/aerial/archive/aerial-dt/1.1/text/ran_digital_twin.html">AODT RAN Digital Twin v1.1</a></li>
+  <li><a href="https://docs.nvidia.com/aerial/aerial-dt/archive/1.4.1/text/ran_digital_twin.html">AODT RAN Digital Twin 1.4</a>, <a href="https://docs.nvidia.com/aerial/aerial-dt/archive/1.3.0/text/gui.html">AODT Graphical User Interface 1.3</a></li>
 </ul>
 <h4>Bài báo</h4>
 <ul class="refs">
@@ -1524,20 +2089,32 @@ snap.commit_field(d_eps.detach().numpy(), d_sig.detach().numpy(), message="calib
   <li><a href="https://arxiv.org/abs/2603.13383">An et al., Taming Vision Priors for Data Efficient mmWave Channel Modeling (arXiv 2603.13383)</a></li>
   <li><a href="https://riuma.uma.es/entities/publication/eb4888b3-22d4-4b70-b997-74687973bc0b">Sánchez et al., On the Improvement of Cellular Coverage Maps by Filtering MDT Measurements, IEEE TMC 2023</a></li>
   <li><a href="https://arxiv.org/abs/math-ph/0401050">Wirgin, "The inverse crime", arXiv:math-ph/0401050, 2004</a></li>
+  <li><a href="https://arxiv.org/abs/1201.4116">Siomina &amp; Yuan, Analysis of Cell Load Coupling for LTE Network Planning and Optimization, IEEE TWC 2012 (arXiv 1201.4116)</a></li>
+  <li><a href="https://researchportal.ip-paris.fr/en/publications/flow-level-performance-and-capacity-of-wireless-networks-with-use/">Bonald et al., Flow-level performance and capacity of wireless networks with user mobility, Queueing Systems 2009</a></li>
+  <li><a href="https://www.themoonlight.io/en/review/geo2commap-deep-learning-based-mimo-throughput-prediction-using-geographic-data">Geo2ComMap: Deep Learning-Based MIMO Throughput Prediction Using Geographic Data (tóm tắt)</a></li>
+  <li>Monte Carlo trong công cụ quy hoạch: <a href="https://www.telecomhall.net/t/monte-carlo-simulation-in-atoll/8789">Monte Carlo simulation in Atoll (telecomhall)</a>, <a href="https://jurnalet.brin.go.id/jet/article/view/251">Subscriber Growth Forecasting of LTE Network using Monte Carlo Simulation</a></li>
 </ul>
 <h4>Tiêu chuẩn 3GPP và ITU</h4>
 <ul class="refs">
   <li><a href="https://itecspec.com/3gpp/37.320/s/5.1.1.3.3">3GPP TS 37.320 §5.1.1.3.3, Reporting parameters (MDT)</a></li>
   <li><a href="https://itecspec.com/3gpp/38.101-2/s/5.1">3GPP TS 38.101-2 §5.1 (Rel-19)</a>: định nghĩa FR1, FR2-1, FR2-2</li>
   <li><a href="https://www.itu.int/rec/R-REC-P.676/en">ITU-R P.676-13 (08/2022)</a>: suy hao do khí quyển</li>
+  <li><a href="https://itecspec.com/3gpp/37.320/s/5.4.1.1">3GPP TS 37.320 §5.4.1.1 (Rel-19)</a>: số đo immediate MDT của NR (M1 đến M10)</li>
+  <li>3GPP TS 38.215: <a href="https://itecspec.com/3gpp/38.215/s/5.1.1">§5.1.1 SS-RSRP</a>, <a href="https://www.itecspec.com/3gpp/38.215/s/5.1.3">§5.1.3 SS-RSRQ</a></li>
+  <li>3GPP TS 38.331: <a href="https://itecspec.com/3gpp/38.331/s/5.5.3.2">§5.5.3.2 lọc L3</a>, <a href="https://itecspec.com/3gpp/38.331/s/5.5.3.3">§5.5.3.3 chất lượng cell từ beam</a>, <a href="https://itecspec.com/3gpp/38.331/s/5.5.4.4">§5.5.4.4 sự kiện A3</a></li>
+  <li><a href="https://3gpp.org/ftp/tsg_ran/WG4_Radio/TSGR4_98bis_e/Inbox/Drafts/%5B98bis-e%5D%5B212%5D%20NR_CSIRS_L3meas_1/documents/R4-21XXXX%20revised%20CR%20on%20CSI-RSRP%20report%20mapping.docx">Bản nháp CR của TS 38.133</a>: dải báo cáo SS-RSRP</li>
+  <li><a href="https://www.itecspec.com/3gpp/36.942/s/a.1">3GPP TR 36.942 Phụ lục A.1</a>, <a href="https://itecspec.com/3gpp/38.803/s/5.2.7">TR 38.803 §5.2.7</a>: Shannon có hệ số suy giảm và chặn</li>
+  <li><a href="https://www.itecspec.com/3gpp/38.214/s/5.2.2.1">3GPP TS 38.214 §5.2.2.1</a>: bảng CQI; <a href="https://www.itecspec.com/3gpp/38.306/s/4.1.2">TS 38.306 §4.1.2</a>: tốc độ tối đa và overhead</li>
+  <li><a href="https://www.3gpp.org/ftp/tsg_SA/WG5_TM/Draft_Specs/28313-k00.docx">3GPP TS 28.313</a>: SON cho 5G; <a href="https://itecspec.com/3gpp/32.422/s/4.1.1.2a">TS 32.422</a>: kích hoạt MDT và sự đồng ý của người dùng</li>
 </ul>
 <h4>Hệ sinh thái Rust và hạ tầng</h4>
 <ul class="refs">
   <li><a href="https://github.com/jeertmans/differt">DiffeRT</a>, <a href="https://lib.rs/crates/obvhs">obvhs</a>, <a href="https://lib.rs/crates/embree4-sys">embree4-sys</a>, <a href="https://lib.rs/crates/object_store">object_store</a>, <a href="https://docs.rs/crate/zarrs/latest">zarrs</a>, <a href="https://github.com/PyO3/pyo3">PyO3</a></li>
   <li><a href="https://wgpu.rs/doc/wgpu/documentation/extensions/ray_tracing/index.html">wgpu: Experimental Ray Tracing</a>, <a href="https://github.com/Rust-GPU/rust-cuda">Rust-CUDA</a>, <a href="https://rust.googlesource.com/rust-lang/rustc-dev-guide/+/e60f2f03f8cf8babb3de043098b336d123e4be21/src/autodiff/installation.md">std::autodiff installation (rustc-dev-guide)</a></li>
   <li>NATS JetStream: <a href="https://docs.nats.io/learn/jetstream/retention-policies">Retention policies</a>, <a href="https://docs.nats.io/nats-concepts/jetstream/consumers">Consumers</a>, <a href="https://docs.nats.io/learn/jetstream/acknowledgment">Ack responses and redelivery</a>, <a href="https://beta-docs.nats.io/ref/config/max_payload">max_payload</a>; <a href="https://docs.rs/async-nats/latest/async_nats/jetstream/index.html">async-nats jetstream</a></li>
+  <li><a href="https://packaging.python.org/specifications/entry-points">PyPA Entry points specification</a>, <a href="https://docs.python.org/3/library/importlib.metadata.html">importlib.metadata</a>, <a href="https://hub.docker.com/r/mikedh/trimesh">trimesh</a></li>
 </ul>
-<div class="foot">RayTwin · Tài liệu kỹ thuật phiên bản 1.1 · 29/10/2026. Các số liệu về phần mềm bên thứ ba đúng tại thời điểm khảo sát; Sionna và AODT thay đổi nhanh, cần kiểm tra lại theo phiên bản khi dùng.</div>
+<div class="foot">RayTwin · Tài liệu kỹ thuật phiên bản 1.2 · 30/10/2026. Các số liệu về phần mềm bên thứ ba đúng tại thời điểm khảo sát; Sionna và AODT thay đổi nhanh, cần kiểm tra lại theo phiên bản khi dùng.</div>
 
   </main>
 </div>

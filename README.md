@@ -13,9 +13,9 @@ RayTwin is a Rust ray-tracing engine that calculates versioned 3D radio maps and
 | **Contact** | [GitHub Issues](https://github.com/NguyenVu04/ray-twin/issues) |
 | **Source of record** | <https://github.com/NguyenVu04/ray-twin> |
 | **Issue tracker** | <https://github.com/NguyenVu04/ray-twin/issues> |
-| **Design document** | [`docs/technical-report.html`](docs/technical-report.html) (Vietnamese, version 1.1, 29 October 2026) |
+| **Design document** | [`docs/technical-report.html`](docs/technical-report.html) (Vietnamese, version 1.2, 30 October 2026) |
 | **Architecture** | [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) |
-| **Decisions** | [`docs/adr/`](docs/adr/README.md) |
+| **Decisions** | [`docs/architecture/adr/`](docs/architecture/adr/README.md) and [section 10 of the architecture](docs/architecture/ARCHITECTURE.md#10-decisions-and-rationale) |
 
 ## Contents
 
@@ -24,6 +24,7 @@ RayTwin is a Rust ray-tracing engine that calculates versioned 3D radio maps and
 - [How it works](#how-it-works)
 - [Compute backends](#compute-backends)
 - [Material field and calibration](#material-field-and-calibration)
+- [Service-quality simulation (release 0.2)](#service-quality-simulation-release-02)
 - [Getting started](#getting-started)
 - [Configuration](#configuration)
 - [Usage](#usage)
@@ -56,7 +57,11 @@ The MVP (release 0.1) contains these capabilities:
 - Scene loading from local disk, S3, or MinIO.
 - A distributed mode with work distribution through NATS JetStream.
 - A Python API, a Sionna-compatible API layer (`raytwin.compat`), and calibration with PyTorch.
+- Self-describing results. Each result array has its grid, its band and transmitter ids, the coordinate reference of the scene, and the ray-segment count of each voxel.
+- A 3D viewer in Jupyter, and a glTF export of the scene, a map slice, and the ray paths.
 - A public release 0.1 with Python wheels for Linux, macOS, and Windows.
+
+Release 0.2 adds service-quality simulation from MDT and a plugin API. Release 0.3 adds antenna-pattern and material tables, scene importers, and a SON loop. See [Roadmap](#roadmap).
 
 ### Glossary
 
@@ -66,6 +71,10 @@ The MVP (release 0.1) contains these capabilities:
 | Digital twin | A numerical model of the real network. Measurement data updates the model continuously. | Test 5 tilt values on the twin. Apply only the best value to the live network. |
 | RSRP | Reference Signal Received Power. The average power per resource element (RE) that carries a reference signal, in dBm. | −92 dBm is a typical urban value. |
 | SINR | The ratio of the wanted signal power to the sum of co-channel interference and thermal noise. | 20 dB SINR means that the signal is 100 times stronger than interference plus noise. |
+| RAN config | The radio parameters that act only when RayTwin reads a result: reference-signal power per resource element (EPRE), cell on/off state, noise figure, UE gain, and from release 0.2 offsets and handover parameters. It has its own hash. | A change of the cell individual offset needs no new trace. |
+| Cell load | The fraction of the resource blocks of a cell that its users need. | A load of 0.74 means that the users need 74 % of the blocks. |
+| User association, CIO | The selection of the serving cell of each user. The cell individual offset (CIO) adds to the RSRP of one cell when the UE compares cells. | A CIO of +3 dB moves users at the cell edge to that cell. |
+| Handover, event A3 | A handover moves a user to another cell. Event A3 starts it when a neighbor cell is better than the serving cell by an offset for a time to trigger (TTT). | Hysteresis 1 dB, offset 3 dB, TTT 320 ms. |
 | MDT | Minimization of Drive Tests (3GPP TS 37.320). The phone records and reports measurements, such as RSRP and, when available, a GNSS position. | A sample without GNSS has only a cell ID and an RF fingerprint, so its position is not accurate. |
 | CM, PM | Configuration Management (power, tilt, azimuth, antenna type). Performance Management (KPI statistics over time). | An incorrect CM tilt value causes an incorrect calibration of the materials. |
 | FR1, FR2-1, FR2-2 | 5G NR frequency ranges: 410–7125 MHz, 24.25–52.6 GHz, 52.6–71 GHz (TS 38.101-2 §5.1). | Band n78 (3.5 GHz) is in FR1. |
@@ -132,10 +141,10 @@ In library mode, the Python API calls `raytwin-core` in the same process. Librar
 ### Design principles
 
 1. **Separate the core from the runtime.** `raytwin-core` contains all the physics. The distributed layer and the Python layer are thin wrappers. Thus the two modes give the same results.
-2. **Immutable snapshots, identified by content hash.** The manifest contains the geometry, material field, antennas, bands, and solver parameters, including the seed. The snapshot id does not include URIs. RayTwin checks the hash of each input when it reads the input, and it never overwrites an object. Workers cache data by hash, so they do not need to synchronize state ([ADR 0002](docs/adr/0002-snapshot-identity-and-path-based-storage.md)).
+2. **Immutable snapshots, identified by content hash.** The manifest contains the geometry, material field, antennas, bands, and solver parameters, including the seed. The snapshot id does not include URIs. RayTwin checks the hash of each input when it reads the input, and it never overwrites an object. Workers cache data by hash, so they do not need to synchronize state ([ADR 0002](docs/architecture/adr/0002-snapshot-identity-and-path-based-storage.md)).
 3. **Split work by transmitter × ray batch.** A radio map is an incoherent sum of power. Thus the sum of partial maps is equal to the full map. For a very large area, RayTwin also splits the area into tiles with a buffer zone.
-4. **Internal traits, no plugin API in release 0.1.** A trait exists only where two or more implementations exist. In the MVP that is only `Backend`. Materials, antennas, interactions, and map accumulation are concrete types ([ADR 0007](docs/adr/0007-no-public-plugin-api-in-release-0-1.md)).
-5. **Determinism.** The random-number key is (manifest seed, Tx), and the counter is (global ray index, bounce). The key contains no job id and no batch index. Every backend and every partial result accumulates with 64-bit fixed-point integers. Thus the result does not depend on thread count, worker count, batch size, or merge order. Two jobs that compare two tilt values use the same random numbers. This also makes it safe to run a task again after a worker failure ([ADR 0003](docs/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md)).
+4. **Internal traits in release 0.1, plugins from release 0.2.** In release 0.1, a trait exists only where two or more implementations exist, which is only `Backend`. From release 0.2, Python plugins in the client process extend data input, service-quality models, KPIs, and export. From release 0.3, antenna patterns and materials can be tables in the snapshot. No plugin code runs in the Rust crates or on the workers ([ADR 0004](docs/architecture/adr/0004-plugin-api.md)).
+5. **Determinism.** The random-number key is (manifest seed, Tx), and the counter is (global ray index, bounce). The key contains no job id and no batch index. Every backend and every partial result accumulates with 64-bit fixed-point integers. Thus the result does not depend on thread count, worker count, batch size, or merge order. Two jobs that compare two tilt values use the same random numbers. Each transmitter has its own key and its own fixed-point scale, so a change of one transmitter does not change the results of the others. This also makes it safe to run a task again after a worker failure ([ADR 0003](docs/architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md)).
 6. **One trace, many bands.** All bands share the path geometry. Each worker calculates the field and the accumulation for all bands of its ray batch.
 
 ### Components
@@ -145,18 +154,21 @@ In library mode, the Python API calls `raytwin-core` in the same process. Librar
 | `raytwin-core` | Geometry, BVH, SBR, image method, materials, antennas, voxel radio map, CIR. No network or Python dependency. | `raytwin-core` crate (planned) |
 | `raytwin-store` | Read and write snapshots, manifests, and Zarr arrays through `object_store` (local, S3, MinIO). Check input hashes. Parse Mitsuba XML and PLY. | `raytwin-store` crate (planned) |
 | `raytwin-dist` | Coordinator, worker, task queue on NATS JetStream, NATS job protocol (submit, cancel, job state). Binary `raytwin` with the subcommands `coordinator` and `worker`. | `raytwin-dist` crate (planned) |
-| `raytwin-py` (package `raytwin`) | PyO3 binding: native API, `raytwin.compat` (Sionna-compatible names), `raytwin.calib` (PyTorch calibration). | `raytwin-py` crate (planned) |
+| `raytwin-py` (package `raytwin`) | PyO3 binding: native API, `raytwin.compat` (Sionna-compatible names), `raytwin.calib` (PyTorch calibration), `raytwin.mdt` (canonical MDT input), `raytwin.viz` (3D viewer). From release 0.2 also `raytwin.qos` (service quality) and `raytwin.plugins`. | `raytwin-py` crate (planned) |
 
 ### Data model: snapshot and manifest
 
 A manifest describes all inputs of one simulation. The hash of the manifest identifies the snapshot. Two runs with the same hash give the same result. The hash covers the canonical manifest (RFC 8785) without its URI fields. Thus the same scene on local disk, MinIO, or S3 gets the same snapshot id. Inputs stay at the paths that the user selects. RayTwin checks each hash when it reads the input, and it writes every object create-only. When calibration makes a new material field, only the field gets a new version. The geometry and the antennas keep their hashes.
+
+The snapshot holds only the inputs of the ray trace. The scene can have a coordinate reference (`crs`: an EPSG code and the origin of the scene coordinates). RayTwin uses it to convert MDT positions. Radio parameters are in a separate RAN config with its own hash, so a change of power, offset, or handover parameters needs no new trace. An edit never changes a snapshot or a RAN config. A config delta makes a new one with a new hash. From release 0.2, a named reference records the history of a plan, and a rollback adds an entry that points to an earlier configuration ([ADR 0002](docs/architecture/adr/0002-snapshot-identity-and-path-based-storage.md)).
 
 Example manifest (illustrative, not a fixed format):
 
 ```json
 {
   "schema": "raytwin.manifest/v1",
-  "scene": { "uri": "s3://raytwin/scenes/munich/munich.xml", "hash": "blake3:9f2c…" },
+  "scene": { "uri": "s3://raytwin/scenes/munich/munich.xml", "hash": "blake3:9f2c…",
+             "crs": { "epsg": 32632, "origin": [691000.0, 5334000.0, 0.0] } },
   "materials": { "prior": "itu-classes",
                  "field": { "uri": "s3://raytwin/fields/munich/v3.zarr", "hash": "blake3:7a01…" } },
   "bands": [
@@ -182,7 +194,7 @@ Example manifest (illustrative, not a fixed format):
 | Storage | Local disk is sufficient | S3 or MinIO |
 | Use | Research, notebooks, CI | Large areas, many transmitters |
 
-The two modes use the same `Task` type and the same two functions, `run_task` and `merge`. The compute core does not know which mode it runs in ([ADR 0001](docs/adr/0001-one-core-two-runtime-modes.md)).
+The two modes use the same `Task` type and the same two functions, `run_task` and `merge`. The compute core does not know which mode it runs in ([ADR 0001](docs/architecture/adr/0001-one-core-two-runtime-modes.md)).
 
 ### Work distribution with NATS JetStream
 
@@ -225,9 +237,9 @@ sequenceDiagram
 | A message contains only references: manifest hash, Tx, ray range, result key. | Messages stay much smaller than the 1 MB `max_payload` default. Large data goes through S3 or MinIO. |
 | Worker order: write result, then publish the "done" event, then ack. | If a worker stops at any step, the task runs again with the same result. The second write is create-only, and it counts as success when the hash agrees. The coordinator deduplicates events by task ID. |
 | Stream `RAYTWIN_EVENTS` for completion and failure events. KV bucket `RAYTWIN_JOBS` for job state. | The coordinator tracks progress without a listing of the object store. |
-| Subjects per job: `raytwin.tasks.<job>.<task>`. | The coordinator can purge all queued tasks of one job when the job is cancelled or fails ([ADR 0004](docs/adr/0004-work-distribution-with-nats-jetstream.md)). |
+| Subjects per job: `raytwin.tasks.<job>.<task>`. | The coordinator can purge all queued tasks of one job when the job is cancelled or fails ([D-05](docs/architecture/ARCHITECTURE.md#10-decisions-and-rationale)). |
 | Three task kinds: `radio_map` (Tx × ray batch, merged by integer addition), `paths` and `tape` (Tx × receiver group or MDT sample group, merged by concatenation in task order). | Calibration also runs in distributed mode. `paths` and `tape` need no global deduplication. |
-| Clients submit with a request on `raytwin.jobs.submit` and cancel with a request on `raytwin.jobs.cancel`. They watch the job state in the KV bucket. | One protocol serves clients and workers. The coordinator and the workers open no listening port ([ADR 0005](docs/adr/0005-nats-as-the-client-protocol.md)). |
+| Clients submit with a request on `raytwin.jobs.submit` and cancel with a request on `raytwin.jobs.cancel`. They watch the job state in the KV bucket. | One protocol serves clients and workers. The coordinator and the workers open no listening port ([D-06](docs/architecture/ARCHITECTURE.md#10-decisions-and-rationale)). |
 | The job id is the hash of the canonical job spec. | A second submission is safe. A running job returns its state, a finished job returns its result, and a failed or cancelled job runs again. |
 | To cancel, the coordinator sets the state to `cancelled` and purges the queued tasks. A worker reads the state at each in-progress tick and stops between two ray sub-batches. | No new task of the job starts after the reply. A running task stops within about one tick (10 s). |
 
@@ -244,7 +256,7 @@ For CIR jobs, the coordinator splits tasks by (Tx, receiver group), not by ray b
 
 ### Extension points
 
-**Decided.** Release 0.1 has no public plugin API ([ADR 0007](docs/adr/0007-no-public-plugin-api-in-release-0-1.md)). A WGSL shader cannot call a Rust trait object, so a plugin trait would not run on the GPU backends. The only trait is the internal seam `Backend`, which has three implementations. It is not part of the stable API. The signature below is illustrative.
+**Decided.** Release 0.1 has no public plugin API ([ADR 0004](docs/architecture/adr/0004-plugin-api.md)). A WGSL shader cannot call a Rust trait object, so a plugin trait would not run on the GPU backends. The only trait is the internal seam `Backend`, which has three implementations. It is not part of the stable API. The signature below is illustrative.
 
 ```rust
 /// Cpu (rayon + obvhs), GpuCompute (WGSL, own BVH traversal), GpuRayQuery (Vulkan, RT cores).
@@ -258,7 +270,25 @@ pub trait Backend: Send + Sync {
 }
 ```
 
-The other points are concrete types. `MaterialField` is a struct (ITU class prior plus δ grid). `AntennaPattern` is an enum (isotropic, dipole, TR 38.901). Interactions are functions (specular reflection, thin-slab transmission). After the MVP, a plugin API can keep the same signatures. Plugin jobs then run on the CPU first. Later, the core samples a plugin into a grid or a table that the GPU can read.
+The other points are concrete types. `MaterialField` is a struct (ITU class prior plus δ grid). `AntennaPattern` is an enum (isotropic, dipole, TR 38.901). Interactions are functions (specular reflection, thin-slab transmission).
+
+**Decided.** From release 0.2, plugins extend RayTwin outside the trace kernel ([ADR 0004](docs/architecture/adr/0004-plugin-api.md)). A code plugin is a Python distribution that registers an entry point in one plugin group. RayTwin finds it with `importlib.metadata` from the standard library. Code plugins run only in the client process.
+
+| # | Plugin group | The plugin supplies | Release |
+|---|---|---|---|
+| PL-01 | `raytwin.mdt_readers` | A reader of MDT, PM, or CM data to the canonical MDT schema | 0.2 |
+| PL-02 | `raytwin.qos.association` | The selection of the serving cell | 0.2 |
+| PL-03 | `raytwin.qos.link` | The map from SINR to rate | 0.2 |
+| PL-04 | `raytwin.qos.sharing` | The sharing of cell resources between users | 0.2 |
+| PL-05 | `raytwin.qos.mobility` | Trajectories and the handover decision | 0.2 |
+| PL-06 | `raytwin.qos.scenario` | The user population and the traffic | 0.2 |
+| PL-07 | `raytwin.kpi`, `raytwin.exporters` | KPI definitions, and export to GeoTIFF, Parquet, or dashboards | 0.2 |
+| PL-08 | `raytwin.pattern_readers` | A reader of vendor antenna files to a pattern table | 0.3 |
+| PL-09 | Table in the snapshot | Material parameters as functions of frequency | 0.3 |
+| PL-10 | `raytwin.scene_importers` | A converter of CityGML, OSM, or glTF to the scene format | 0.3 |
+| PL-11 | `raytwin.son.policies` | A SON policy that proposes configurations | 0.3 |
+
+Antenna patterns and material tables are data, not code. They enter the snapshot with a hash, and the CPU and the GPU interpolate them in the same way. Each code plugin declares an API version. Its name, version, and parameters are part of the run id, so a cached result never belongs to another plugin. A plugin uses only the random generator that RayTwin gives it. RayTwin provides no physics plugins, no WGSL plugins, and no Rust libraries that load at run time.
 
 ### External dependencies
 
@@ -276,6 +306,9 @@ Criticality states the effect on RayTwin when the dependency is not available. *
 | S3 or MinIO | Snapshot and result storage in distributed mode | Degraded (local disk remains) | Deployment operator |
 | PyO3, maturin, `rust-numpy` | Python binding, wheels, zero-copy arrays | Degraded (Rust API remains) | PyO3 project |
 | PyTorch | Calibration loop | Degraded (no calibration) | PyTorch Foundation |
+| pyarrow | MDT input in Parquet | Degraded (no MDT input) | Apache Arrow |
+| trimesh | 3D viewer and glTF export | Optional (no viewer) | trimesh maintainers |
+| Plugin packages (release 0.2) | Readers, service-quality models, KPIs, exporters | Optional (built-in plugins remain) | Plugin authors |
 | Sionna RT 2.2.0 (pinned) | Reference oracle in CI, generator of simulated MDT | Optional at runtime, critical for CI | NVIDIA |
 
 ## How it works
@@ -600,7 +633,7 @@ q_v = \sum_i \operatorname{round}\!\left(\frac{P_i\,\ell_{i,v}}{s}\right) \in \m
 10\log_{10}2^{63} \approx 190\ \mathrm{dB}
 ```
 
-RayTwin selects the scale $s$ per job from the transmit power, the ray count, and the voxel size. The largest sum must stay below $2^{63}$. The dynamic range of about 190 dB is sufficient for RSRP maps. A contribution smaller than $s$ rounds to 0. For example, a contribution of $3.7\cdot10^{-9}$ with $s = 10^{-12}$ is stored as 3700. The job plan fixes $s$ one time, and every task of the job carries the same $s$. An adapter without 64-bit atomics uses the CPU backend. RayTwin has no 32-bit emulation of 64-bit atomics ([ADR 0006](docs/adr/0006-gpu-backends-through-wgpu.md)).
+RayTwin selects the scale $s$ per job from the transmit power, the ray count, and the voxel size. The largest sum must stay below $2^{63}$. The dynamic range of about 190 dB is sufficient for RSRP maps. A contribution smaller than $s$ rounds to 0. For example, a contribution of $3.7\cdot10^{-9}$ with $s = 10^{-12}$ is stored as 3700. The job plan fixes $s$ one time, and every task of the job carries the same $s$. An adapter without 64-bit atomics uses the CPU backend. RayTwin has no 32-bit emulation of 64-bit atomics ([D-07](docs/architecture/ARCHITECTURE.md#10-decisions-and-rationale)).
 
 ### Numerical precision of the CIR
 
@@ -709,7 +742,23 @@ flowchart TD
 
 The tape ignores one effect: the set of paths changes with the materials. The reason is that the Fresnel coefficients set the probability to select reflection or transmission. For this reason, the loop traces rays again after every $K$ iterations. The optimization runs in PyTorch, so a researcher can test loss functions, optimizers, and regularization without a Rust rebuild.
 
-**Decided.** Tapes run in both modes ([ADR 0008](docs/adr/0008-calibration-on-frozen-paths-in-pytorch.md)). In library mode, the tape arrays are NumPy views on Rust memory, with no copy. In distributed mode, a job of kind `tape` writes the tapes in Zarr, and Python reads them into NumPy. The Fresnel and thin-slab formulas exist in Rust and in PyTorch. A CI test requires that both agree within $10^{-6}$ when $\delta = 0$.
+**Decided.** Tapes run in both modes ([D-08](docs/architecture/ARCHITECTURE.md#10-decisions-and-rationale)). In library mode, the tape arrays are NumPy views on Rust memory, with no copy. In distributed mode, a job of kind `tape` writes the tapes in Zarr, and Python reads them into NumPy. The Fresnel and thin-slab formulas exist in Rust and in PyTorch. A CI test requires that both agree within $10^{-6}$ when $\delta = 0$.
+
+### The observable: reported RSRP
+
+**Decided.** RayTwin compares its prediction with the value that the UE reports. MDT reports SS-RSRP and SS-RSRQ (3GPP TS 37.320). It does not report the total received power (RSS). SS-RSRP is the average power per resource element that carries the secondary synchronization signal, at the antenna connector of the UE (TS 38.215). A measurement operator converts the path gain $g_{c,b}$ of cell $c$ in band $b$ into the reported value:
+
+```math
+\widehat{\mathrm{RSRP}}_{c,b}(\mathbf{x}) = Q\!\left[\mathrm{EPRE}_{c,b} + 10\log_{10} g_{c,b}(\mathbf{x}) + G_{\mathrm{UE}} - L_{\mathrm{body}}\right]
+```
+
+$Q$ rounds to 1 dB and clips to the reporting range. The EPRE of the synchronization signal comes from the RAN config. A conversion from total power to RSRP would need assumptions: equal power on all resource elements, no power boost of the synchronization signal, and the same beam pattern for the synchronization signal and the data. If one assumption is wrong, the error is a constant for the cell, and calibration puts it into the material field.
+
+> **Example: a boost of the synchronization signal.**
+> A cell transmits 46 dBm on 3276 subcarriers. Equal power gives an EPRE of $46 - 10\log_{10}3276 \approx 10.85$ dBm.
+> If the operator boosts the synchronization signal by 3 dB, the real EPRE is 13.85 dBm. A prediction from total power is then 3 dB too low everywhere in the cell.
+
+For massive MIMO cells, release 0.3 uses the envelope of the beams of the synchronization signal as one pattern table. The envelope gives an upper bound of the best-beam RSRP.
 
 ### Twin experiment with simulated MDT
 
@@ -734,7 +783,7 @@ flowchart TB
 
 1. Make a "true" material field on `munich`. Assign different ITU materials, or perturb $\varepsilon_r$ and $\sigma$, per building group. RayTwin starts from a uniform prior per class.
 2. Generate RSRP with Sionna RT at UE positions along the streets. Use many cells, many tilts, and at least two FR1 bands.
-3. Add errors: measurement noise, quantization per the 3GPP report mapping, and position error. The fraction of samples with GNSS is a swept parameter.
+3. Add errors: measurement noise, quantization per the 3GPP report mapping, position error, and an EPRE error per cell. The fraction of samples with GNSS is a swept parameter. The EPRE error shows how much of a configuration error goes into the material field.
 4. Calibrate on a part of the cells and tilts. Evaluate on the held-out part. Report the RSRP RMSE, the material parameter error per building, and the rank correctness between configurations.
 
 A different simulator generates the data, so the experiment avoids the "inverse crime". An inverse crime occurs when the same model generates and inverts the data, and the result is unrealistically good (Wirgin, 2004). Both simulators use the same ITU formulas and the same geometry, so the result is only an upper bound. Real MDT or drive-test data is necessary before a conclusion about calibration quality.
@@ -754,6 +803,43 @@ For this reason, RayTwin splits the validation set by cell and by configuration 
 > Then $\sum d^2 = 2$ and $\rho_s = 1 - 6\cdot2/(5\cdot24) = 0.9$.
 > For SON, a correct rank is more important than a small absolute error. If the first two candidates change places, SON applies the wrong configuration.
 
+## Service-quality simulation (release 0.2)
+
+A SON application must also know what the users get: throughput, cell load, and handovers. The service-quality layer `raytwin.qos` calculates these values from a radio map, a RAN config, and a scenario. It is a Python module in the client process. It reads results and traces no rays. The design is in [TR §17](docs/technical-report.html#qos).
+
+A scenario is a set of users with traffic and trajectories, and a seed. It comes from MDT: positions of samples, a user density per voxel scaled to PM counters, or the trajectories of logged MDT. The random generator of a scenario does not use the network configuration. Thus two configurations of one scenario see the same users ([ADR 0003](docs/architecture/adr/0003-deterministic-monte-carlo-with-fixed-point-accumulation.md)).
+
+The model is flow-level. For each time step:
+
+1. **Association.** Each user selects the cell with the highest $\mathrm{RSRP}_c + \mathrm{CIO}_c$ on its carrier.
+2. **Load-coupled SINR.** A neighbor cell $j$ interferes only on the fraction $\rho_j$ of its resources that it uses.
+3. **Rate.** An attenuated and truncated Shannon formula (3GPP TR 36.942), with a calibrated factor per cell.
+4. **Load.** The load of a cell is the sum of user demand divided by user rate. Steps 2 to 4 repeat until the loads are a fixed point.
+5. **Throughput.** Full buffer: $R/n$. Elastic traffic: $R(1-\rho)$.
+6. **Handover.** A layer-3 filter and event A3 with time to trigger, along each trajectory.
+
+```math
+\mathrm{SINR}_u(\boldsymbol{\rho}) = \frac{S_u}{\sum_{j \ne c^*} \rho_j I_{j,u} + N}, \qquad
+\rho_c = \min\!\left(1, \sum_{u \in c} \frac{d_u}{R_u(\boldsymbol{\rho})}\right), \qquad
+T_u = R_u (1 - \rho_c)
+```
+
+> **Example: 25 % more traffic.**
+> Two symmetric 100 MHz cells. Each user receives −90 dBm from its cell and −96 dBm from the other cell. The noise is −122.2 dBm per resource element.
+> With a demand of 80 Mbit/s per cell, the fixed point is $\rho \approx 0.50$, SINR ≈ 9.0 dB, and throughput ≈ 80 Mbit/s.
+> With 100 Mbit/s per cell, $\rho \approx 0.74$, SINR ≈ 7.3 dB, and throughput ≈ 35.6 Mbit/s. The throughput decreases by 56 %, because the load of each cell decreases the SINR of the other cell.
+
+| Change | New trace |
+|---|---|
+| Offset, power, handover parameters, cell on/off | No. The change is in the RAN config |
+| Traffic, number of users, trajectories | No. The change is in the scenario |
+| Tilt, azimuth, or antenna of one cell, or a new site | Yes. From release 0.3, only for the changed transmitters |
+| Geometry, materials, ray count | Yes, for all transmitters |
+
+The result of a run is a time series in Zarr: user positions, serving cells, RSRP, SINR, throughput, cell load, and handover events. A static scenario has one time step. A viewer can therefore replay a scenario and show the users and the cells at each step.
+
+The layer ranks scenarios. It does not predict the absolute throughput of one user, because the radio map has no fast fading and no beamforming gain of the data channel, and schedulers differ between vendors. It needs MDT with RSRP (M1). Throughput (M5) and PM counters improve the rate model. RayTwin accepts only pseudonymous trace ids.
+
 ## Getting started
 
 Not available yet. The project is in the design phase and the repository has no code. Install and run instructions will be part of release 0.1. See [Roadmap](#roadmap).
@@ -772,7 +858,7 @@ Not available yet. [Components](#components) describes the planned crate layout.
 
 ## Testing
 
-Not available yet. The planned validation is the four gates in [Roadmap](#roadmap). CI will compare each physics change with Sionna RT 2.2.0 as a reference oracle. GPU tests will run on a self-hosted runner only for trusted pull requests, or for a fork after the owner adds the `gpu-ok` label ([ADR 0010](docs/adr/0010-trusted-pull-requests-on-the-gpu-runner.md)).
+Not available yet. The planned validation is the four gates in [Roadmap](#roadmap). CI will compare each physics change with Sionna RT 2.2.0 as a reference oracle. GPU tests will run on a self-hosted runner only for trusted pull requests, or for a fork after the owner adds the `gpu-ok` label ([D-10](docs/architecture/ARCHITECTURE.md#10-decisions-and-rationale)).
 
 ## Build and deployment
 
@@ -863,7 +949,9 @@ flowchart TD
 | Materials | Class prior + δ grid in Zarr | Hash encoding or MLP, priors from images |
 | Scene loading | Mitsuba XML + PLY from local disk, S3, MinIO | glTF, CityGML, automatic OSM, geometry updates from images |
 | Execution | CPU (rayon) and GPU (wgpu) on Linux and Windows. Coordinator and workers on NATS JetStream. Docker Compose + MinIO. | GPU on macOS (Metal) and DX12, GPU performance tuning, Kubernetes, autoscaling |
-| API and release | Rust crates. Python (PyO3) with native API and `raytwin.compat`. NATS job protocol (submit, watch, cancel). Wheels for Linux, macOS, Windows. Public release 0.1. | gRPC or REST gateway, plugin API |
+| API and release | Rust crates. Python (PyO3) with native API and `raytwin.compat`. NATS job protocol (submit, watch, cancel). Wheels for Linux, macOS, Windows. Public release 0.1. | gRPC or REST gateway. Plugin API from release 0.2 |
+| Service quality | Canonical MDT schema with optional service-quality columns. RAN config. RSRP through the measurement operator | Release 0.2: association, cell load, throughput, handover, replay, scenarios from MDT. Release 0.3: SON loop |
+| Viewer and interaction | 3D viewer in Jupyter, glTF export, self-describing results, configuration readable from Python | Release 0.2: edits as config deltas, history, rollback. Later: a web UI for planning engineers |
 | Calibration | Twin experiment with simulated MDT. Optimization with PyTorch. | Real MDT import (CSV/Parquet, position filter), continuous calibration, joint CM and material calibration |
 | Multi-band | Several FR1 bands in one trace. ITU materials with valid-range checks. Antennas per (cell, band). Band axis in maps. | FR2-1 and FR2-2, wideband split into sub-frequencies, calibrated materials below 1 GHz |
 
@@ -872,6 +960,20 @@ flowchart TD
 1. First-order UTD diffraction and diffuse scattering for the CIR.
 2. GPU performance tuning and GPU on macOS.
 3. FR2: materials above 40 GHz, atmospheric loss (ITU-R P.676-13), diffuse scattering, and more detailed geometry.
+4. Release 0.2: service-quality simulation from MDT, the plugin API, and edits with history and rollback.
+5. Release 0.3: antenna-pattern and material tables, scene importers, and a SON loop that traces again only the changed transmitters.
+
+### Interactive planning
+
+A later phase adds a user interface for planning engineers. The design already keeps these extension points open ([TR §19](docs/technical-report.html#tuong-tac)):
+
+- Edits are config deltas with a history and a rollback.
+- Each transmitter has an independent result, so an edit traces only the changed transmitters.
+- Cells, transmitters, users, scenarios, and jobs have stable ids.
+- Results carry their grid and coordinate reference. JSON Schemas describe the documents that a client writes.
+- The viewer exports glTF, and service-quality results are time series that a UI can replay.
+
+Before a UI, RayTwin needs authentication and TLS for its protocol, presigned URLs for the object store, and a catalog of scenarios.
 
 ## License
 
@@ -886,3 +988,10 @@ MIT — see [LICENSE](LICENSE).
 - J. Hoydis et al., "Learning Radio Environments by Differentiable Ray Tracing", IEEE TMLCN, 2024. <https://arxiv.org/abs/2311.18558>
 - A. Wirgin, "The inverse crime", 2004. <https://arxiv.org/abs/math-ph/0401050>
 - J. Amanatides and A. Woo, "A Fast Voxel Traversal Algorithm for Ray Tracing", Eurographics, 1987.
+- 3GPP TS 37.320, §5.4.1.1, Immediate MDT measurements for NR. <https://itecspec.com/3gpp/37.320/s/5.4.1.1>
+- 3GPP TS 38.215, §5.1.1 and §5.1.3, SS-RSRP and SS-RSRQ. <https://itecspec.com/3gpp/38.215/s/5.1.1>
+- 3GPP TS 38.331, §5.5.3.2 and §5.5.4.4, layer-3 filtering and event A3. <https://itecspec.com/3gpp/38.331/s/5.5.4.4>
+- 3GPP TR 36.942, Annex A.1, attenuated and truncated Shannon bound. <https://www.itecspec.com/3gpp/36.942/s/a.1>
+- I. Siomina and D. Yuan, "Analysis of Cell Load Coupling for LTE Network Planning and Optimization", IEEE TWC, 2012. <https://arxiv.org/abs/1201.4116>
+- T. Bonald et al., "Flow-level performance and capacity of wireless networks with user mobility", Queueing Systems, 2009.
+- PyPA, Entry points specification. <https://packaging.python.org/specifications/entry-points>

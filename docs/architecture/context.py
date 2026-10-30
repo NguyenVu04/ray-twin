@@ -17,7 +17,7 @@ with Diagram(
     direction="LR",
 ):
     users = Users("researchers and\nSON applications")
-    measurements = Storage("measurement data\nMDT and CM\n(simulated in the MVP)")
+    measurements = Storage("measurement data\nMDT, PM and CM\n(simulated in the MVP)")
 
     with Cluster("RayTwin"):
         system = Server("RayTwin")
@@ -27,7 +27,7 @@ with Diagram(
     ci = GithubActions("CI with the\nreference oracle")
 
     users >> Edge(label="manifests, jobs, results") >> system
-    measurements >> Edge(label="calibration input") >> system
+    measurements >> Edge(label="calibration and scenario input") >> system
     system >> Edge(label="reads inputs, writes results") >> object_store
     system >> Edge(label="tasks, events, job state", style="dashed") >> broker
     ci >> Edge(label="compares each pull request") >> system
