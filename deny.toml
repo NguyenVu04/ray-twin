@@ -42,7 +42,8 @@ targets = [
 # If true, metadata will be collected with `--all-features`. Note that this can't
 # be toggled off if true, if you want to conditionally enable `--all-features` it
 # is recommended to pass `--all-features` on the cmd line instead
-all-features = false
+# True, so the check covers the `gpu` feature of raytwin-core and its `wgpu` ban
+all-features = true
 # If true, metadata will be collected with `--no-default-features`. The same
 # caveat with `all-features` applies
 no-default-features = false
@@ -89,9 +90,14 @@ ignore = [
 # See https://spdx.org/licenses/ for list of possible licenses
 # [possible values: any SPDX 3.11 short identifier (+ optional exception)].
 allow = [
-    #"MIT",
-    #"Apache-2.0",
-    #"Apache-2.0 WITH LLVM-exception",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "ISC",
+    "MIT",
+    "Unicode-3.0",
+    "Unlicense",
+    "Zlib",
 ]
 # The confidence threshold for detecting a license from license text.
 # The higher the value, the more closely the license text must be to the
@@ -175,6 +181,14 @@ deny = [
     # Wrapper crates can optionally be specified to allow the crate when it
     # is a direct dependency of the otherwise banned crate
     #{ crate = "ansi_term@0.11.0", wrappers = ["this-crate-directly-depends-on-ansi_term"] },
+    # Crate rules of ARCHITECTURE §6.2. `wrappers` are the only crates that may
+    # depend directly on the banned crate.
+    { crate = "wgpu", wrappers = ["raytwin-core"], reason = "only backend::gpu of raytwin-core uses the GPU (ARCHITECTURE §6.2 rule 2)" },
+    { crate = "pyo3", wrappers = ["raytwin-py"], reason = "only the binding crate uses Python (ARCHITECTURE §6.2 rules 1, 3, 4)" },
+    { crate = "tokio", wrappers = ["raytwin-store", "raytwin-dist"], reason = "only store and dist are asynchronous (ARCHITECTURE §6.2 rule 1, P-05)" },
+    { crate = "object_store", wrappers = ["raytwin-store"], reason = "only raytwin-store accesses the object store (ARCHITECTURE §6.2 rule 1, §6.5)" },
+    { crate = "async-nats", wrappers = ["raytwin-dist"], reason = "only raytwin-dist uses NATS (ARCHITECTURE §6.2 rule 1, §6.6)" },
+    { crate = "zarrs", wrappers = ["raytwin-store"], reason = "only raytwin-store reads and writes Zarr (ARCHITECTURE §6.2 rule 1, §6.5)" },
 ]
 
 # List of features to allow/deny
